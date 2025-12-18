@@ -1,0 +1,25 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "welcome": "HiNobody에 오신 것을 환영합니다",
+    "description": "Next.js + NestJS with TypeScript"
+  },
+  "eyeMasking": {
+    "title": "눈 감지 및 마스킹 도구",
+    "uploadImage": "이미지 업로드",
+    "auto": "자동",
+    "manual": "수동",
+    "uploadMaskedImage": "마스킹된 이미지 업로드",
+    "loadingTool": "눈 마스킹 도구 로딩 중..."
+  },
+  "language": {
+    "switch": "언어 변경",
+    "english": "영어",
+    "korean": "한국어",
+    "chinese": "중국어",
+    "japanese": "일본어"
+  }
+}
+
+
+

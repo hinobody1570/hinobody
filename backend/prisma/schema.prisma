@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  nickname     String    @unique
+  language     Language  @default(EN)
+  role         UserRole  @default(USER)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  blockedBy    Block[]   @relation("Blocked")
+  blockedUsers Block[]   @relation("Blocker")
+  comments     Comment[]
+  images       Image[]
+  posts        Post[]
+  reports      Report[]  @relation("UserReports")
+  votes        Vote[]
+
+  @@index([email])
+  @@index([nickname])
+  @@map("users")
+}
+
+model Board {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+
+  @@map("boards")
+}
+
+model Post {
+  id               String    @id @default(cuid())
+  title            String
+  body             String
+  originalLanguage Language
+  authorId         String
+  boardId          String
+  isActive         Boolean   @default(true)
+  isDeleted        Boolean   @default(false)
+  upvoteCount      Int       @default(0)
+  downvoteCount    Int       @default(0)
+  commentCount     Int       @default(0)
+  viewCount        Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  comments         Comment[]
+  images           Image[]
+  author           User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  board            Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  reports          Report[]  @relation("ReportedPosts")
+  votes            Vote[]
+
+  @@index([boardId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([isActive, isDeleted])
+  @@index([title, body])
+  @@map("posts")
+}
+
+model Comment {
+  id               String    @id @default(cuid())
+  body             String
+  originalLanguage Language
+  postId           String
+  authorId         String
+  parentId         String?
+  isActive         Boolean   @default(true)
+  isDeleted        Boolean   @default(false)
+  upvoteCount      Int       @default(0)
+  downvoteCount    Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  author           User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent           Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies          Comment[] @relation("CommentReplies")
+  post             Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reports          Report[]  @relation("ReportedComments")
+  votes            Vote[]
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@index([body])
+  @@map("comments")
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  type      VoteType
+  userId    String
+  postId    String?
+  commentId String?
+  createdAt DateTime @default(now())
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+  @@index([postId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("votes")
+}
+
+model Report {
+  id           String       @id @default(cuid())
+  reason       String
+  status       ReportStatus @default(PENDING)
+  reportedById String
+  postId       String?
+  commentId    String?
+  createdAt    DateTime     @default(now())
+  reviewedAt   DateTime?
+  reviewedBy   String?
+  comment      Comment?     @relation("ReportedComments", fields: [commentId], references: [id], onDelete: Cascade)
+  post         Post?        @relation("ReportedPosts", fields: [postId], references: [id], onDelete: Cascade)
+  reportedBy   User         @relation("UserReports", fields: [reportedById], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([postId])
+  @@index([commentId])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+  blocked   User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  blocker   User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+  @@map("blocks")
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  key       String
+  postId    String?
+  userId    String
+  size      Int?
+  mimeType  String?
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("images")
+}
+
+enum Language {
+  KO
+  EN
+  ZH
+  JA
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  DISMISSED
+}

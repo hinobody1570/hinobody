@@ -1,0 +1,25 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "welcome": "Welcome to HiNobody",
+    "description": "Next.js + NestJS with TypeScript"
+  },
+  "eyeMasking": {
+    "title": "Eye Detection & Masking Tool",
+    "uploadImage": "Upload Image",
+    "auto": "Auto",
+    "manual": "Manual",
+    "uploadMaskedImage": "Upload Masked Image",
+    "loadingTool": "Loading Eye Masking Tool..."
+  },
+  "language": {
+    "switch": "Switch Language",
+    "english": "English",
+    "korean": "Korean",
+    "chinese": "Chinese",
+    "japanese": "Japanese"
+  }
+}
+
+
+

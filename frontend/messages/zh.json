@@ -1,0 +1,25 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "welcome": "欢迎来到 HiNobody",
+    "description": "Next.js + NestJS with TypeScript"
+  },
+  "eyeMasking": {
+    "title": "眼睛检测和遮罩工具",
+    "uploadImage": "上传图片",
+    "auto": "自动",
+    "manual": "手动",
+    "uploadMaskedImage": "上传遮罩图片",
+    "loadingTool": "正在加载眼睛遮罩工具..."
+  },
+  "language": {
+    "switch": "切换语言",
+    "english": "英语",
+    "korean": "韩语",
+    "chinese": "中文",
+    "japanese": "日语"
+  }
+}
+
+
+

@@ -1,0 +1,23 @@
+{
+  "name": "hinobody",
+  "version": "1.0.0",
+  "description": "HiNobody - Next.js + NestJS Monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm run start:prod"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
