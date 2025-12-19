@@ -33,6 +33,8 @@ cd frontend && npm install
 cd backend && npm install
 ```
 
+4. Add .env file with using .env.example
+
 ## Development
 
 ### Run both frontend and backend:
