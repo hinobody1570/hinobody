@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +22,12 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  // Global response interceptor - standardizes all API responses
+  app.useGlobalInterceptors(new TransformInterceptor());
+
+  // Global exception filter - standardizes all error responses
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Swagger configuration
   const config = new DocumentBuilder()
@@ -41,6 +49,7 @@ async function bootstrap() {
     .addTag('Users', 'User management')
     .addTag('Boards', 'Board management')
     .addTag('Posts', 'Post management')
+    .addTag('S3', 'AWS S3 file management')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
