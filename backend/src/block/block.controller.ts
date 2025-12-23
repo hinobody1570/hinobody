@@ -3,6 +3,7 @@ import { BlockService } from './block.service';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('blocks')
 export class BlockController {
@@ -10,6 +11,7 @@ export class BlockController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   create(@Body() createBlockDto: CreateBlockDto, @GetUser('id') userId: string) {
     return this.blockService.create(createBlockDto, userId);
   }

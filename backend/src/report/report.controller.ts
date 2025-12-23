@@ -15,6 +15,7 @@ import { UpdateReportDto } from './dto/update-report.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ReportStatus } from '@prisma/client';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('reports')
 export class ReportController {
@@ -22,6 +23,7 @@ export class ReportController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   create(@Body() createReportDto: CreateReportDto, @GetUser('id') userId: string) {
     return this.reportService.create(createReportDto, userId);
   }

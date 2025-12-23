@@ -12,6 +12,7 @@ import { PostModule } from './post/post.module';
 import { ReportModule } from './report/report.module';
 import { UserModule } from './user/user.module';
 import { S3Module } from './s3/s3.module';
+import { EmailModule } from './email/email.module';
 
 
 @Module({
@@ -21,6 +22,7 @@ import { S3Module } from './s3/s3.module';
       envFilePath: '.env',
     }) as any,
     PrismaModule,
+    EmailModule,
     UserModule,
     AuthModule,
     BlockModule,

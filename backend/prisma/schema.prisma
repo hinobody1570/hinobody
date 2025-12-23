@@ -8,25 +8,31 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  passwordHash String
-  nickname     String    @unique
-  language     Language  @default(EN)
-  role         UserRole  @default(USER)
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  blockedBy    Block[]   @relation("Blocked")
-  blockedUsers Block[]   @relation("Blocker")
-  comments     Comment[]
-  images       Image[]
-  posts        Post[]
-  reports      Report[]  @relation("UserReports")
-  votes        Vote[]
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  passwordHash         String
+  nickname             String    @unique
+  language             Language  @default(EN)
+  role                 UserRole  @default(USER)
+  isActive             Boolean   @default(true)
+  emailVerified        Boolean   @default(false)
+  emailVerificationOTP String?
+  otpExpiry            DateTime?
+  passwordResetToken   String?
+  passwordResetExpiry  DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  blockedBy            Block[]   @relation("Blocked")
+  blockedUsers         Block[]   @relation("Blocker")
+  comments             Comment[]
+  images               Image[]
+  posts                Post[]
+  reports              Report[]  @relation("UserReports")
+  votes                Vote[]
 
   @@index([email])
   @@index([nickname])
+  @@index([passwordResetToken])
   @@map("users")
 }
 

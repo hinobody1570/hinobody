@@ -12,6 +12,7 @@ export class BoardController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   create(@Body() createBoardDto: CreateBoardDto) {
     return this.boardService.create(createBoardDto);
   }

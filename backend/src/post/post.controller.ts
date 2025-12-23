@@ -25,6 +25,7 @@ export class PostController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new post' })
   @ApiResponse({ status: 201, description: 'Post successfully created' })
   create(@Body() createPostDto: CreatePostDto, @GetUser('id') userId: string) {
