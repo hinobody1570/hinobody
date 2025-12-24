@@ -30,18 +30,21 @@ export class ReportController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findAll(@Query('status') status?: ReportStatus) {
     return this.reportService.findAll(status);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findOne(@Param('id') id: string) {
     return this.reportService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   update(
     @Param('id') id: string,
     @Body() updateReportDto: UpdateReportDto,
@@ -56,6 +59,7 @@ export class ReportController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   remove(@Param('id') id: string) {
     return this.reportService.remove(id);
   }

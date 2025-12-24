@@ -25,22 +25,29 @@ export class ImageController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findAll() {
     return this.imageService.findAll();
   }
 
   @Get('post/:postId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findByPost(@Param('postId') postId: string) {
     return this.imageService.findByPost(postId);
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findOne(@Param('id') id: string) {
     return this.imageService.findOne(id);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   remove(@Param('id') id: string) {
     return this.imageService.remove(id);
   }

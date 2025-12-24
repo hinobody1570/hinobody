@@ -33,6 +33,8 @@ export class PostController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get all posts with pagination and filters' })
   @ApiQuery({ name: 'boardId', required: false, description: 'Filter by board ID' })
   @ApiQuery({ name: 'authorId', required: false, description: 'Filter by author ID' })
@@ -45,6 +47,8 @@ export class PostController {
   }
 
   @Get('feed')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get home feed (all boards combined)' })
   @ApiResponse({ status: 200, description: 'Home feed posts' })
   getHomeFeed(@Query() query: QueryPostsDto) {
@@ -52,12 +56,15 @@ export class PostController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findOne(@Param('id') id: string) {
     return this.postService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
@@ -68,6 +75,7 @@ export class PostController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   remove(
     @Param('id') id: string,
     @GetUser('id') userId: string,

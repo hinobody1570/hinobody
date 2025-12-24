@@ -18,18 +18,21 @@ export class BlockController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findAll(@GetUser('id') userId: string) {
     return this.blockService.findAll(userId);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findOne(@Param('id') id: string) {
     return this.blockService.findOne(id);
   }
 
   @Delete(':blockedId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   remove(@Param('blockedId') blockedId: string, @GetUser('id') userId: string) {
     return this.blockService.remove(blockedId, userId);
   }

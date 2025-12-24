@@ -27,17 +27,22 @@ export class CommentController {
   }
 
   @Get('post/:postId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findByPost(@Param('postId') postId: string) {
     return this.commentService.findByPost(postId);
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   findOne(@Param('id') id: string) {
     return this.commentService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   update(
     @Param('id') id: string,
     @Body() updateCommentDto: UpdateCommentDto,
@@ -48,6 +53,7 @@ export class CommentController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   remove(
     @Param('id') id: string,
     @GetUser('id') userId: string,
