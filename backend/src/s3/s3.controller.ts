@@ -42,7 +42,7 @@ export class S3Controller {
         folder: {
           type: 'string',
           description: 'Optional folder path in S3 bucket',
-          example: 'images',
+          example: 'uploads/contractor',
         },
       },
     },
