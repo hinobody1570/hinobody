@@ -10,6 +10,8 @@
  * - 'public-redirect-if-auth': Public route that redirects authenticated users (e.g., login/register)
  */
 
+import { ROUTE_ACCESS, ROUTE_PATHS } from "./paths";
+
 export type RouteAccess = 'public' | 'private' | 'public-redirect-if-auth';
 
 export interface RouteConfig {
@@ -27,45 +29,49 @@ export interface RouteConfig {
 export const routesConfig: RouteConfig[] = [
   // Public Routes
   {
-    path: '/',
-    access: 'public',
+    path: ROUTE_PATHS.DEFAULT,
+    access: ROUTE_ACCESS.PUBLIC,
   },
   {
-    path: '/about',
-    access: 'public',
+    path: ROUTE_PATHS.ABOUT,
+    access: ROUTE_ACCESS.PUBLIC,
   },
   {
-    path: '/dummy-example',
-    access: 'public',
+    path: ROUTE_PATHS.DUMMY_EXAMPLE,
+    access: ROUTE_ACCESS.PUBLIC,
+  },
+  {
+    path: ROUTE_PATHS.HOME,
+    access: ROUTE_ACCESS.PUBLIC,
   },
   
   // Public Routes that redirect if authenticated
   {
-    path: '/login',
-    access: 'public-redirect-if-auth',
-    redirectTo: '/dashboard',
+    path: ROUTE_PATHS.LOGIN,
+    access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
+    redirectTo: ROUTE_PATHS.DASHBOARD,
   },
   {
-    path: '/register',
-    access: 'public-redirect-if-auth',
-    redirectTo: '/dashboard',
+    path: ROUTE_PATHS.REGISTER,
+    access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
+    redirectTo: ROUTE_PATHS.DASHBOARD,
   },
   
   // Private Routes (require authentication)
   {
-    path: '/dashboard',
-    access: 'private',
-    redirectTo: '/login',
+    path: ROUTE_PATHS.DASHBOARD,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
-    path: '/profile',
-    access: 'private',
-    redirectTo: '/login',
+    path: ROUTE_PATHS.PROFILE,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
-    path: '/settings',
-    access: 'private',
-    redirectTo: '/login',
+    path: ROUTE_PATHS.SETTINGS,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
 ];
 
@@ -89,7 +95,7 @@ export function getRouteConfig(path: string): RouteConfig | undefined {
  */
 export function isPrivateRoute(path: string): boolean {
   const config = getRouteConfig(path);
-  return config?.access === 'private';
+  return config?.access == ROUTE_ACCESS.PRIVATE;
 }
 
 /**
@@ -99,7 +105,7 @@ export function isPrivateRoute(path: string): boolean {
  */
 export function isPublicRoute(path: string): boolean {
   const config = getRouteConfig(path);
-  return config?.access === 'public' || config?.access === 'public-redirect-if-auth';
+  return config?.access == ROUTE_ACCESS.PUBLIC || config?.access == ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH;
 }
 
 /**
