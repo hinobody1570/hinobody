@@ -3,6 +3,8 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import type { Metadata, Viewport } from 'next';
+import { AuthProvider } from '@/contexts/AuthContext';
+import RouteGuard from '@/routes/RouteGuard';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -72,7 +74,11 @@ export default async function LocaleLayout({
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <AuthProvider>
+            <RouteGuard>
+              {children}
+            </RouteGuard>
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>
