@@ -75,9 +75,8 @@ export const routesConfig: RouteConfig[] = [
  * @returns RouteConfig or undefined if not found
  */
 export function getRouteConfig(path: string): RouteConfig | undefined {
-  // Normalize path (remove locale, trailing slashes, etc.)
+  // Normalize path (remove trailing slashes, etc.)
   const normalizedPath = path
-    .replace(/^\/(en|ko|zh|ja)/, '') // Remove locale prefix
     .replace(/\/$/, '') || '/'; // Remove trailing slash, default to '/'
   
   return routesConfig.find(route => route.path === normalizedPath);

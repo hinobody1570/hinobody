@@ -1,19 +1,16 @@
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default createMiddleware(routing);
+// Middleware - no locale in URL, just pass through
+// Locale is handled via localStorage/cookie in the app
+export default function middleware(request: NextRequest) {
+  // Just pass through - no locale handling needed
+  return NextResponse.next();
+}
 
 export const config = {
-  // Match only internationalized pathnames
+  // Match all pathnames except static files and API routes
   matcher: [
-    // Enable a redirect to a matching locale at the root
-    '/',
-    
-    // Set a cookie to remember the user's locale
-    '/(ko|en|zh|ja)/:path*',
-    
-    // Enable redirects that add missing locales
-    // (e.g. `/pathnames` -> `/en/pathnames`)
+    // Match all paths except Next.js internals and static files
     '/((?!_next|_vercel|.*\\..*).*)'
   ]
 };

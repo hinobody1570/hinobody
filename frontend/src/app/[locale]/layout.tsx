@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import type { Metadata, Viewport } from 'next';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import RouteGuard from '@/routes/RouteGuard';
 import '../globals.css';
 
@@ -74,11 +75,13 @@ export default async function LocaleLayout({
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <AuthProvider>
-            <RouteGuard>
-              {children}
-            </RouteGuard>
-          </AuthProvider>
+          <LanguageProvider initialLocale={locale as any}>
+            <AuthProvider>
+              <RouteGuard>
+                {children}
+              </RouteGuard>
+            </AuthProvider>
+          </LanguageProvider>
         </NextIntlClientProvider>
       </body>
     </html>
