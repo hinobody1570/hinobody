@@ -15,7 +15,7 @@ const LoadingComponent = () => {
 };
 
 // Dynamically import the component to prevent SSR issues with MediaPipe/TensorFlow
-const EyeMaskingForm = dynamic(() => import("@/pages/EyeMaskingForm"), {
+const EyeMaskingForm = dynamic(() => import("@/components/EyeMaskingForm"), {
   ssr: false,
   loading: LoadingComponent,
 });

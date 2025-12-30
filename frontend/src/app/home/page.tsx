@@ -1,9 +1,12 @@
+import { RedditHeader } from '@/components/topHeader/TopHeader'
 import React from 'react'
 
-const Home = () => {
+const HomePage = () => {
   return (
-    <div>Home</div>
+    <div>
+      <RedditHeader />
+    </div>
   )
 }
 
-export default Home
+export default HomePage
