@@ -9,6 +9,7 @@ import { Avatar } from "../reuseComponents/Avatar";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { VscDiffAdded } from "react-icons/vsc";
 import { BsBadgeAd, BsBell } from "react-icons/bs";
+import LanguageSwitcher from "../LanguageSwitcher";
 
 export const RedditHeader = () => {
   const headerActions = [
@@ -29,6 +30,7 @@ export const RedditHeader = () => {
         </div>
 
         <div className="flex items-center gap-4">
+          <LanguageSwitcher />
           {headerActions.map((action, index) => (
             <IconButton
               key={index}

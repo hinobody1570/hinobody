@@ -1,0 +1,23 @@
+import Image from "next/image";
+
+export const RecentPostCard = ({ post }: any) => {
+  return (
+    <div className="mb-4 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors" style={{ padding: "2px", marginBottom: "4px" }}>
+      <div className="flex items-start gap-2 mb-2" style={{ marginBottom: "2px" }}>
+        <Image src={post.avatar} alt={post.community} className="w-5 h-5 rounded-full" />
+        <div className="flex-1">
+          <span className="text-xs text-gray-600">
+            {post.community} • {post.timestamp}
+          </span>
+        </div>
+      </div>
+      <p className="text-sm font-medium text-gray-900 mb-2" style={{ marginBottom: "2px" }}>
+        {post.title}
+      </p>
+      <div className="flex items-center gap-3 text-xs text-gray-500">
+        <span>{post.upvotes} upvotes</span>
+        <span>{post.comments} comments</span>
+      </div>
+    </div>
+  );
+};
