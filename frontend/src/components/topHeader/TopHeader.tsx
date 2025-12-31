@@ -1,16 +1,14 @@
 "use client";
 
-import React from "react";
-import { Logo } from "../reuseComponents/Logo";
-import { SearchBar } from "../reuseComponents/SearchBar";
-import { IconButton } from "../reuseComponents/NavBarIconButton";
-import { Avatar } from "../reuseComponents/Avatar";
 import { useTranslations } from "next-intl";
-
+import { BsBadgeAd, BsBell } from "react-icons/bs";
 import { LuMessageCircleMore } from "react-icons/lu";
 import { VscDiffAdded } from "react-icons/vsc";
-import { BsBadgeAd, BsBell } from "react-icons/bs";
 import LanguageSwitcher from "../LanguageSwitcher";
+import { Avatar } from "../reuseComponents/Avatar";
+import { Logo } from "../reuseComponents/Logo";
+import { IconButton } from "../reuseComponents/NavBarIconButton";
+import { SearchBar } from "../reuseComponents/SearchBar";
 
 export const RedditHeader = () => {
   const t = useTranslations('header');

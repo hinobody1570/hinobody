@@ -1,9 +1,6 @@
 import RedditFeed from "@/components/feedSection/FeedSection";
 import RedditSidebar from "@/components/sidebar/Sidebar";
 import { RedditHeader } from "@/components/topHeader/TopHeader";
-import React from "react";
-
-const HEADER_HEIGHT = "64px"; // match your header height
 
 const HomePage = () => {
   return (

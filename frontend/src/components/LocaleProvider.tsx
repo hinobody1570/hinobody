@@ -2,7 +2,7 @@
 
 import { NextIntlClientProvider } from 'next-intl';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // Load all locale messages
 const messagesCache: Record<string, any> = {};

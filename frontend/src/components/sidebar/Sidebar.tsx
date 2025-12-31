@@ -1,26 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { BiBarChartSquare } from "react-icons/bi";
+import { CgArrowTopRightO } from "react-icons/cg";
+import { FaBars, FaPlus } from "react-icons/fa6";
 import {
   IoIosHelpCircleOutline,
+  IoLogoCodepen,
+  IoMdSettings,
 } from "react-icons/io";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { CgArrowTopRightO } from "react-icons/cg";
-import { PiCirclesThree, PiClockCountdownLight } from "react-icons/pi";
-import { BiBarChartSquare } from "react-icons/bi";
-import { FaPlus, FaBars } from "react-icons/fa6";
-import { IoMdSettings } from "react-icons/io";
+import { IoBagRemoveSharp, IoHomeOutline } from "react-icons/io5";
 import { LuSmilePlus } from "react-icons/lu";
 import { MdCampaign } from "react-icons/md";
-import { IoLogoCodepen } from "react-icons/io";
-import { VscBook } from "react-icons/vsc";
-import { IoBagRemoveSharp, IoHomeOutline } from "react-icons/io5";
+import { PiCirclesThree, PiClockCountdownLight } from "react-icons/pi";
 import { TbMicrophone2 } from "react-icons/tb";
-
-import { MenuItem } from "../reuseComponents/MenuItem";
-import { CollapsibleSection } from "../reuseComponents/CollapseItems";
+import { VscBook } from "react-icons/vsc";
 import { FaRegUserCircle } from "react-icons/fa";
+import { CollapsibleSection } from "../reuseComponents/CollapseItems";
+import { MenuItem } from "../reuseComponents/MenuItem";
 
 /* ---------------- DATA CONFIG ---------------- */
 

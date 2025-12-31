@@ -1,16 +1,15 @@
 "use client";
 
-import React from "react";
 import { useTranslations } from "next-intl";
+import { CiCalendar } from "react-icons/ci";
+import { IoChevronDown } from "react-icons/io5";
+import { PostCard } from "../reuseComponents/PostCard";
+import { RecentPostCard } from "../reuseComponents/RecentPostCard";
+import DP from "./../../../public/assets/images/avatar_default_4.png";
 import POST_1 from "./../../../public/assets/images/post_1.webp";
 import POST_2 from "./../../../public/assets/images/post_2.webp";
 import POST_3 from "./../../../public/assets/images/post_3.webp";
 import POST_4 from "./../../../public/assets/images/post_4.png";
-import DP from "./../../../public/assets/images/avatar_default_4.png";
-import { IoChevronDown } from "react-icons/io5";
-import { CiCalendar } from "react-icons/ci";
-import { PostCard } from "../reuseComponents/PostCard";
-import { RecentPostCard } from "../reuseComponents/RecentPostCard";
 
 const dummyPosts = [
   {
