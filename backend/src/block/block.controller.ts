@@ -1,0 +1,42 @@
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
+import { BlockService } from './block.service';
+import { CreateBlockDto } from './dto/create-block.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
+
+@Controller('blocks')
+export class BlockController {
+  constructor(private readonly blockService: BlockService) {}
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  create(@Body() createBlockDto: CreateBlockDto, @GetUser('id') userId: string) {
+    return this.blockService.create(createBlockDto, userId);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  findAll(@GetUser('id') userId: string) {
+    return this.blockService.findAll(userId);
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  findOne(@Param('id') id: string) {
+    return this.blockService.findOne(id);
+  }
+
+  @Delete(':blockedId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  remove(@Param('blockedId') blockedId: string, @GetUser('id') userId: string) {
+    return this.blockService.remove(blockedId, userId);
+  }
+}
+
+
+

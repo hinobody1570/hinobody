@@ -3,6 +3,16 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { BlockModule } from './block/block.module';
+import { BoardModule } from './board/board.module';
+import { CommentModule } from './comment/comment.module';
+import { ImageModule } from './image/image.module';
+import { PostModule } from './post/post.module';
+import { ReportModule } from './report/report.module';
+import { UserModule } from './user/user.module';
+import { S3Module } from './s3/s3.module';
+import { EmailModule } from './email/email.module';
 
 
 @Module({
@@ -12,6 +22,16 @@ import { PrismaModule } from './prisma/prisma.module';
       envFilePath: '.env',
     }) as any,
     PrismaModule,
+    EmailModule,
+    UserModule,
+    AuthModule,
+    BlockModule,
+    BoardModule,
+    CommentModule,
+    ImageModule,
+    PostModule,
+    ReportModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
