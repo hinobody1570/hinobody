@@ -11,6 +11,10 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'HiNobody - Eye Detection & Masking Tool',
   description: 'Progressive Web App for eye detection and masking using AI',
+   icons: {
+    icon: '/assets/images/avatar_default_4.png',
+    apple: '/assets/images/avatar_default_4.png',
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
