@@ -1,7 +1,13 @@
+"use client";
+
 import { IoIosSearch } from "react-icons/io";
 import { PiIntersectThree } from "react-icons/pi";
+import { useTranslations } from "next-intl";
 
-export const SearchBar = ({ placeholder = "Find anything" }) => {
+export const SearchBar = ({ placeholder }: { placeholder?: string }) => {
+  const t = useTranslations('header');
+  const defaultPlaceholder = placeholder || t('findAnything');
+  
   return (
     <div className="relative flex-1 max-w-2xl">
       {/* Left search icon */}
@@ -13,7 +19,7 @@ export const SearchBar = ({ placeholder = "Find anything" }) => {
       <input
       style={{padding: "8px"}}  
         type="text"
-        placeholder={placeholder}
+        placeholder={defaultPlaceholder}
         className="
           w-full
           pl-12
@@ -49,7 +55,7 @@ export const SearchBar = ({ placeholder = "Find anything" }) => {
         "
       >
         <PiIntersectThree size={16} className="text-orange-600"/>
-        Ask
+        {t('ask')}
       </button>
     </div>
   );

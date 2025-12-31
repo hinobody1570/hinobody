@@ -1,10 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { FiMessageSquare, FiMoreHorizontal, FiShare2 } from "react-icons/fi";
 import { GoBell } from "react-icons/go";
 import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 
 export const PostCard = ({ post }: any) => {
+  const t = useTranslations('feed');
   const [upvotes, setUpvotes] = useState(post.upvotes);
   const [voteState, setVoteState] = useState<any>(null); // null, 'up', or 'down'
 
@@ -61,7 +65,7 @@ export const PostCard = ({ post }: any) => {
             className="px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors"
             style={{ padding: "4px" }}
           >
-            Join
+            {t('join')}
           </button>
           <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
             <FiMoreHorizontal size={20} className="text-gray-600" />
@@ -114,7 +118,7 @@ export const PostCard = ({ post }: any) => {
 
         <button style={{ padding: "2px" }} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
           <FiShare2 size={20} className="text-gray-600" />
-          <span className="text-sm font-semibold text-gray-800">Share</span>
+          <span className="text-sm font-semibold text-gray-800">{t('share')}</span>
         </button>
       </div>
     </article>

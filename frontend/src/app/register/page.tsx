@@ -13,7 +13,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const t = useTranslations('common');
+  const t = useTranslations('auth');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +32,7 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || 'Registration failed');
+        throw new Error(data.message || t('registrationFailed'));
       }
 
       setSuccess(true);
@@ -41,7 +41,7 @@ export default function RegisterPage() {
         router.push('/login');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message || t('registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-500 to-teal-600 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Register</h1>
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">{t('register')}</h1>
         
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -60,14 +60,14 @@ export default function RegisterPage() {
 
         {success && (
           <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-            Registration successful! Redirecting to login...
+            {t('registrationSuccessful')}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-1">
-              Nickname
+              {t('nickname')}
             </label>
             <input
               id="nickname"
@@ -76,13 +76,13 @@ export default function RegisterPage() {
               onChange={(e) => setNickname(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Your nickname"
+              placeholder={t('nicknamePlaceholder')}
             />
           </div>
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              {t('email')}
             </label>
             <input
               id="email"
@@ -91,13 +91,13 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="user@example.com"
+              placeholder={t('emailPlaceholder')}
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
+              {t('password')}
             </label>
             <input
               id="password"
@@ -107,7 +107,7 @@ export default function RegisterPage() {
               required
               minLength={6}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="At least 6 characters"
+              placeholder={t('passwordMinLength')}
             />
           </div>
 
@@ -116,15 +116,15 @@ export default function RegisterPage() {
             disabled={loading || success}
             className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Registering...' : success ? 'Success!' : 'Register'}
+            {loading ? t('registering') : success ? t('success') : t('register')}
           </button>
         </form>
 
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
-            Already have an account?{' '}
+            {t('alreadyHaveAccount')}{' '}
             <Link href="/login" className="text-green-600 hover:underline">
-              Login
+              {t('login')}
             </Link>
           </p>
         </div>

@@ -1,6 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export const RecentPostCard = ({ post }: any) => {
+  const t = useTranslations('feed');
+  
   return (
     <div className="mb-4 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors" style={{ padding: "2px", marginBottom: "4px" }}>
       <div className="flex items-start gap-2 mb-2" style={{ marginBottom: "2px" }}>
@@ -15,8 +20,8 @@ export const RecentPostCard = ({ post }: any) => {
         {post.title}
       </p>
       <div className="flex items-center gap-3 text-xs text-gray-500">
-        <span>{post.upvotes} upvotes</span>
-        <span>{post.comments} comments</span>
+        <span>{post.upvotes} {t('upvotes')}</span>
+        <span>{post.comments} {t('comments')}</span>
       </div>
     </div>
   );

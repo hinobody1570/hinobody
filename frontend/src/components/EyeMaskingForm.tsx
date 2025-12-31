@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import * as tf from "@tensorflow/tfjs";
 import { createDetector, SupportedModels } from "@tensorflow-models/face-landmarks-detection";
 import imageCompression from "browser-image-compression";
@@ -9,6 +10,7 @@ import "./EyeMaskingForm.css";
 import "@tensorflow/tfjs-backend-webgl";
 
 const EyeMaskingForm = () => {
+  const t = useTranslations('eyeMasking');
   const [imageFile, setImageFile] = useState<any>(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -272,7 +274,7 @@ const EyeMaskingForm = () => {
   // Automatic eye detection and masking
   const detectAndMaskEyes = async () => {
     if (!model || !canvasRef.current || !imagePreview) {
-      alert("Please wait for the model to load and select an image.");
+      alert(t('pleaseWaitForModel'));
       return;
     }
 
@@ -919,7 +921,7 @@ const EyeMaskingForm = () => {
     // const bucketName = import.meta.env.VITE_AWS_S3_BUCKET || "";
       const bucketName = ""
     if (!bucketName) {
-      throw new Error("AWS S3 bucket name not configured. Please set VITE_AWS_S3_BUCKET environment variable.");
+      throw new Error(t('awsBucketNotConfigured'));
     }
 
     const key = `masked-images/${Date.now()}-${fileName}`;
@@ -940,15 +942,15 @@ const EyeMaskingForm = () => {
     e.preventDefault();
 
     if (!imageFile) {
-      alert("Please select an image first.");
+      alert(t('pleaseSelectImage'));
       return;
     }
 
     if (masks.length === 0) {
       if (mode === "auto") {
-        alert('Please detect eyes first by clicking "Detect & Mask Eyes" button.');
+        alert(t('pleaseDetectEyes'));
       } else {
-        alert("Please create at least one mask by dragging on the image.");
+        alert(t('pleaseCreateMask'));
       }
       return;
     }
@@ -964,7 +966,7 @@ const EyeMaskingForm = () => {
       const maskedBlob = await getMaskedImageBlob();
 
       if (!maskedBlob) {
-        throw new Error("Failed to create masked image");
+        throw new Error(t('failedToCreateMaskedImage'));
       }
 
       console.log("✅ Masked image blob created successfully");
@@ -1027,11 +1029,11 @@ const EyeMaskingForm = () => {
 
   return (
     <div className="eye-masking-form-container">
-      <h1>Eye Detection & Masking Tool</h1>
+      <h1>{t('title')}</h1>
 
       <form onSubmit={handleSubmit} className="masking-form">
         <div className="form-group">
-          <label htmlFor="image-upload">Select Image:</label>
+          <label htmlFor="image-upload">{t('selectImage')}</label>
           <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} ref={fileInputRef} disabled={isProcessing} />
         </div>
 
@@ -1040,11 +1042,11 @@ const EyeMaskingForm = () => {
             <div className="mode-selector">
               <label>
                 <input type="radio" value="auto" checked={mode === "auto"} onChange={(e) => setMode(e.target.value)} disabled={isProcessing} />
-                Automatic (AI Detection)
+                {t('automaticDetection')}
               </label>
               <label>
                 <input type="radio" value="manual" checked={mode === "manual"} onChange={(e) => setMode(e.target.value)} disabled={isProcessing} />
-                Manual Masking
+                {t('manualMasking')}
               </label>
             </div>
 
@@ -1064,41 +1066,41 @@ const EyeMaskingForm = () => {
               {mode === "auto" && (
                 <>
                   <button type="button" onClick={detectAndMaskEyes} disabled={isProcessing || !model} className="btn btn-primary">
-                    {isProcessing ? "Detecting..." : "Detect & Mask Eyes"}
+                    {isProcessing ? t('detecting') : t('detectAndMaskEyes')}
                   </button>
                   {masks.length === 0 && !debugInfo.validationFailed && (
                     <p className="info-text">
-                      👆 Click "Detect & Mask Eyes" to automatically find and mask eyes. Then click "Upload Masked Image" below to save.
+                      {t('clickToDetect')}
                       <br />
-                      <small>⚠️ Note: Works best with clear, unobstructed eyes (no glasses).</small>
+                      <small>{t('noteNoGlasses')}</small>
                     </p>
                   )}
                   {debugInfo.validationFailed && (
                     <div className="validation-error">
-                      <strong>⚠️ Detection Failed</strong>
-                      <p>{debugInfo.detectionError || "Eyes not clearly detected"}</p>
+                      <strong>{t('detectionFailed')}</strong>
+                      <p>{debugInfo.detectionError || t('eyesNotDetected')}</p>
                       <p>
-                        Please use <strong>Manual Masking</strong> mode instead, or ensure eyes are clearly visible without glasses.
+                        {t('useManualMode')}
                       </p>
                     </div>
                   )}
                 </>
               )}
 
-              {mode === "manual" && <p className="manual-instructions">Click and drag on the image to create masks</p>}
+              {mode === "manual" && <p className="manual-instructions">{t('clickAndDrag')}</p>}
 
               {masks.length > 0 && (
                 <>
                   <button type="button" onClick={clearMasks} disabled={isProcessing} className="btn btn-secondary">
-                    Clear All Masks ({masks.length})
+                    {t('clearAllMasks')} ({masks.length})
                   </button>
 
                   <div className="masks-list">
                     {masks.map((mask: any, index: any) => (
                       <div key={index} className="mask-item">
-                        <span>Mask {index + 1}</span>
+                        <span>{t('mask')} {index + 1}</span>
                         <button type="button" onClick={() => removeMask(index)} className="btn-small">
-                          Remove
+                          {t('remove')}
                         </button>
                       </div>
                     ))}
@@ -1107,13 +1109,13 @@ const EyeMaskingForm = () => {
               )}
 
               <button type="submit" disabled={isProcessing || masks.length === 0} className="btn btn-success">
-                {isProcessing ? "Processing..." : "Upload Masked Image"}
+                {isProcessing ? t('processing') : t('uploadMaskedImageButton')}
               </button>
               {masks.length > 0 && (
                 <p className="info-text">
-                  ✅ {masks.length} mask(s) applied. Click "Upload Masked Image" to compress and upload to S3.
+                  {t('masksApplied', { count: masks.length })}
                   <br />
-                  <small>🔒 Original image stays in browser - only masked version is uploaded.</small>
+                  <small>{t('originalStaysInBrowser')}</small>
                 </p>
               )}
             </div>
@@ -1122,61 +1124,60 @@ const EyeMaskingForm = () => {
           </>
         )}
 
-        {!model && !debugInfo.modelError && <div className="loading-model">Loading AI model... Please wait.</div>}
+        {!model && !debugInfo.modelError && <div className="loading-model">{t('loadingModel')}</div>}
 
         {debugInfo.modelError && (
           <div className="model-error-notice">
-            <strong>⚠️ AI Model Not Available</strong>
-            <p>Error: {debugInfo.modelError}</p>
+            <strong>{t('modelNotAvailable')}</strong>
+            <p>{t('error')} {debugInfo.modelError}</p>
             <p>
-              You can still use <strong>Manual Masking</strong> mode to create masks by dragging on the image.
+              {t('canUseManualMode')}
             </p>
             <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary">
-              Retry Loading Model
+              {t('retryLoadingModel')}
             </button>
           </div>
         )}
       </form>
 
       <div className="privacy-notice">
-        <strong>Privacy Notice:</strong> Your original image is processed entirely in your browser and never stored. Only the masked image is uploaded
-        to AWS S3.
+        <strong>{t('privacyNotice')}</strong> {t('privacyDescription')}
       </div>
 
       {/* Debug Panel - Remove in production */}
       {Object.keys(debugInfo).length > 0 && (
         <div className="debug-panel">
-          <h3>🔍 Debug Information</h3>
+          <h3>{t('debugInformation')}</h3>
           <div className="debug-content">
             <p>
-              <strong>Model Status:</strong> {debugInfo.modelLoaded ? "✅ Loaded" : "❌ Not Loaded"}
+              <strong>{t('modelStatus')}</strong> {debugInfo.modelLoaded ? t('modelLoaded') : t('modelNotLoaded')}
             </p>
             {debugInfo.modelError && (
               <p>
-                <strong>Model Error:</strong> {debugInfo.modelError}
+                <strong>{t('modelError')}</strong> {debugInfo.modelError}
               </p>
             )}
             {debugInfo.imageLoaded && (
               <>
                 <p>
-                  <strong>Image:</strong> {debugInfo.imageName} ({(debugInfo.imageSize / 1024).toFixed(2)} KB)
+                  <strong>{t('image')}</strong> {debugInfo.imageName} ({(debugInfo.imageSize / 1024).toFixed(2)} KB)
                 </p>
               </>
             )}
             {debugInfo.facesDetected !== undefined && (
               <p>
-                <strong>Faces Detected:</strong> {debugInfo.facesDetected}
+                <strong>{t('facesDetected')}</strong> {debugInfo.facesDetected}
               </p>
             )}
             {debugInfo.masksCreated !== undefined && (
               <p>
-                <strong>Masks Created:</strong> {debugInfo.masksCreated}
+                <strong>{t('masksCreated')}</strong> {debugInfo.masksCreated}
               </p>
             )}
             {croppedMasks.length > 0 && (
               <>
                 <p>
-                  <strong>Cropped Regions:</strong> {croppedMasks.length}
+                  <strong>{t('croppedRegions')}</strong> {croppedMasks.length}
                 </p>
                 <div className="cropped-masks-preview">
                   {croppedMasks.map((cropped: any, idx) => (
@@ -1184,13 +1185,13 @@ const EyeMaskingForm = () => {
                       <img src={cropped.dataURL} alt={`Cropped mask ${idx + 1}`} className="cropped-preview-img" />
                       <div className="cropped-info">
                         <p>
-                          <strong>Mask {idx + 1}</strong>
+                          <strong>{t('mask')} {idx + 1}</strong>
                         </p>
                         <p>
-                          Position: ({cropped.x}, {cropped.y})
+                          {t('position')} ({cropped.x}, {cropped.y})
                         </p>
                         <p>
-                          Size: {cropped.width} × {cropped.height}px
+                          {t('size')} {cropped.width} × {cropped.height}px
                         </p>
                       </div>
                     </div>
@@ -1200,21 +1201,21 @@ const EyeMaskingForm = () => {
             )}
             {debugInfo.originalSize && (
               <p>
-                <strong>Compression:</strong> {debugInfo.originalSize} KB → {debugInfo.compressedSize} KB ({debugInfo.compressionRatio}% reduction)
+                <strong>{t('compression')}</strong> {debugInfo.originalSize} KB → {debugInfo.compressedSize} KB ({debugInfo.compressionRatio}% reduction)
               </p>
             )}
             {debugInfo.s3Key && (
               <p>
-                <strong>S3 Key:</strong> {debugInfo.s3Key}
+                <strong>{t('s3Key')}</strong> {debugInfo.s3Key}
               </p>
             )}
             {debugInfo.uploadError && (
               <p>
-                <strong>Upload Error:</strong> {debugInfo.uploadError}
+                <strong>{t('uploadError')}</strong> {debugInfo.uploadError}
               </p>
             )}
             <button type="button" onClick={() => setDebugInfo({})} className="btn btn-small">
-              Clear Debug Info
+              {t('clearDebugInfo')}
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   IoIosHelpCircleOutline,
 } from "react-icons/io";
@@ -23,40 +24,41 @@ import { FaRegUserCircle } from "react-icons/fa";
 
 /* ---------------- DATA CONFIG ---------------- */
 
-const MAIN_MENU = [
-  { icon: IoHomeOutline, label: "Home" },
-  { icon: CgArrowTopRightO, label: "Popular" },
-  { icon: PiCirclesThree, label: "Explore" },
-  { icon: BiBarChartSquare, label: "All" },
-  { icon: FaPlus, label: "Start a community" },
-];
-
-const GAMES_MENU = [
-  { icon: IoHomeOutline, label: "Farm Merge Valley" },
-  { icon: CgArrowTopRightO, label: "Quiz Planet" },
-  { icon: PiCirclesThree, label: "Sword & Supper" },
-  { icon: BiBarChartSquare, label: "Discover More Games" },
-];
-
-const RESOURCES_MENU = [
-  { icon: LuSmilePlus, label: "About Reddit" },
-  { icon: MdCampaign, label: "Advertise" },
-  { icon: IoLogoCodepen, label: "Developer Platform" },
-  {
-    icon: PiClockCountdownLight,
-    label: "Reddit Pro",
-    badge: "BETA",
-  },
-  { icon: IoIosHelpCircleOutline, label: "Help" },
-  { icon: VscBook, label: "Blog" },
-  { icon: IoBagRemoveSharp, label: "Careers" },
-  { icon: TbMicrophone2, label: "Press" },
-];
-
 /* ---------------- COMPONENT ---------------- */
 
 const RedditSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const t = useTranslations('sidebar');
+
+  const MAIN_MENU = [
+    { icon: IoHomeOutline, label: t('home') },
+    { icon: CgArrowTopRightO, label: t('popular') },
+    { icon: PiCirclesThree, label: t('explore') },
+    { icon: BiBarChartSquare, label: t('all') },
+    { icon: FaPlus, label: t('startCommunity') },
+  ];
+
+  const GAMES_MENU = [
+    { icon: IoHomeOutline, label: t('farmMergeValley') },
+    { icon: CgArrowTopRightO, label: t('quizPlanet') },
+    { icon: PiCirclesThree, label: t('swordSupper') },
+    { icon: BiBarChartSquare, label: t('discoverMoreGames') },
+  ];
+
+  const RESOURCES_MENU = [
+    { icon: LuSmilePlus, label: t('aboutReddit') },
+    { icon: MdCampaign, label: t('advertise') },
+    { icon: IoLogoCodepen, label: t('developerPlatform') },
+    {
+      icon: PiClockCountdownLight,
+      label: t('redditPro'),
+      badge: t('beta'),
+    },
+    { icon: IoIosHelpCircleOutline, label: t('help') },
+    { icon: VscBook, label: t('blog') },
+    { icon: IoBagRemoveSharp, label: t('careers') },
+    { icon: TbMicrophone2, label: t('press') },
+  ];
 
   return (
     <div className="flex">
@@ -75,7 +77,7 @@ const RedditSidebar = () => {
           </nav>
 
           {/* Games Section */}
-          <CollapsibleSection title="GAMES ON REDDIT">
+          <CollapsibleSection title={t('gamesOnReddit')}>
             <nav className="flex flex-col gap-2 mt-4">
               {GAMES_MENU.map((item, index) => (
                 <MenuItem key={index} {...item} />
@@ -84,17 +86,17 @@ const RedditSidebar = () => {
           </CollapsibleSection>
 
           {/* Custom Feeds */}
-          <CollapsibleSection title="CUSTOM FEEDS">
-            <MenuItem icon={FaPlus} label="Create Custom feed" />
+          <CollapsibleSection title={t('customFeeds')}>
+            <MenuItem icon={FaPlus} label={t('createCustomFeed')} />
           </CollapsibleSection>
 
           {/* Communities */}
-          <CollapsibleSection title="COMMUNITIES" defaultOpen>
-            <MenuItem icon={IoMdSettings} label="Manage Communities" />
+          <CollapsibleSection title={t('communities')} defaultOpen>
+            <MenuItem icon={IoMdSettings} label={t('manageCommunities')} />
           </CollapsibleSection>
 
           {/* Resources */}
-          <CollapsibleSection title="RESOURCES" defaultOpen>
+          <CollapsibleSection title={t('resources')} defaultOpen>
             <nav className="flex flex-col gap-2 mt-4">
               {RESOURCES_MENU.map((item, index) => (
                 <MenuItem key={index} {...item} />
@@ -104,7 +106,7 @@ const RedditSidebar = () => {
 
           {/* Bottom */}
           <div className="border-t border-gray-200 pt-2">
-            <MenuItem icon={FaRegUserCircle} label="Communities" />
+            <MenuItem icon={FaRegUserCircle} label={t('communities')} />
           </div>
         </div>
       </aside>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import POST_1 from "./../../../public/assets/images/post_1.webp";
 import POST_2 from "./../../../public/assets/images/post_2.webp";
 import POST_3 from "./../../../public/assets/images/post_3.webp";
@@ -90,6 +91,8 @@ const recentPosts = [
 ];
 
 export const RedditFeed = () => {
+  const t = useTranslations('feed');
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-4" style={{ padding: "4px", margin: "0 auto" }}>
@@ -102,7 +105,7 @@ export const RedditFeed = () => {
                 style={{ padding: "8px" }}
                 className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
               >
-                <span className="text-sm font-semibold">Best</span>
+                <span className="text-sm font-semibold">{t('best')}</span>
                 <IoChevronDown size={16} />
               </button>
               <button
@@ -124,8 +127,8 @@ export const RedditFeed = () => {
           <div className="lg:col-span-1">
             <div className="bg-white border border-gray-300 rounded-lg p-4 sticky top-8" style={{ padding: "20px" }}>
               <div className="flex items-center justify-between mb-4" style={{ marginBottom: "10px" }}>
-                <h3 className="text-sm font-semibold text-gray-600 uppercase">Recent Posts</h3>
-                <button className="text-sm text-blue-600 hover:underline font-semibold">Clear</button>
+                <h3 className="text-sm font-semibold text-gray-600 uppercase">{t('recentPosts')}</h3>
+                <button className="text-sm text-blue-600 hover:underline font-semibold">{t('clear')}</button>
               </div>
 
               <div className="space-y-2">
@@ -138,19 +141,19 @@ export const RedditFeed = () => {
               <div className="mt-6 pt-4 border-t border-gray-200" style={{ paddingTop: "6px" }}>
                 <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3" style={{ margin: "4px" }}>
                   <a href="#" className="hover:underline">
-                    Reddit Rules
+                    {t('redditRules')}
                   </a>
                   <a href="#" className="hover:underline">
-                    Privacy Policy
+                    {t('privacyPolicy')}
                   </a>
                   <a href="#" className="hover:underline">
-                    User Agreement
+                    {t('userAgreement')}
                   </a>
                   <a href="#" className="hover:underline">
-                    Accessibility
+                    {t('accessibility')}
                   </a>
                 </div>
-                <p className="text-xs text-gray-500">Reddit, Inc. © 2025. All rights reserved.</p>
+                <p className="text-xs text-gray-500">{t('redditCopyright')}</p>
               </div>
             </div>
           </div>

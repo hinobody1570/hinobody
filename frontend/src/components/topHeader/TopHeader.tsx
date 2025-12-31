@@ -5,6 +5,7 @@ import { Logo } from "../reuseComponents/Logo";
 import { SearchBar } from "../reuseComponents/SearchBar";
 import { IconButton } from "../reuseComponents/NavBarIconButton";
 import { Avatar } from "../reuseComponents/Avatar";
+import { useTranslations } from "next-intl";
 
 import { LuMessageCircleMore } from "react-icons/lu";
 import { VscDiffAdded } from "react-icons/vsc";
@@ -12,10 +13,12 @@ import { BsBadgeAd, BsBell } from "react-icons/bs";
 import LanguageSwitcher from "../LanguageSwitcher";
 
 export const RedditHeader = () => {
+  const t = useTranslations('header');
+  
   const headerActions = [
     { icon: BsBadgeAd, onClick: () => console.log("Ads") },
     { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
-    { icon: VscDiffAdded, label: "Create", onClick: () => console.log("Create") },
+    { icon: VscDiffAdded, label: t('create'), onClick: () => console.log("Create") },
     { icon: BsBell, onClick: () => console.log("Notifications") },
   ];
 
@@ -26,7 +29,7 @@ export const RedditHeader = () => {
         <Logo text="reddit" onClick={() => console.log("Logo clicked")} />
 
         <div className="flex-1 max-w-2xl">
-          <SearchBar placeholder="Find anything" />
+          <SearchBar placeholder={t('findAnything')} />
         </div>
 
         <div className="flex items-center gap-4">

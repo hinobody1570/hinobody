@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslations } from 'next-intl';
 import { getRouteConfig } from './routes.config';
 
 interface RouteGuardProps {
@@ -19,6 +20,7 @@ export default function RouteGuard({ children }: RouteGuardProps) {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations('common');
 
   useEffect(() => {
     // Wait for auth to load
@@ -59,7 +61,7 @@ export default function RouteGuard({ children }: RouteGuardProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
