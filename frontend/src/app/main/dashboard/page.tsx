@@ -45,7 +45,7 @@ export default function DashboardPage() {
               <h3 className="text-xl font-semibold mb-2">{t('profile')}</h3>
               <p className="mb-4">{t('manageAccount')}</p>
               <Link
-                href="/profile"
+                href="/main/profile"
                 className="inline-block bg-white text-purple-600 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
               >
                 {t('goToProfile')}
@@ -56,7 +56,7 @@ export default function DashboardPage() {
               <h3 className="text-xl font-semibold mb-2">{t('settings')}</h3>
               <p className="mb-4">{t('configurePreferences')}</p>
               <Link
-                href="/settings"
+                href="/main/settings"
                 className="inline-block bg-white text-green-600 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
               >
                 {t('goToSettings')}

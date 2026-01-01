@@ -9,11 +9,11 @@ export const ROUTE_PATHS = {
     DEFAULT: "/",
     LOGIN : '/login',
     REGISTER: "/register",
-    DASHBOARD: "/dashboard",
-    PROFILE: "/profile",
-    SETTINGS: "/settings",
-    ABOUT: "/about",
-    DUMMY_EXAMPLE : "/dummy-example",
-
-    HOME: "/home",
+    DASHBOARD: "/main/dashboard",
+    PROFILE: "/main/profile",
+    SETTINGS: "/main/settings",
+    ABOUT: "/main/about",
+    DUMMY_EXAMPLE : "/main/dummy-example",
+    CREATE_POST: "/main/create-post",
+    HOME: "/main/home",
 }

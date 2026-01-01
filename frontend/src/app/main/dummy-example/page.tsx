@@ -111,11 +111,11 @@ export default function DummyExamplePage() {
               {t('goToLogin')}
             </Link>
             {isAuthenticated ? (
-              <Link href="/dashboard" className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors">
+              <Link href="/main/dashboard" className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors">
                 {t('goToDashboard')}
               </Link>
             ) : (
-              <Link href="/about" className="bg-purple-500 text-white px-6 py-2 rounded-md hover:bg-purple-600 transition-colors">
+              <Link href="/main/about" className="bg-purple-500 text-white px-6 py-2 rounded-md hover:bg-purple-600 transition-colors">
                 {t('goToAbout')}
               </Link>
             )}

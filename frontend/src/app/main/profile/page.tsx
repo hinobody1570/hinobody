@@ -25,7 +25,7 @@ export default function ProfilePage() {
             <h1 className="text-4xl font-bold text-gray-800">{t('title')}</h1>
             <div className="space-x-2">
               <Link
-                href="/dashboard"
+                href="/main/dashboard"
                 className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
               >
                 {t('backToDashboard')}
