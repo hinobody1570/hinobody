@@ -62,11 +62,11 @@ const RedditSidebar = () => {
     <div className="flex">
       {/* Sidebar */}
       <aside
-        className={`bg-white border-r border-gray-200 h-screen overflow-y-auto transition-all duration-300 ${
+        className={`bg-white border-r border-gray-200 h-screen overflow-y-auto transition-all no-scrollbar duration-300 ${
           isOpen ? "w-68" : "w-8"
         }`}
       >
-        <div className="py-2 w-[80%] mx-auto flex flex-col gap-4">
+        <div className={`py-2 w-[80%] mx-auto flex flex-col gap-4 ${isOpen ? "" : "pl-6"}`}>
           {/* Main Navigation */}
           <nav className="flex flex-col gap-2">
             {MAIN_MENU.map((item, index) => (
@@ -113,7 +113,7 @@ const RedditSidebar = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed cursor-pointer top-20 ${
-          isOpen ? "left-60" : "left-8"
+          isOpen ? "left-63" : "left-3"
         } z-50 p-2 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors`}
       >
         <FaBars size={16} className="text-gray-700 m-1" />
