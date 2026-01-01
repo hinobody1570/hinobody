@@ -236,5 +236,29 @@
     "goToDashboard": "대시보드로 이동",
     "goToAbout": "회사 소개로 이동",
     "codeExample": "코드 예제"
+  },
+  "createPost": {
+    "title": "게시물 작성",
+    "drafts": "초안",
+    "selectCommunity": "커뮤니티 선택",
+    "tabs": {
+      "text": "텍스트",
+      "images": "이미지 및 동영상",
+      "link": "링크",
+      "poll": "투표"
+    },
+    "titlePlaceholder": "제목*",
+    "addTags": "태그 추가",
+    "saveDraft": "초안 저장",
+    "post": "게시",
+    "postingGuidelines": "게시 가이드라인",
+    "guidelines": {
+      "rememberHuman": "사람을 기억하세요",
+      "behaveRealLife": "실생활에서처럼 행동하세요",
+      "originalSource": "콘텐츠의 원본 출처를 찾으세요",
+      "searchDuplicates": "게시하기 전에 중복을 검색하세요",
+      "readRules": "커뮤니티 규칙을 읽으세요"
+    },
+    "characters": "자"
   }
 }

@@ -236,5 +236,29 @@
     "goToDashboard": "前往仪表板",
     "goToAbout": "前往关于",
     "codeExample": "代码示例"
+  },
+  "createPost": {
+    "title": "创建帖子",
+    "drafts": "草稿",
+    "selectCommunity": "选择社区",
+    "tabs": {
+      "text": "文本",
+      "images": "图片和视频",
+      "link": "链接",
+      "poll": "投票"
+    },
+    "titlePlaceholder": "标题*",
+    "addTags": "添加标签",
+    "saveDraft": "保存草稿",
+    "post": "发布",
+    "postingGuidelines": "发帖指南",
+    "guidelines": {
+      "rememberHuman": "记住人性",
+      "behaveRealLife": "像在现实生活中一样行事",
+      "originalSource": "寻找内容的原始来源",
+      "searchDuplicates": "发布前搜索重复内容",
+      "readRules": "阅读社区规则"
+    },
+    "characters": "字符"
   }
 }

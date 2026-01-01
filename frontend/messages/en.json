@@ -236,5 +236,29 @@
     "goToDashboard": "Go to Dashboard",
     "goToAbout": "Go to About",
     "codeExample": "Code Example"
+  },
+  "createPost": {
+    "title": "Create post",
+    "drafts": "Drafts",
+    "selectCommunity": "Select a community",
+    "tabs": {
+      "text": "Text",
+      "images": "Images & Video",
+      "link": "Link",
+      "poll": "Poll"
+    },
+    "titlePlaceholder": "Title*",
+    "addTags": "Add tags",
+    "saveDraft": "Save Draft",
+    "post": "Post",
+    "postingGuidelines": "Posting Guidelines",
+    "guidelines": {
+      "rememberHuman": "Remember the human",
+      "behaveRealLife": "Behave like you would in real life",
+      "originalSource": "Look for the original source of content",
+      "searchDuplicates": "Search for duplicates before posting",
+      "readRules": "Read the community's rules"
+    },
+    "characters": "characters"
   }
 }

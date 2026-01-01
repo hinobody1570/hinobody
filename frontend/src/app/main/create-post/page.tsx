@@ -1,22 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { BiChevronDown } from "react-icons/bi";
 import { Tab } from "@/components/reuseComponents/Tabs";
 import RichTextEditor from "@/components/reuseComponents/RichTextEditor";
 
 // Main Create Post Component
 const CreatePost = () => {
+  const t = useTranslations('createPost');
   const [activeTab, setActiveTab] = useState("text");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState(null);
 
   const tabs = [
-    { id: "text", label: "Text" },
-    { id: "images", label: "Images & Video" },
-    { id: "link", label: "Link" },
-    { id: "poll", label: "Poll", disabled: true },
+    { id: "text", label: t('tabs.text') },
+    { id: "images", label: t('tabs.images') },
+    { id: "link", label: t('tabs.link') },
+    { id: "poll", label: t('tabs.poll'), disabled: true },
   ];
 
   const handlePost = () => {
@@ -34,8 +36,8 @@ const CreatePost = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Create post</h1>
-          <button className="text-sm text-gray-600 hover:text-gray-800 font-semibold">Drafts</button>
+          <h1 className="text-2xl font-bold text-gray-800">{t('title')}</h1>
+          <button className="text-sm text-gray-600 hover:text-gray-800 font-semibold">{t('drafts')}</button>
         </div>
 
         {/* Main Card */}
@@ -48,7 +50,7 @@ const CreatePost = () => {
               <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">r</span>
               </div>
-              <span className="text-sm font-semibold text-gray-700">{selectedCommunity || "Select a community"}</span>
+              <span className="text-sm font-semibold text-gray-700">{selectedCommunity || t('selectCommunity')}</span>
               <BiChevronDown size={16} className="text-gray-600" />
             </button>
           </div>
@@ -68,14 +70,14 @@ const CreatePost = () => {
             <div className="mb-4">
               <input
                 type="text"
-                placeholder="Title*"
+                placeholder={t('titlePlaceholder')}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={300}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400"
               />
               <div className="text-right mt-1">
-                <span className="text-xs text-gray-500">{title.length}/300</span>
+                <span className="text-xs text-gray-500">{title.length}/300 {t('characters')}</span>
               </div>
             </div>
 
@@ -83,7 +85,7 @@ const CreatePost = () => {
             <button
               className="mb-4 px-4 py-2 bg-gray-100 text-gray-500 text-sm rounded-full hover:bg-gray-200 transition-colors"
             >
-              Add tags
+              {t('addTags')}
             </button>
 
             {/* Rich Text Editor */}
@@ -97,7 +99,7 @@ const CreatePost = () => {
                 onClick={handleSaveDraft}
                 className="px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
               >
-                Save Draft
+                {t('saveDraft')}
               </button>
               <button
                 onClick={handlePost}
@@ -106,7 +108,7 @@ const CreatePost = () => {
                   title.trim() ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
-                Post
+                {t('post')}
               </button>
             </div>
           </div>
@@ -114,27 +116,27 @@ const CreatePost = () => {
 
         {/* Guidelines Card */}
         <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-800 mb-3">Posting Guidelines</h3>
+          <h3 className="font-semibold text-gray-800 mb-3">{t('postingGuidelines')}</h3>
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-start gap-2">
               <span className="text-gray-400">•</span>
-              <span>Remember the human</span>
+              <span>{t('guidelines.rememberHuman')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gray-400">•</span>
-              <span>Behave like you would in real life</span>
+              <span>{t('guidelines.behaveRealLife')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gray-400">•</span>
-              <span>Look for the original source of content</span>
+              <span>{t('guidelines.originalSource')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gray-400">•</span>
-              <span>Search for duplicates before posting</span>
+              <span>{t('guidelines.searchDuplicates')}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gray-400">•</span>
-              <span>Read the community's rules</span>
+              <span>{t('guidelines.readRules')}</span>
             </li>
           </ul>
         </div>

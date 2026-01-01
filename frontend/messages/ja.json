@@ -236,5 +236,29 @@
     "goToDashboard": "ダッシュボードに移動",
     "goToAbout": "についてに移動",
     "codeExample": "コード例"
+  },
+  "createPost": {
+    "title": "投稿を作成",
+    "drafts": "下書き",
+    "selectCommunity": "コミュニティを選択",
+    "tabs": {
+      "text": "テキスト",
+      "images": "画像と動画",
+      "link": "リンク",
+      "poll": "投票"
+    },
+    "titlePlaceholder": "タイトル*",
+    "addTags": "タグを追加",
+    "saveDraft": "下書きを保存",
+    "post": "投稿",
+    "postingGuidelines": "投稿ガイドライン",
+    "guidelines": {
+      "rememberHuman": "人間を思い出してください",
+      "behaveRealLife": "実生活のように行動してください",
+      "originalSource": "コンテンツの元のソースを探してください",
+      "searchDuplicates": "投稿前に重複を検索してください",
+      "readRules": "コミュニティのルールを読んでください"
+    },
+    "characters": "文字"
   }
 }
