@@ -6,10 +6,12 @@ import { useTranslations } from "next-intl";
 import { FiMessageSquare, FiMoreHorizontal, FiShare2 } from "react-icons/fi";
 import { GoBell } from "react-icons/go";
 import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
+import { CommentsSection } from "../commentSection/CommentSection";
 
 export const PostCard = ({ post }: any) => {
-  const t = useTranslations('feed');
+  const t = useTranslations("feed");
   const [upvotes, setUpvotes] = useState(post.upvotes);
+  const [showComments, setShowComments] = useState(false);
   const [voteState, setVoteState] = useState<any>(null); // null, 'up', or 'down'
 
   const handleUpvote = () => {
@@ -39,8 +41,7 @@ export const PostCard = ({ post }: any) => {
   };
 
   return (
-    <article
-      className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors"    >
+    <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
       {/* Post Header */}
       <div className="flex items-center justify-between px-3 py-2">
         <div className="flex items-center gap-2">
@@ -52,17 +53,11 @@ export const PostCard = ({ post }: any) => {
             </div>
           )}
           <span className="text-gray-500 text-xs">• {post.timestamp}</span>
-          {post.badge && (
-            <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold" >
-              {post.badge}
-            </span>
-          )}
+          {post.badge && <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold">{post.badge}</span>}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            className="px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors"
-          >
-            {t('join')}
+          <button className="px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors">
+            {t("join")}
           </button>
           <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
             <FiMoreHorizontal size={20} className="text-gray-600" />
@@ -83,7 +78,7 @@ export const PostCard = ({ post }: any) => {
       )}
 
       {/* Post Actions */}
-      <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200" >
+      <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200">
         <div className="flex items-center bg-gray-100 rounded-full">
           <button
             onClick={handleUpvote}
@@ -91,9 +86,7 @@ export const PostCard = ({ post }: any) => {
           >
             <HiOutlineArrowUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
           </button>
-          <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">
-            {upvotes}
-          </span>
+          <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">{upvotes}</span>
           <button
             onClick={handleDownvote}
             className={`p-1.5 hover:bg-gray-200 rounded-r-full transition-colors ${voteState === "down" ? "text-blue-500" : "text-gray-600"}`}
@@ -102,7 +95,10 @@ export const PostCard = ({ post }: any) => {
           </button>
         </div>
 
-        <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors"
+        >
           <FiMessageSquare size={20} className="text-gray-600" />
           <span className="text-sm font-semibold text-gray-800">{post.comments}</span>
         </button>
@@ -113,9 +109,11 @@ export const PostCard = ({ post }: any) => {
 
         <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
           <FiShare2 size={20} className="text-gray-600" />
-          <span className="text-sm font-semibold text-gray-800">{t('share')}</span>
+          <span className="text-sm font-semibold text-gray-800">{t("share")}</span>
         </button>
       </div>
+              {showComments && <CommentsSection />}
+
     </article>
   );
 };

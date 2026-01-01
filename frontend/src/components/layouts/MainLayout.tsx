@@ -9,7 +9,7 @@ interface MainLayoutProps {
 
 /**
  * MainLayout Component
- * 
+ *
  * Provides a consistent layout structure with:
  * - Top Header (fixed at top)
  * - Sidebar (left side)
@@ -21,17 +21,18 @@ export default function MainLayout({ children }: MainLayoutProps) {
       {/* Fixed Header */}
       <RedditHeader />
 
-      {/* Main Layout Container - Sidebar component handles its own layout */}
+      {/* Main Layout Container */}
       <div className="flex">
-        {/* Sidebar - Component includes its own wrapper and toggle button */}
-        <RedditSidebar />
+        {/* Sidebar - fixed height, sticky position */}
+        <div className="h-screen sticky top-16">
+          {" "}
+          {/* top-16 = header height */}
+          <RedditSidebar />
+        </div>
 
-        {/* Main Content Area - Changes based on route */}
-        <main className="flex-1 px-6 py-4 overflow-y-auto">
-          {children}
-        </main>
+        {/* Main Content */}
+        <main className="flex-1 px-6 py-4 overflow-y-auto max-h-screen">{children}</main>
       </div>
     </div>
   );
 }
-

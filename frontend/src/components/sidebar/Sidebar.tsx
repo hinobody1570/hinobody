@@ -63,7 +63,7 @@ const RedditSidebar = () => {
       {/* Sidebar */}
       <aside
         className={`bg-white border-r border-gray-200 h-screen overflow-y-auto transition-all duration-300 ${
-          isOpen ? "w-64" : "w-0"
+          isOpen ? "w-68" : "w-8"
         }`}
       >
         <div className="py-2 w-[80%] mx-auto flex flex-col gap-4">
