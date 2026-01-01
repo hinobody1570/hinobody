@@ -1,7 +1,13 @@
-export const MenuItem = ({ icon: Icon, label, badge, onClick }: any) => {
+interface MenuItemTypes {
+  icon: any;
+  label: string;
+  badge?: string;
+  onClick?: ()=> void;
+}
+
+export const MenuItem = ({ icon: Icon, label, badge, onClick }: MenuItemTypes) => {
   return (
     <button
-      style={{ padding: "4px 4px" }}
       onClick={onClick}
       className="w-full mx-auto flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 transition-colors text-left group"
     >

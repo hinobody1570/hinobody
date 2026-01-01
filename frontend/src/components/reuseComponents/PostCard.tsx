@@ -40,11 +40,9 @@ export const PostCard = ({ post }: any) => {
 
   return (
     <article
-      className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors"
-      style={{ marginBottom: "4px" }}
-    >
+      className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors"    >
       {/* Post Header */}
-      <div className="flex items-center justify-between px-3 py-2" style={{ padding: "12px" }}>
+      <div className="flex items-center justify-between px-3 py-2">
         <div className="flex items-center gap-2">
           <Image src={post.communityAvatar} alt={post.community} className="w-6 h-6 rounded-full" />
           <span className="font-bold text-sm hover:underline cursor-pointer">{post.community}</span>
@@ -55,7 +53,7 @@ export const PostCard = ({ post }: any) => {
           )}
           <span className="text-gray-500 text-xs">• {post.timestamp}</span>
           {post.badge && (
-            <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold" style={{ padding: "4px" }}>
+            <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold" >
               {post.badge}
             </span>
           )}
@@ -63,7 +61,6 @@ export const PostCard = ({ post }: any) => {
         <div className="flex items-center gap-2">
           <button
             className="px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors"
-            style={{ padding: "4px" }}
           >
             {t('join')}
           </button>
@@ -74,7 +71,7 @@ export const PostCard = ({ post }: any) => {
       </div>
 
       {/* Post Title */}
-      <div className="px-3 pb-2" style={{ padding: "3px 2px" }}>
+      <div className="px-3 pb-2">
         <h2 className="text-lg font-medium text-gray-900 hover:text-gray-700 cursor-pointer">{post.title}</h2>
       </div>
 
@@ -86,20 +83,18 @@ export const PostCard = ({ post }: any) => {
       )}
 
       {/* Post Actions */}
-      <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200" style={{ padding: "20px 10px" }}>
+      <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200" >
         <div className="flex items-center bg-gray-100 rounded-full">
           <button
-            style={{ padding: "4px" }}
             onClick={handleUpvote}
             className={`p-1.5 hover:bg-gray-200 rounded-l-full transition-colors ${voteState === "up" ? "text-orange-500" : "text-gray-600"}`}
           >
             <HiOutlineArrowUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
           </button>
-          <span style={{ padding: "4px" }} className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">
+          <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">
             {upvotes}
           </span>
           <button
-            style={{ padding: "4px" }}
             onClick={handleDownvote}
             className={`p-1.5 hover:bg-gray-200 rounded-r-full transition-colors ${voteState === "down" ? "text-blue-500" : "text-gray-600"}`}
           >
@@ -107,16 +102,16 @@ export const PostCard = ({ post }: any) => {
           </button>
         </div>
 
-        <button style={{ padding: "2px" }} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
+        <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
           <FiMessageSquare size={20} className="text-gray-600" />
           <span className="text-sm font-semibold text-gray-800">{post.comments}</span>
         </button>
 
-        <button style={{ padding: "2px" }} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
+        <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
           <GoBell size={20} className="text-gray-600" />
         </button>
 
-        <button style={{ padding: "2px" }} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
+        <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors">
           <FiShare2 size={20} className="text-gray-600" />
           <span className="text-sm font-semibold text-gray-800">{t('share')}</span>
         </button>

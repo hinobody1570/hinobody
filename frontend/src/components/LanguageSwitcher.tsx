@@ -49,7 +49,6 @@ export default function LanguageSwitcher() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         aria-label="Switch language"
-        style={{ padding: "4px 6px" }}
       >
         <Image src={currentLanguage.flag} alt={currentLanguage.name} className="w-6 h-6" />
         <span className="font-medium text-gray-700">{currentLanguage.nativeName}</span>
@@ -62,7 +61,6 @@ export default function LanguageSwitcher() {
           <div className="py-2 max-h-72 overflow-y-auto">
             {languages.map((lang) => (
               <button
-                style={{ padding: "2px 4px" }}
                 key={lang.code}
                 onClick={() => handleLanguageChange(lang.code)}
                 className={`w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50 transition-colors duration-150 ${

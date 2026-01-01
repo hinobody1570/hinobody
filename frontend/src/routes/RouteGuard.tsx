@@ -20,7 +20,7 @@ export default function RouteGuard({ children }: RouteGuardProps) {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const t = useTranslations('common');
+  const t = useTranslations?.('common');
 
   useEffect(() => {
     // Wait for auth to load

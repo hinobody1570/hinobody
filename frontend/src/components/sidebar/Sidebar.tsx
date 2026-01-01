@@ -66,7 +66,7 @@ const RedditSidebar = () => {
           isOpen ? "w-64" : "w-0"
         }`}
       >
-        <div className="py-2 w-[80%] mx-auto flex flex-col gap-4" style={{margin: "0 auto"}}>
+        <div className="py-2 w-[80%] mx-auto flex flex-col gap-4">
           {/* Main Navigation */}
           <nav className="flex flex-col gap-2">
             {MAIN_MENU.map((item, index) => (
@@ -112,7 +112,6 @@ const RedditSidebar = () => {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        style={{ margin: "4px", padding: "4px" }}
         className={`fixed cursor-pointer top-20 ${
           isOpen ? "left-60" : "left-8"
         } z-50 p-2 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors`}

@@ -9,20 +9,23 @@ import { Avatar } from "../reuseComponents/Avatar";
 import { Logo } from "../reuseComponents/Logo";
 import { IconButton } from "../reuseComponents/NavBarIconButton";
 import { SearchBar } from "../reuseComponents/SearchBar";
+import { useRouter } from 'next/navigation';
+import { ROUTE_PATHS } from "@/routes/paths";
 
 export const RedditHeader = () => {
   const t = useTranslations('header');
+  const router = useRouter();
   
   const headerActions = [
     { icon: BsBadgeAd, onClick: () => console.log("Ads") },
     { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
-    { icon: VscDiffAdded, label: t('create'), onClick: () => console.log("Create") },
+    { icon: VscDiffAdded, label: t('create'), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
     { icon: BsBell, onClick: () => console.log("Notifications") },
   ];
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      <div className="flex items-center justify-between gap-4 px-6 py-3 lg:px-16" style={{padding: "16px"}}>
+      <div className="flex items-center justify-between gap-4 px-6 py-3 lg:px-16">
 
         <Logo text="reddit" onClick={() => console.log("Logo clicked")} />
 

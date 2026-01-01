@@ -61,7 +61,7 @@ export function LocaleProvider({ children, initialLocale, initialMessages }: Loc
   }, [locale, currentLocale]);
 
   return (
-    <NextIntlClientProvider locale={currentLocale} messages={messages}>
+    <NextIntlClientProvider locale={currentLocale} messages={messages} timeZone="UTC">
       {children}
     </NextIntlClientProvider>
   );

@@ -29,7 +29,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen" style={styleContainer}>
-      <div className="container px-4 py-6 mt-6" style={{margin: "0 auto"}}>
+      <div className="container px-4 py-6 mx-auto mt-6">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-4xl font-bold">{t('welcome')}</h1>

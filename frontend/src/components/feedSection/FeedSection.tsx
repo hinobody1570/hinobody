@@ -94,21 +94,19 @@ export const RedditFeed = () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-4" style={{ padding: "4px", margin: "0 auto" }}>
+      <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Feed */}
           <div className="lg:col-span-2">
             {/* Sort Options */}
-            <div className="flex items-center gap-2 mb-4" style={{ marginBottom: "4px" }}>
+            <div className="flex items-center gap-2 mb-4">
               <button
-                style={{ padding: "8px" }}
                 className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
               >
                 <span className="text-sm font-semibold">{t('best')}</span>
                 <IoChevronDown size={16} />
               </button>
               <button
-                style={{ padding: "8px" }}
                 className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
               >
                 <CiCalendar size={16} />
@@ -124,8 +122,8 @@ export const RedditFeed = () => {
 
           {/* Sidebar - Recent Posts */}
           <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-300 rounded-lg p-4 sticky top-8" style={{ padding: "20px" }}>
-              <div className="flex items-center justify-between mb-4" style={{ marginBottom: "10px" }}>
+            <div className="bg-white border border-gray-300 rounded-lg p-4 sticky top-8">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-gray-600 uppercase">{t('recentPosts')}</h3>
                 <button className="text-sm text-blue-600 hover:underline font-semibold">{t('clear')}</button>
               </div>
@@ -137,8 +135,8 @@ export const RedditFeed = () => {
               </div>
 
               {/* Footer Links */}
-              <div className="mt-6 pt-4 border-t border-gray-200" style={{ paddingTop: "6px" }}>
-                <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3" style={{ margin: "4px" }}>
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3">
                   <a href="#" className="hover:underline">
                     {t('redditRules')}
                   </a>

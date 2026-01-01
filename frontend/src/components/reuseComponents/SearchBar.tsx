@@ -16,8 +16,7 @@ export const SearchBar = ({ placeholder }: { placeholder?: string }) => {
       </div>
 
       {/* Input */}
-      <input
-      style={{padding: "8px"}}  
+      <input  
         type="text"
         placeholder={defaultPlaceholder}
         className="

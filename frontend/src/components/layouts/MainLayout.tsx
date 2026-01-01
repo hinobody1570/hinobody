@@ -22,7 +22,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <RedditHeader />
 
       {/* Main Layout Container - Sidebar component handles its own layout */}
-      <div className="flex pt-16">
+      <div className="flex">
         {/* Sidebar - Component includes its own wrapper and toggle button */}
         <RedditSidebar />
 
