@@ -7,6 +7,8 @@ import { FiMessageSquare, FiMoreHorizontal, FiShare2 } from "react-icons/fi";
 import { GoBell } from "react-icons/go";
 import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 import { CommentsSection } from "../commentSection/CommentSection";
+import { DropdownMenu } from "./DropDownMenu";
+import { menuItems } from "../commentSection/Comment";
 
 export const PostCard = ({ post }: any) => {
   const t = useTranslations("feed");
@@ -59,8 +61,11 @@ export const PostCard = ({ post }: any) => {
           <button className="px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors">
             {t("join")}
           </button>
-          <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+          {/* <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
             <FiMoreHorizontal size={20} className="text-gray-600" />
+          </button> */}
+          <button className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
+            <DropdownMenu items={menuItems} />
           </button>
         </div>
       </div>
@@ -112,8 +117,7 @@ export const PostCard = ({ post }: any) => {
           <span className="text-sm font-semibold text-gray-800">{t("share")}</span>
         </button>
       </div>
-              {showComments && <CommentsSection />}
-
+      {showComments && <CommentsSection />}
     </article>
   );
 };

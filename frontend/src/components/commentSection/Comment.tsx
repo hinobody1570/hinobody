@@ -1,19 +1,45 @@
 import { useState } from "react";
-import { BiAward, BiMessageSquare } from "react-icons/bi";
+import { BiAward, BiGlobe, BiInfoCircle, BiMessageSquare, BiSearch } from "react-icons/bi";
 import { CiShare2 } from "react-icons/ci";
-import { FiMoreHorizontal } from "react-icons/fi";
+import { FiEyeOff } from "react-icons/fi";
 import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
+import { DropdownMenu } from "../reuseComponents/DropDownMenu";
+import { FaLayerGroup } from "react-icons/fa";
 
 interface commentType {
   comment: any;
   level?: number;
 }
 
+export const menuItems = [
+  {
+    icon: FiEyeOff,
+    label: "Hide",
+    onClick: () => console.log("Hide clicked"),
+  },
+  {
+    icon: FaLayerGroup,
+    label: "Report",
+    onClick: () => console.log("Report clicked"),
+  },
+  {
+    icon: BiInfoCircle,
+    label: "About this ad",
+    onClick: () => console.log("About clicked"),
+  },
+  {
+    icon: BiGlobe,
+    label: "Tired of ads?",
+    onClick: () => console.log("Ads clicked"),
+  },
+];
+
 const Comment = ({ comment, level = 0 }: commentType) => {
   const [upvotes, setUpvotes] = useState(comment.upvotes);
   const [voteState, setVoteState] = useState<any>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showReplyComment, setShowReplyComment] = useState(false);
 
   const handleUpvote = () => {
     if (voteState === "up") {
@@ -94,7 +120,10 @@ const Comment = ({ comment, level = 0 }: commentType) => {
                 </div>
 
                 {/* Reply Button */}
-                <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                <button
+                  onClick={() => setShowReplyComment(!showReplyComment)}
+                  className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                >
                   <BiMessageSquare size={16} />
                   <span>Reply</span>
                 </button>
@@ -120,14 +149,24 @@ const Comment = ({ comment, level = 0 }: commentType) => {
                 )}
 
                 {/* More Options */}
-                <button className="p-1 hover:bg-gray-100 rounded transition-colors ml-auto">
-                  <FiMoreHorizontal size={18} className="text-gray-500" />
+                <button className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
+                  <DropdownMenu items={menuItems} />
                 </button>
               </div>
             </>
           )}
         </div>
       </div>
+      {showReplyComment && (
+        <div className="relative flex-1 max-w-md ml-20">
+          <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Enter reply"
+            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+          />
+        </div>
+      )}
 
       {/* Nested Comments */}
       {!isCollapsed && comment.replies && comment.replies.length > 0 && (
