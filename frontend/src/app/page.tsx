@@ -35,6 +35,7 @@ export default function Home() {
             <h1 className="text-4xl font-bold">{t('welcome')}</h1>
             <p className="text-lg mt-2">{t('description')}</p>
           </div>
+          <button className="p-6">Home</button>
           <LanguageSwitcher />
         </div>
         <EyeMaskingForm />
