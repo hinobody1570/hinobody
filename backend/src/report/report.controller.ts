@@ -12,10 +12,10 @@ import {
 import { ReportService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { QueryReportsDto } from './dto/query-reports.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
-import { ReportStatus } from '@prisma/client';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 
 @Controller('reports')
 export class ReportController {
@@ -34,8 +34,13 @@ export class ReportController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  findAll(@Query('status') status?: ReportStatus) {
-    return this.reportService.findAll(status);
+  @ApiOperation({ summary: 'Get all reports with pagination, filters, and search' })
+  @ApiQuery({ name: 'status', required: false, description: 'Filter by status', enum: ['PENDING', 'REVIEWED', 'RESOLVED', 'DISMISSED'] })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
+  @ApiQuery({ name: 'search', required: false, description: 'Search term' })
+  findAll(@Query() query: QueryReportsDto) {
+    return this.reportService.findAll(query);
   }
 
   @Get(':id')
