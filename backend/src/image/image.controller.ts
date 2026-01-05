@@ -20,7 +20,10 @@ export class ImageController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  create(@Body() createImageDto: CreateImageDto, @GetUser('id') userId: string) {
+  create(
+    @Body() createImageDto: CreateImageDto,
+    @GetUser('id') userId: string,
+  ) {
     return this.imageService.create(createImageDto, userId);
   }
 
@@ -52,6 +55,3 @@ export class ImageController {
     return this.imageService.remove(id);
   }
 }
-
-
-

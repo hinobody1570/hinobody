@@ -47,7 +47,7 @@ export default function LanguageSwitcher() {
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="cursor-pointer flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         aria-label="Switch language"
       >
         <Image src={currentLanguage.flag} alt={currentLanguage.name} className="w-6 h-6" />
@@ -63,7 +63,7 @@ export default function LanguageSwitcher() {
               <button
                 key={lang.code}
                 onClick={() => handleLanguageChange(lang.code)}
-                className={`w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50 transition-colors duration-150 ${
+                className={`cursor-pointer w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50 transition-colors duration-150 ${
                   locale === lang.code ? "bg-blue-50" : ""
                 }`}
               >

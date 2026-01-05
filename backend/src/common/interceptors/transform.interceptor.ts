@@ -16,8 +16,14 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
+export class TransformInterceptor<T> implements NestInterceptor<
+  T,
+  Response<T>
+> {
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Observable<Response<T>> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
     const statusCode = response.statusCode || HttpStatus.OK;
@@ -59,7 +65,8 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
 
   private getSuccessMessage(method: string, url: string): string {
     if (method === 'GET') {
-      if (url.includes('/users/me')) return 'User profile retrieved successfully';
+      if (url.includes('/users/me'))
+        return 'User profile retrieved successfully';
       if (url.includes('/posts/feed')) return 'Feed retrieved successfully';
       if (url.includes('/s3/files')) return 'Files retrieved successfully';
       return 'Data retrieved successfully';
@@ -73,4 +80,3 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
     return 'Success';
   }
 }
-

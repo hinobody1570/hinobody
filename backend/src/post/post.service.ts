@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -163,7 +167,11 @@ export class PostService {
     return post;
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto, userId: string): Promise<Post> {
+  async update(
+    id: string,
+    updatePostDto: UpdatePostDto,
+    userId: string,
+  ): Promise<Post> {
     const post = await this.findOne(id);
 
     // Check if user is the author
@@ -194,7 +202,11 @@ export class PostService {
     });
   }
 
-  async remove(id: string, userId: string, isAdmin: boolean = false): Promise<void> {
+  async remove(
+    id: string,
+    userId: string,
+    isAdmin: boolean = false,
+  ): Promise<void> {
     const post = await this.findOne(id);
 
     // Check if user is the author or admin
@@ -217,6 +229,3 @@ export class PostService {
     });
   }
 }
-
-
-

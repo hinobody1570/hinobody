@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -8,7 +12,10 @@ import { Comment } from '@prisma/client';
 export class CommentService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createCommentDto: CreateCommentDto, userId: string): Promise<Comment> {
+  async create(
+    createCommentDto: CreateCommentDto,
+    userId: string,
+  ): Promise<Comment> {
     // Verify post exists
     const post = await this.prisma.post.findUnique({
       where: { id: createCommentDto.postId },
@@ -124,7 +131,11 @@ export class CommentService {
     return comment;
   }
 
-  async update(id: string, updateCommentDto: UpdateCommentDto, userId: string): Promise<Comment> {
+  async update(
+    id: string,
+    updateCommentDto: UpdateCommentDto,
+    userId: string,
+  ): Promise<Comment> {
     const comment = await this.findOne(id);
 
     if (comment.authorId !== userId) {
@@ -145,7 +156,11 @@ export class CommentService {
     });
   }
 
-  async remove(id: string, userId: string, isAdmin: boolean = false): Promise<void> {
+  async remove(
+    id: string,
+    userId: string,
+    isAdmin: boolean = false,
+  ): Promise<void> {
     const comment = await this.findOne(id);
 
     if (comment.authorId !== userId && !isAdmin) {
@@ -165,6 +180,3 @@ export class CommentService {
     });
   }
 }
-
-
-

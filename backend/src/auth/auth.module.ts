@@ -17,7 +17,8 @@ import { RolesGuard } from './guards/roles.guard';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService): any => {
-        const secret = configService.get<string>('JWT_SECRET') || 'your-secret-key';
+        const secret =
+          configService.get<string>('JWT_SECRET') || 'your-secret-key';
         const expiresIn = configService.get<string>('JWT_EXPIRES_IN') || '7d';
         return {
           secret,
@@ -34,4 +35,3 @@ import { RolesGuard } from './guards/roles.guard';
   exports: [AuthService, RolesGuard],
 })
 export class AuthModule {}
-

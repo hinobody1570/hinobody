@@ -24,7 +24,10 @@ export class ReportController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  create(@Body() createReportDto: CreateReportDto, @GetUser('id') userId: string) {
+  create(
+    @Body() createReportDto: CreateReportDto,
+    @GetUser('id') userId: string,
+  ) {
     return this.reportService.create(createReportDto, userId);
   }
 
@@ -64,6 +67,3 @@ export class ReportController {
     return this.reportService.remove(id);
   }
 }
-
-
-

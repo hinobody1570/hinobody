@@ -35,7 +35,7 @@ export class EmailService {
           To: [{ Email: toEmail }],
           Subject: subject,
           TextPart: mailText,
-          HTMLPart: html
+          HTMLPart: html,
         },
       ],
     };
@@ -78,7 +78,8 @@ export class EmailService {
   ): Promise<boolean> {
     const subject = 'Reset Your Password';
 
-    const frontendUrl = `${process.env.FRONTEND_URL}` || "http://localhost:3000"
+    const frontendUrl =
+      `${process.env.FRONTEND_URL}` || 'http://localhost:3000';
 
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
@@ -98,6 +99,9 @@ export class EmailService {
   }
 
   private stripHtml(html: string): string {
-    return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    return html
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 }

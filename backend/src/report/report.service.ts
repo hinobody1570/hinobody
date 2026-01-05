@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
@@ -12,7 +16,9 @@ export class ReportService {
     const { reason, postId, commentId } = createReportDto;
 
     if (!postId && !commentId) {
-      throw new BadRequestException('Either postId or commentId must be provided');
+      throw new BadRequestException(
+        'Either postId or commentId must be provided',
+      );
     }
 
     if (postId && commentId) {
@@ -28,7 +34,9 @@ export class ReportService {
     }
 
     if (commentId) {
-      const comment = await this.prisma.comment.findUnique({ where: { id: commentId } });
+      const comment = await this.prisma.comment.findUnique({
+        where: { id: commentId },
+      });
       if (!comment) {
         throw new NotFoundException('Comment not found');
       }
@@ -145,6 +153,3 @@ export class ReportService {
     });
   }
 }
-
-
-

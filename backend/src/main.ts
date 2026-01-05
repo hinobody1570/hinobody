@@ -7,7 +7,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Enable CORS for frontend
   app.enableCors({
     origin: 'http://localhost:3000',
@@ -61,7 +61,8 @@ async function bootstrap() {
 
   await app.listen(3001);
   console.log('🚀 HiNobody Backend is running on: http://localhost:3001');
-  console.log('📚 Swagger documentation available at: http://localhost:3001/api');
+  console.log(
+    '📚 Swagger documentation available at: http://localhost:3001/api',
+  );
 }
 bootstrap();
-

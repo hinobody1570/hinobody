@@ -67,5 +67,3 @@ export class CreateImageDto {
   @IsInt()
   height?: number;
 }
-
-

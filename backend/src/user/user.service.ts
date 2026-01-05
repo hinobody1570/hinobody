@@ -1,4 +1,9 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,9 +13,13 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>> {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<
+    Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>
+  > {
     const { email, password, nickname, language } = createUserDto;
 
     // Check if email already exists
@@ -68,7 +77,6 @@ export class UserService {
   }
 
   async findAll(): Promise<Omit<User, 'passwordHash'>[]> {
-
     const response: any = this.prisma.user.findMany({
       select: {
         id: true,
@@ -81,7 +89,7 @@ export class UserService {
         updatedAt: true,
       },
     });
-    return response
+    return response;
   }
 
   async findOne(id: string): Promise<Omit<User, 'passwordHash'>> {
@@ -112,10 +120,7 @@ export class UserService {
     });
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<any> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
     const { nickname, language } = updateUserDto;
 
     if (nickname) {
@@ -147,7 +152,6 @@ export class UserService {
     });
   }
 
-
   async remove(id: string): Promise<void> {
     await this.prisma.user.delete({
       where: { id },
@@ -158,7 +162,12 @@ export class UserService {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  async verifyEmail(email: string, otp: string): Promise<Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>> {
+  async verifyEmail(
+    email: string,
+    otp: string,
+  ): Promise<
+    Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>
+  > {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -180,11 +189,13 @@ export class UserService {
     }
 
     if (new Date() > user.otpExpiry) {
-      throw new BadRequestException('OTP has expired. Please request a new one.');
+      throw new BadRequestException(
+        'OTP has expired. Please request a new one.',
+      );
     }
 
     // Verify email and activate account
-    const updatedUser:any = await this.prisma.user.update({
+    const updatedUser: any = await this.prisma.user.update({
       where: { email },
       data: {
         emailVerified: true,
@@ -290,6 +301,3 @@ export class UserService {
     });
   }
 }
-
-
-

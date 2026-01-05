@@ -46,5 +46,3 @@ export class UpdatePostDto {
   @IsOptional()
   imageIds?: string[];
 }
-
-

@@ -22,7 +22,10 @@ export class CommentController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  create(@Body() createCommentDto: CreateCommentDto, @GetUser('id') userId: string) {
+  create(
+    @Body() createCommentDto: CreateCommentDto,
+    @GetUser('id') userId: string,
+  ) {
     return this.commentService.create(createCommentDto, userId);
   }
 
@@ -62,6 +65,3 @@ export class CommentController {
     return this.commentService.remove(id, userId, role === 'ADMIN');
   }
 }
-
-
-

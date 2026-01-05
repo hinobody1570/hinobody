@@ -14,7 +14,6 @@ import { UserModule } from './user/user.module';
 import { S3Module } from './s3/s3.module';
 import { EmailModule } from './email/email.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -37,4 +36,3 @@ import { EmailModule } from './email/email.module';
   providers: [AppService],
 })
 export class AppModule {}
-

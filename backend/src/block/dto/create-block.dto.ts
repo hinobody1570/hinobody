@@ -10,5 +10,3 @@ export class CreateBlockDto {
   @IsNotEmpty()
   blockedId: string;
 }
-
-

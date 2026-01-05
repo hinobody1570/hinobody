@@ -25,15 +25,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
         error = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
         const responseObj = exceptionResponse as any;
-        
+
         // Handle validation errors (BadRequestException from ValidationPipe)
         if (Array.isArray(responseObj.message)) {
           message = responseObj.message.join(', ');
           error = message;
         } else {
-          message = responseObj.message || exception.message || 'An error occurred';
+          message =
+            responseObj.message || exception.message || 'An error occurred';
           error = responseObj.error || message;
         }
       } else {
@@ -62,4 +66,3 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.status(statusCode).json(errorResponse);
   }
 }
-

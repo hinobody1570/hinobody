@@ -56,5 +56,3 @@ export class CreatePostDto {
   @IsOptional()
   imageIds?: string[];
 }
-
-

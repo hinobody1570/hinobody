@@ -1,9 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  MinLength,
-  Matches,
-} from 'class-validator';
+import { IsString, IsOptional, MinLength, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateBoardDto {
@@ -36,5 +31,3 @@ export class CreateBoardDto {
   @IsOptional()
   description?: string;
 }
-
-

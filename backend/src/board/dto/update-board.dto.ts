@@ -1,9 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  MinLength,
-  IsBoolean,
-} from 'class-validator';
+import { IsString, IsOptional, MinLength, IsBoolean } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateBoardDto {
@@ -33,5 +28,3 @@ export class UpdateBoardDto {
   @IsOptional()
   isActive?: boolean;
 }
-
-
