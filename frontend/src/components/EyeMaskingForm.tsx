@@ -2,15 +2,15 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import * as tf from "@tensorflow/tfjs";
-import { createDetector, SupportedModels } from "@tensorflow-models/face-landmarks-detection";
 import imageCompression from "browser-image-compression";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import "./EyeMaskingForm.css";
-import "@tensorflow/tfjs-backend-webgl";
+
+// Dynamic import for face-api.js to avoid SSR issues
+let faceapi: any = null;
 
 const EyeMaskingForm = () => {
-  const t = useTranslations('eyeMasking');
+  const t = useTranslations("eyeMasking");
   const [imageFile, setImageFile] = useState<any>(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -97,69 +97,40 @@ const EyeMaskingForm = () => {
       try {
         setIsProcessing(true);
 
-        // Ensure TensorFlow.js is ready
-        console.log("🔧 Initializing TensorFlow.js...");
-        await tf.ready();
-        console.log("✅ TensorFlow.js ready");
-        console.log("📦 TensorFlow version:", tf.version);
+        // Dynamically import face-api.js to avoid SSR issues
+        if (typeof window === "undefined") return;
 
-        console.log("🔧 Loading face landmarks model...");
-        console.log("📦 SupportedModels:", SupportedModels);
-        console.log("📦 createDetector type:", typeof createDetector);
+        console.log("🔧 Loading face-api.js library...");
+        // @ts-ignore - face-api.js will be available at runtime after npm install
+        const faceApiModule = await import("face-api.js");
+        faceapi = faceApiModule;
 
-        // Use createDetector with SupportedModels enum
-        // Try MediaPipe runtime first (faster, better accuracy)
-        console.log("📦 Creating detector with MediaPipe runtime...");
-        let faceLandmarksModel;
+        console.log("🔧 Loading face-api.js models...");
 
-        try {
-          faceLandmarksModel = await createDetector(SupportedModels.MediaPipeFaceMesh, {
-            runtime: "mediapipe",
-            maxFaces: 5,
-            refineLandmarks: true,
-          });
-          console.log("✅ MediaPipe runtime loaded successfully");
-        } catch (mediapipeError) {
-          console.warn("⚠️ MediaPipe runtime failed, trying TensorFlow.js runtime...", mediapipeError);
-          // Fallback to TensorFlow.js runtime
-          faceLandmarksModel = await createDetector(SupportedModels.MediaPipeFaceMesh, {
-            runtime: "tfjs",
-            maxFaces: 5,
-            refineLandmarks: true,
-          });
-          console.log("✅ TensorFlow.js runtime loaded successfully (fallback)");
-        }
+        // Load the models from CDN (face-api.js models)
+        // Using @vladmandic/face-api CDN which hosts the models
+        const MODEL_URL = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 
-        console.log("✅ Model created:", typeof faceLandmarksModel);
-        console.log("✅ Model methods:", Object.keys(faceLandmarksModel));
+        await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL), faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)]);
 
-        setModel(faceLandmarksModel);
-        console.log("✅ Face landmarks model loaded successfully");
-        setDebugInfo((prev:any) => ({ ...prev, modelLoaded: true, modelError: null }));
-      } catch (error:any) {
-        console.error("❌ Error loading model:", error);
+        console.log("✅ face-api.js models loaded successfully");
+        setModel({ loaded: true }); // Set a simple flag since face-api.js doesn't need a model object
+        setDebugInfo((prev: any) => ({ ...prev, modelLoaded: true, modelError: null }));
+      } catch (error: any) {
+        console.error("❌ Error loading face-api.js models:", error);
         console.error("❌ Error message:", error.message);
         console.error("❌ Error name:", error.name);
         console.error("❌ Error stack:", error.stack);
-        console.error("❌ Full error object:", error);
 
-        // Try to get more details about the error
-        if (error.toString) {
-          console.error("❌ Error toString:", error.toString());
-        }
-
-        setDebugInfo((prev:any) => ({
+        setDebugInfo((prev: any) => ({
           ...prev,
           modelLoaded: false,
           modelError: `${error.name}: ${error.message}`,
         }));
 
-        // Don't show alert if it's just a loading issue - let user try manual mode
-        if (!error.message.includes("z2")) {
-          alert(
-            `Failed to load AI model: ${error.message}\n\nYou can still use Manual Masking mode.\n\nPlease check:\n1. Internet connection (model downloads from CDN)\n2. Browser console for details\n3. Try refreshing the page`
-          );
-        }
+        alert(
+          `Failed to load AI model: ${error.message}\n\nYou can still use Manual Masking mode.\n\nPlease check:\n1. Internet connection (model downloads from CDN)\n2. Browser console for details\n3. Try refreshing the page`
+        );
       } finally {
         setIsProcessing(false);
       }
@@ -168,7 +139,6 @@ const EyeMaskingForm = () => {
     loadModel();
   }, []);
 
-  
   // Handle image file selection
   const handleImageChange = (e: any) => {
     const file = e.target.files?.[0];
@@ -272,9 +242,9 @@ const EyeMaskingForm = () => {
   }, [masks, imagePreview]);
 
   // Automatic eye detection and masking
-  const detectAndMaskEyes = async () => {
-    if (!model || !canvasRef.current || !imagePreview) {
-      alert(t('pleaseWaitForModel'));
+ const detectAndMaskEyes = async () => {
+    if (!model || !model.loaded || !canvasRef.current || !imagePreview) {
+      alert("Please wait for the model to load and select an image.");
       return;
     }
 
@@ -297,63 +267,51 @@ const EyeMaskingForm = () => {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
 
-      // Detect faces and landmarks - use image element for better compatibility
+      // Detect faces and landmarks using face-api.js
       console.log("🔍 Starting face detection...");
       console.log("📸 Image dimensions:", img.width, "x", img.height);
-      console.log("🤖 Model type:", typeof model, model);
 
-      const predictions = await model.estimateFaces(img, {
-        flipHorizontal: false,
-        staticImageMode: true,
-      });
+      if (!faceapi) {
+        throw new Error("face-api.js not loaded. Please wait for the model to load.");
+      }
 
-      console.log("✅ Predictions received:", predictions.length, "face(s)");
+      // Use face-api.js to detect faces with landmarks
+      const detections = await faceapi
+        .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks();
 
-      console.log(`✅ Detected ${predictions.length} face(s)`);
-      setDebugInfo((prev: any) => ({ ...prev, facesDetected: predictions.length }));
+      console.log(`✅ Detected ${detections.length} face(s)`);
+      setDebugInfo((prev: any) => ({ ...prev, facesDetected: detections.length }));
 
       const newMasks: any[] = [];
 
-      // Use for loop instead of forEach to allow continue statement
-      for (let i = 0; i < predictions.length; i++) {
-        const prediction = predictions[i];
-        const keypoints = prediction.keypoints || prediction.scaledMesh || [];
+      // Process each detected face
+      for (let i = 0; i < detections.length; i++) {
+        const detection = detections[i];
+        
+        if (!detection.landmarks) {
+          continue;
+        }
 
-        if (!keypoints || keypoints.length === 0) return;
+        // face-api.js provides landmarks as an object with specific parts
+        // Left eye: landmarks.getLeftEye()
+        // Right eye: landmarks.getRightEye()
+        const leftEye = detection.landmarks.getLeftEye();
+        const rightEye = detection.landmarks.getRightEye();
 
-        // Eye landmarks indices (MediaPipe Face Mesh)
-        // Left eye: 33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246
-        // Right eye: 362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398
+        if (!leftEye || !rightEye || leftEye.length === 0 || rightEye.length === 0) {
+          console.warn(`⚠️ Face ${i + 1}: Eyes not detected properly`);
+          continue;
+        }
 
-        // Get bounding box for left eye
-        const leftEyeIndices = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246];
-        const leftEyeCoords = leftEyeIndices
-          .map((idx) => keypoints[idx])
-          .filter((coord) => coord && (coord.x !== undefined || coord[0] !== undefined));
+        // Get bounding box for left eye (leftEye is an array of {x, y} points)
+        const leftEyeBounds = getBoundingBox(leftEye);
 
-        // Handle different keypoint formats (object with x,y or array [x,y])
-        const normalizedLeftCoords = leftEyeCoords.map((coord) => ({
-          x: coord.x !== undefined ? coord.x : coord[0],
-          y: coord.y !== undefined ? coord.y : coord[1],
-        }));
-
-        const leftEyeBounds = getBoundingBox(normalizedLeftCoords);
-
-        // Get bounding box for right eye
-        const rightEyeIndices = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398];
-        const rightEyeCoords = rightEyeIndices
-          .map((idx) => keypoints[idx])
-          .filter((coord) => coord && (coord.x !== undefined || coord[0] !== undefined));
-
-        const normalizedRightCoords = rightEyeCoords.map((coord) => ({
-          x: coord.x !== undefined ? coord.x : coord[0],
-          y: coord.y !== undefined ? coord.y : coord[1],
-        }));
-
-        const rightEyeBounds = getBoundingBox(normalizedRightCoords);
+        // Get bounding box for right eye (rightEye is an array of {x, y} points)
+        const rightEyeBounds = getBoundingBox(rightEye);
 
         // First validate if this is actually a human face (not an object like basket, mobile, etc.)
-        const faceValidation = validateHumanFace(prediction, img, leftEyeBounds, rightEyeBounds);
+        const faceValidation = validateHumanFace(detection, img, leftEyeBounds, rightEyeBounds);
         console.log("faceValidation", faceValidation);
         if (!faceValidation.isHuman) {
           console.error("❌ Non-human object detected:", faceValidation.reason);
@@ -369,7 +327,14 @@ const EyeMaskingForm = () => {
         console.log("✅ Human face validated:", faceValidation.reason);
 
         // Validate eye detection quality and check for glasses
-        const validation = validateEyeDetection(keypoints, leftEyeBounds, rightEyeBounds, img, canvas);
+        // Combine all landmarks for validation
+        const allLandmarks = [
+          ...detection.landmarks.getLeftEye(),
+          ...detection.landmarks.getRightEye(),
+          ...detection.landmarks.getNose(),
+          ...detection.landmarks.getMouth(),
+        ];
+        const validation = validateEyeDetection(allLandmarks, leftEyeBounds, rightEyeBounds, img, canvas);
 
         if (!validation.isValid) {
           console.error("❌ Eye detection validation failed:", validation.issues);
@@ -493,31 +458,43 @@ const EyeMaskingForm = () => {
   };
 
   // Validate if detection is actually a human face (not an object)
-  const validateHumanFace = (prediction: any, img: any, leftEyeBounds: any, rightEyeBounds: any) => {
-    const keypoints = prediction.keypoints || prediction.scaledMesh || [];
-
-    if (!keypoints || keypoints.length === 0) {
+  const validateHumanFace = (detection: any, img: any, leftEyeBounds: any, rightEyeBounds: any) => {
+    if (!detection || !detection.landmarks) {
       return { isHuman: false, reason: "No face landmarks detected" };
     }
 
-    // Check if we have enough keypoints (human faces have many landmarks)
-    // MediaPipe Face Mesh has 468 landmarks for human faces
-    if (keypoints.length < 200) {
-      console.log(`⚠️ Only ${keypoints.length} landmarks detected - human faces typically have 400+ landmarks`);
-      return { isHuman: false, reason: "Insufficient landmarks detected - this is not a human face" };
+    // face-api.js provides 68 landmarks total
+    const landmarks = detection.landmarks;
+    const leftEye = landmarks.getLeftEye();
+    const rightEye = landmarks.getRightEye();
+    const nose = landmarks.getNose();
+    const mouth = landmarks.getMouth();
+
+    // Check if we have required facial features
+    if (!leftEye || leftEye.length === 0) {
+      return { isHuman: false, reason: "Missing left eye landmarks" };
+    }
+    if (!rightEye || rightEye.length === 0) {
+      return { isHuman: false, reason: "Missing right eye landmarks" };
+    }
+    if (!nose || nose.length === 0) {
+      return { isHuman: false, reason: "Missing nose landmarks" };
+    }
+    if (!mouth || mouth.length === 0) {
+      return { isHuman: false, reason: "Missing mouth landmarks" };
     }
 
-    // Get face bounding box from prediction
-    const box = prediction.box;
+    // Get face bounding box from detection
+    const box = detection.detection.box;
     if (!box) {
       return { isHuman: false, reason: "No face bounding box detected" };
     }
 
     // Validate face size - human faces should be reasonably sized
-    const boxWidth = box.width || box.xMax - box.xMin || box.right - box.left;
-    const boxHeight = box.height || box.yMax - box.yMin || box.bottom - box.top;
+    const boxWidth = box.width;
+    const boxHeight = box.height;
 
-    if (!boxWidth || !boxHeight) {
+    if (!boxWidth || !boxHeight || boxWidth <= 0 || boxHeight <= 0) {
       return { isHuman: false, reason: "Invalid face bounding box" };
     }
 
@@ -537,36 +514,13 @@ const EyeMaskingForm = () => {
       return { isHuman: false, reason: "Face shape abnormal - likely not a human face" };
     }
 
-    // Check keypoint distribution - human faces have specific landmark patterns
-    // Get eye, nose, and mouth keypoints
-    const leftEyeIndices = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246];
-    const rightEyeIndices = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398];
-    const noseIndices = [1, 2, 5, 4, 6, 19, 20, 94, 125, 141, 235, 236, 3, 51, 48, 115, 131, 134, 102, 49, 220, 305, 281, 363, 360];
-    const mouthIndices = [61, 146, 91, 181, 84, 17, 314, 405, 320, 307, 375, 321, 308, 324, 318];
-
-    const hasLeftEye = leftEyeIndices.some((idx) => keypoints[idx] && (keypoints[idx].x !== undefined || keypoints[idx][0] !== undefined));
-    const hasRightEye = rightEyeIndices.some((idx) => keypoints[idx] && (keypoints[idx].x !== undefined || keypoints[idx][0] !== undefined));
-    const hasNose = noseIndices.some((idx) => keypoints[idx] && (keypoints[idx].x !== undefined || keypoints[idx][0] !== undefined));
-    const hasMouth = mouthIndices.some((idx) => keypoints[idx] && (keypoints[idx].x !== undefined || keypoints[idx][0] !== undefined));
-
-    // Human faces must have eyes, nose, and mouth - all are required
-    if (!hasLeftEye || !hasRightEye || !hasNose || !hasMouth) {
-      const missingFeatures = [];
-      if (!hasLeftEye) missingFeatures.push("left eye");
-      if (!hasRightEye) missingFeatures.push("right eye");
-      if (!hasNose) missingFeatures.push("nose");
-      if (!hasMouth) missingFeatures.push("mouth");
-      console.log(`❌ Missing facial features: ${missingFeatures.join(", ")}`);
-      return { isHuman: false, reason: `Missing facial features (${missingFeatures.join(", ")}) - this is not a human face` };
-    }
-
     // Validate eye positions relative to face box if eye bounds are available
     if (leftEyeBounds && rightEyeBounds) {
       const leftEyeCenterY = leftEyeBounds.y + leftEyeBounds.height / 2;
       const rightEyeCenterY = rightEyeBounds.y + rightEyeBounds.height / 2;
 
       // Get face box coordinates
-      const faceTop = box.yMin || box.y || 0;
+      const faceTop = box.y;
       const faceHeight = boxHeight;
       const faceMiddle = faceTop + faceHeight * 0.5;
 
@@ -587,7 +541,7 @@ const EyeMaskingForm = () => {
   };
 
   // Validate eye detection quality and check for glasses
-  const validateEyeDetection = (keypoints: any, leftEyeBounds: any, rightEyeBounds: any, img: any, canvas: any) => {
+  const validateEyeDetection = (landmarks: any, leftEyeBounds: any, rightEyeBounds: any, img: any, canvas: any) => {
     const issues = [];
 
     // Check if both eyes are detected - this is critical
@@ -919,9 +873,9 @@ const EyeMaskingForm = () => {
     });
 
     // const bucketName = import.meta.env.VITE_AWS_S3_BUCKET || "";
-      const bucketName = ""
+    const bucketName = "";
     if (!bucketName) {
-      throw new Error(t('awsBucketNotConfigured'));
+      throw new Error(t("awsBucketNotConfigured"));
     }
 
     const key = `masked-images/${Date.now()}-${fileName}`;
@@ -942,15 +896,15 @@ const EyeMaskingForm = () => {
     e.preventDefault();
 
     if (!imageFile) {
-      alert(t('pleaseSelectImage'));
+      alert(t("pleaseSelectImage"));
       return;
     }
 
     if (masks.length === 0) {
       if (mode === "auto") {
-        alert(t('pleaseDetectEyes'));
+        alert(t("pleaseDetectEyes"));
       } else {
-        alert(t('pleaseCreateMask'));
+        alert(t("pleaseCreateMask"));
       }
       return;
     }
@@ -966,7 +920,7 @@ const EyeMaskingForm = () => {
       const maskedBlob = await getMaskedImageBlob();
 
       if (!maskedBlob) {
-        throw new Error(t('failedToCreateMaskedImage'));
+        throw new Error(t("failedToCreateMaskedImage"));
       }
 
       console.log("✅ Masked image blob created successfully");
@@ -1029,11 +983,11 @@ const EyeMaskingForm = () => {
 
   return (
     <div className="eye-masking-form-container">
-      <h1>{t('title')}</h1>
+      <h1>{t("title")}</h1>
 
       <form onSubmit={handleSubmit} className="masking-form">
         <div className="form-group">
-          <label htmlFor="image-upload">{t('selectImage')}</label>
+          <label htmlFor="image-upload">{t("selectImage")}</label>
           <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} ref={fileInputRef} disabled={isProcessing} />
         </div>
 
@@ -1042,11 +996,11 @@ const EyeMaskingForm = () => {
             <div className="mode-selector">
               <label>
                 <input type="radio" value="auto" checked={mode === "auto"} onChange={(e) => setMode(e.target.value)} disabled={isProcessing} />
-                {t('automaticDetection')}
+                {t("automaticDetection")}
               </label>
               <label>
                 <input type="radio" value="manual" checked={mode === "manual"} onChange={(e) => setMode(e.target.value)} disabled={isProcessing} />
-                {t('manualMasking')}
+                {t("manualMasking")}
               </label>
             </div>
 
@@ -1065,42 +1019,42 @@ const EyeMaskingForm = () => {
             <div className="controls">
               {mode === "auto" && (
                 <>
-                  <button type="button" onClick={detectAndMaskEyes} disabled={isProcessing || !model} className="btn btn-primary">
-                    {isProcessing ? t('detecting') : t('detectAndMaskEyes')}
+                  <button type="button" onClick={detectAndMaskEyes} disabled={isProcessing || !model || !model.loaded} className="btn btn-primary">
+                    {isProcessing ? t("detecting") : t("detectAndMaskEyes")}
                   </button>
                   {masks.length === 0 && !debugInfo.validationFailed && (
                     <p className="info-text">
-                      {t('clickToDetect')}
+                      {t("clickToDetect")}
                       <br />
-                      <small>{t('noteNoGlasses')}</small>
+                      <small>{t("noteNoGlasses")}</small>
                     </p>
                   )}
                   {debugInfo.validationFailed && (
                     <div className="validation-error">
-                      <strong>{t('detectionFailed')}</strong>
-                      <p>{debugInfo.detectionError || t('eyesNotDetected')}</p>
-                      <p>
-                        {t('useManualMode')}
-                      </p>
+                      <strong>{t("detectionFailed")}</strong>
+                      <p>{debugInfo.detectionError || t("eyesNotDetected")}</p>
+                      <p>{t("useManualMode")}</p>
                     </div>
                   )}
                 </>
               )}
 
-              {mode === "manual" && <p className="manual-instructions">{t('clickAndDrag')}</p>}
+              {mode === "manual" && <p className="manual-instructions">{t("clickAndDrag")}</p>}
 
               {masks.length > 0 && (
                 <>
                   <button type="button" onClick={clearMasks} disabled={isProcessing} className="btn btn-secondary">
-                    {t('clearAllMasks')} ({masks.length})
+                    {t("clearAllMasks")} ({masks.length})
                   </button>
 
                   <div className="masks-list">
                     {masks.map((mask: any, index: any) => (
                       <div key={index} className="mask-item">
-                        <span>{t('mask')} {index + 1}</span>
+                        <span>
+                          {t("mask")} {index + 1}
+                        </span>
                         <button type="button" onClick={() => removeMask(index)} className="btn-small">
-                          {t('remove')}
+                          {t("remove")}
                         </button>
                       </div>
                     ))}
@@ -1109,13 +1063,13 @@ const EyeMaskingForm = () => {
               )}
 
               <button type="submit" disabled={isProcessing || masks.length === 0} className="btn btn-success">
-                {isProcessing ? t('processing') : t('uploadMaskedImageButton')}
+                {isProcessing ? t("processing") : t("uploadMaskedImageButton")}
               </button>
               {masks.length > 0 && (
                 <p className="info-text">
-                  {t('masksApplied', { count: masks.length })}
+                  {t("masksApplied", { count: masks.length })}
                   <br />
-                  <small>{t('originalStaysInBrowser')}</small>
+                  <small>{t("originalStaysInBrowser")}</small>
                 </p>
               )}
             </div>
@@ -1124,60 +1078,60 @@ const EyeMaskingForm = () => {
           </>
         )}
 
-        {!model && !debugInfo.modelError && <div className="loading-model">{t('loadingModel')}</div>}
+        {!model && !debugInfo.modelError && <div className="loading-model">{t("loadingModel")}</div>}
 
         {debugInfo.modelError && (
           <div className="model-error-notice">
-            <strong>{t('modelNotAvailable')}</strong>
-            <p>{t('error')} {debugInfo.modelError}</p>
+            <strong>{t("modelNotAvailable")}</strong>
             <p>
-              {t('canUseManualMode')}
+              {t("error")} {debugInfo.modelError}
             </p>
+            <p>{t("canUseManualMode")}</p>
             <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary">
-              {t('retryLoadingModel')}
+              {t("retryLoadingModel")}
             </button>
           </div>
         )}
       </form>
 
       <div className="privacy-notice">
-        <strong>{t('privacyNotice')}</strong> {t('privacyDescription')}
+        <strong>{t("privacyNotice")}</strong> {t("privacyDescription")}
       </div>
 
       {/* Debug Panel - Remove in production */}
       {Object.keys(debugInfo).length > 0 && (
         <div className="debug-panel">
-          <h3>{t('debugInformation')}</h3>
+          <h3>{t("debugInformation")}</h3>
           <div className="debug-content">
             <p>
-              <strong>{t('modelStatus')}</strong> {debugInfo.modelLoaded ? t('modelLoaded') : t('modelNotLoaded')}
+              <strong>{t("modelStatus")}</strong> {debugInfo.modelLoaded ? t("modelLoaded") : t("modelNotLoaded")}
             </p>
             {debugInfo.modelError && (
               <p>
-                <strong>{t('modelError')}</strong> {debugInfo.modelError}
+                <strong>{t("modelError")}</strong> {debugInfo.modelError}
               </p>
             )}
             {debugInfo.imageLoaded && (
               <>
                 <p>
-                  <strong>{t('image')}</strong> {debugInfo.imageName} ({(debugInfo.imageSize / 1024).toFixed(2)} KB)
+                  <strong>{t("image")}</strong> {debugInfo.imageName} ({(debugInfo.imageSize / 1024).toFixed(2)} KB)
                 </p>
               </>
             )}
             {debugInfo.facesDetected !== undefined && (
               <p>
-                <strong>{t('facesDetected')}</strong> {debugInfo.facesDetected}
+                <strong>{t("facesDetected")}</strong> {debugInfo.facesDetected}
               </p>
             )}
             {debugInfo.masksCreated !== undefined && (
               <p>
-                <strong>{t('masksCreated')}</strong> {debugInfo.masksCreated}
+                <strong>{t("masksCreated")}</strong> {debugInfo.masksCreated}
               </p>
             )}
             {croppedMasks.length > 0 && (
               <>
                 <p>
-                  <strong>{t('croppedRegions')}</strong> {croppedMasks.length}
+                  <strong>{t("croppedRegions")}</strong> {croppedMasks.length}
                 </p>
                 <div className="cropped-masks-preview">
                   {croppedMasks.map((cropped: any, idx) => (
@@ -1185,13 +1139,15 @@ const EyeMaskingForm = () => {
                       <img src={cropped.dataURL} alt={`Cropped mask ${idx + 1}`} className="cropped-preview-img" />
                       <div className="cropped-info">
                         <p>
-                          <strong>{t('mask')} {idx + 1}</strong>
+                          <strong>
+                            {t("mask")} {idx + 1}
+                          </strong>
                         </p>
                         <p>
-                          {t('position')} ({cropped.x}, {cropped.y})
+                          {t("position")} ({cropped.x}, {cropped.y})
                         </p>
                         <p>
-                          {t('size')} {cropped.width} × {cropped.height}px
+                          {t("size")} {cropped.width} × {cropped.height}px
                         </p>
                       </div>
                     </div>
@@ -1201,21 +1157,22 @@ const EyeMaskingForm = () => {
             )}
             {debugInfo.originalSize && (
               <p>
-                <strong>{t('compression')}</strong> {debugInfo.originalSize} KB → {debugInfo.compressedSize} KB ({debugInfo.compressionRatio}% reduction)
+                <strong>{t("compression")}</strong> {debugInfo.originalSize} KB → {debugInfo.compressedSize} KB ({debugInfo.compressionRatio}%
+                reduction)
               </p>
             )}
             {debugInfo.s3Key && (
               <p>
-                <strong>{t('s3Key')}</strong> {debugInfo.s3Key}
+                <strong>{t("s3Key")}</strong> {debugInfo.s3Key}
               </p>
             )}
             {debugInfo.uploadError && (
               <p>
-                <strong>{t('uploadError')}</strong> {debugInfo.uploadError}
+                <strong>{t("uploadError")}</strong> {debugInfo.uploadError}
               </p>
             )}
             <button type="button" onClick={() => setDebugInfo({})} className="btn btn-small">
-              {t('clearDebugInfo')}
+              {t("clearDebugInfo")}
             </button>
           </div>
         </div>

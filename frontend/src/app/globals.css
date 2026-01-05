@@ -16,3 +16,7 @@
   -ms-overflow-style: none; /* IE & Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.ql-conitainer-area .ql-tooltip {
+  left: 15px !important;
+}

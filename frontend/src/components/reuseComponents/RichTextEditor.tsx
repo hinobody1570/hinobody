@@ -34,7 +34,7 @@ const RichTextEditor = ({ value = "", onChange }: QuillEditorProps) => {
   }, [value]);
   return (
     <div className="bg-white border border-gray-300 rounded-md">
-      <div ref={editorRef} className="min-h-[200px]" />
+      <div ref={editorRef} className="min-h-[200px] ql-conitainer-area" />
     </div>
   );
 };

@@ -40,6 +40,7 @@ const nextConfig = {
         fs: false,
         path: false,
         crypto: false,
+        canvas: false,
       };
     }
     
@@ -47,27 +48,9 @@ const nextConfig = {
     config.externals = config.externals || [];
     if (isServer) {
       config.externals.push({
-        '@mediapipe/face_mesh': 'commonjs @mediapipe/face_mesh',
-        '@tensorflow/tfjs': 'commonjs @tensorflow/tfjs',
-        '@tensorflow-models/face-landmarks-detection': 'commonjs @tensorflow-models/face-landmarks-detection',
+        'face-api.js': 'commonjs face-api.js',
+        'canvas': 'commonjs canvas',
       });
-    }
-    
-    // Handle MediaPipe client-side imports
-    // MediaPipe is loaded dynamically at runtime from CDN, so we replace static imports with a stub
-    if (!isServer) {
-      const webpack = require('webpack');
-      const path = require('path');
-      config.plugins = config.plugins || [];
-      
-      // Replace MediaPipe imports with our stub module
-      // This allows the build to complete while MediaPipe is loaded dynamically at runtime
-      config.plugins.push(
-        new webpack.NormalModuleReplacementPlugin(
-          /^@mediapipe\/face_mesh$/,
-          path.resolve(__dirname, 'src/lib/mediapipe-stub.js')
-        )
-      );
     }
     
     return config;
