@@ -53,42 +53,51 @@ export function isAuthenticated(): boolean {
   return !!(token && user);
 }
 
-// Login function (dummy for now, can be connected to backend)
+// Login function - calls real backend API
 export async function login(email: string, password: string): Promise<{ token: string; user: User }> {
-  // This is a dummy implementation
-  // In production, you would call your backend API: /api/auth/login
+  const { authApi } = await import('./api');
+  
   try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Login failed');
-    }
-
-    const data = await response.json();
-    setAuth(data.access_token, data.user);
-    return { token: data.access_token, user: data.user };
-  } catch (error) {
-    // For development/dummy purposes, create a mock user
-    const mockUser: User = {
-      id: '1',
-      email,
-      nickname: email.split('@')[0],
-      role: 'user',
+    const response = await authApi.login(email, password);
+    
+    // Backend returns wrapped response: { statusCode, message, error, data: { access_token, user } }
+    // Store token and user in localStorage (persists after refresh)
+    setAuth(response.data.access_token, response.data.user);
+    
+    return {
+      token: response.data.access_token,
+      user: response.data.user,
     };
-    const mockToken = 'dummy_token_' + Date.now();
-    setAuth(mockToken, mockUser);
-    return { token: mockToken, user: mockUser };
+  } catch (error: any) {
+    // Re-throw with a more user-friendly message
+    const errorMessage = error?.message || 'Login failed. Please check your credentials.';
+    throw new Error(errorMessage);
   }
 }
 
 // Logout function
 export function logout(): void {
   clearAuth();
+}
+
+// Register function - calls real backend API
+export async function register(data: {
+  email: string;
+  password: string;
+  nickname: string;
+  language?: string;
+}): Promise<{ message: string; user: any }> {
+  const { authApi } = await import('./api');
+  
+  try {
+    const response = await authApi.register(data);
+    return {
+      message: response.message,
+      user: response.data.user,
+    };
+  } catch (error: any) {
+    const errorMessage = error?.message || 'Registration failed. Please try again.';
+    throw new Error(errorMessage);
+  }
 }
 

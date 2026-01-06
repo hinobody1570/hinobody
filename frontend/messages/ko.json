@@ -4,6 +4,20 @@
     "welcome": "HiNobody에 오신 것을 환영합니다",
     "description": "Next.js + NestJS with TypeScript"
   },
+  "toast": {
+    "success": "성공",
+    "error": "오류",
+    "info": "정보",
+    "warning": "경고",
+    "loginSuccess": "로그인 성공!",
+    "loginError": "로그인에 실패했습니다. 자격 증명을 확인해주세요.",
+    "registerSuccess": "회원가입 성공! 계정을 확인하려면 이메일을 확인하세요.",
+    "registerError": "회원가입에 실패했습니다. 다시 시도해주세요.",
+    "forgotPasswordSuccess": "비밀번호 재설정 이메일이 전송되었습니다! 받은 편지함을 확인하세요.",
+    "forgotPasswordError": "재설정 이메일 전송에 실패했습니다. 다시 시도해주세요.",
+    "resetPasswordSuccess": "비밀번호 재설정 성공! 이제 새 비밀번호로 로그인할 수 있습니다.",
+    "resetPasswordError": "비밀번호 재설정에 실패했습니다. 다시 시도해주세요."
+  },
   "eyeMasking": {
     "title": "눈 감지 및 마스킹 도구",
     "uploadImage": "이미지 업로드",

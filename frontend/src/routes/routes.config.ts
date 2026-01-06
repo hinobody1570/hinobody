@@ -40,38 +40,39 @@ export const routesConfig: RouteConfig[] = [
     path: ROUTE_PATHS.DUMMY_EXAMPLE,
     access: ROUTE_ACCESS.PUBLIC,
   },
-  {
-    path: ROUTE_PATHS.HOME,
-    access: ROUTE_ACCESS.PUBLIC,
-  },
   
   // Public Routes that redirect if authenticated
   {
     path: ROUTE_PATHS.LOGIN,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.DASHBOARD,
+    redirectTo: ROUTE_PATHS.HOME,
   },
   {
     path: ROUTE_PATHS.REGISTER,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.DASHBOARD,
+    redirectTo: ROUTE_PATHS.HOME,
   },
   {
     path: ROUTE_PATHS.VERIFY_EMAIL,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.DASHBOARD,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.FORGOT_PASSWORD,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.DASHBOARD,
+    redirectTo: ROUTE_PATHS.HOME,
   },
   {
     path: ROUTE_PATHS.RESET_PASSWORD,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.DASHBOARD,
+    redirectTo: ROUTE_PATHS.HOME,
   },
   // Private Routes (require authentication)
+  {
+    path: ROUTE_PATHS.HOME,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.LOGIN,
+  },
   {
     path: ROUTE_PATHS.DASHBOARD,
     access: ROUTE_ACCESS.PRIVATE,

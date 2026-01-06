@@ -11,9 +11,13 @@ import { BsEnvelope } from "react-icons/bs";
 import { FiLock } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { useTranslations } from "next-intl";
+import { authApi } from "@/lib/api";
+import { useToast } from "@/contexts/ToastContext";
 
 export default function ForgotPassword() {
   const t = useTranslations("auth.forgotPasswordPage");
+  const tToast = useTranslations("toast");
+  const { showSuccess, showError } = useToast();
   const [step, setStep] = useState("email"); // 'email', 'success', 'reset'
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -35,16 +39,24 @@ export default function ForgotPassword() {
   };
 
   const handleEmailSubmit = async () => {
-    if (!validateEmail()) return;
+    if (!validateEmail()) {
+      return;
+    }
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Password reset email sent to:", email);
+    try {
+      // Call the real API
+      await authApi.forgotPassword(email);
       setIsLoading(false);
+      showSuccess(tToast("forgotPasswordSuccess"));
       setStep("success");
-    }, 1500);
+    } catch (error: any) {
+      // Handle API errors
+      setIsLoading(false);
+      const errorMessage = error?.message || tToast("forgotPasswordError");
+      showError(errorMessage);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -132,8 +144,12 @@ export default function ForgotPassword() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 mb-2">{t("didntReceiveEmail")}</p>
-            <button onClick={handleEmailSubmit} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              {t("resendEmail")}
+            <button 
+              onClick={handleEmailSubmit} 
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              disabled={isLoading}
+            >
+              {isLoading ? t("sending") : t("resendEmail")}
             </button>
           </div>
           <div className="mt-6 text-center">

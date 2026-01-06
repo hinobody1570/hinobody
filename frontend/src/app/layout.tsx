@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ToastProvider } from '@/contexts/ToastContext';
 import { LocaleProvider } from '@/components/LocaleProvider';
+import { ToastContainer } from '@/components/Toast';
 import RouteGuard from '@/routes/RouteGuard';
 import { headers } from 'next/headers';
 import { parseLocaleFromCookies } from '@/lib/locale-cookie';
@@ -71,11 +73,14 @@ export default async function RootLayout({
       <body>
         <LanguageProvider initialLocale={locale as any}>
           <LocaleProvider initialLocale={locale} initialMessages={messages}>
-            <AuthProvider>
-              <RouteGuard>
-                {children}
-              </RouteGuard>
-            </AuthProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <RouteGuard>
+                  {children}
+                  <ToastContainer />
+                </RouteGuard>
+              </AuthProvider>
+            </ToastProvider>
           </LocaleProvider>
         </LanguageProvider>
       </body>

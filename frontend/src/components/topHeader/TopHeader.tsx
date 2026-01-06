@@ -11,10 +11,12 @@ import { IconButton } from "../reuseComponents/NavBarIconButton";
 import { SearchBar } from "../reuseComponents/SearchBar";
 import { useRouter } from 'next/navigation';
 import { ROUTE_PATHS } from "@/routes/paths";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const RedditHeader = () => {
   const t = useTranslations('header');
   const router = useRouter();
+  const {user} = useAuth()
   
   const headerActions = [
     { icon: BsBadgeAd, onClick: () => console.log("Ads") },
@@ -48,6 +50,7 @@ export const RedditHeader = () => {
             color="bg-teal-400"
             onClick={() => console.log("Avatar")}
           />
+          <h4>{user?.nickname}</h4>
         </div>
       </div>
     </header>

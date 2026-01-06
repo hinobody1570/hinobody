@@ -4,6 +4,20 @@
     "welcome": "Welcome to HiNobody",
     "description": "Next.js + NestJS with TypeScript"
   },
+  "toast": {
+    "success": "Success",
+    "error": "Error",
+    "info": "Info",
+    "warning": "Warning",
+    "loginSuccess": "Login successful!",
+    "loginError": "Login failed. Please check your credentials.",
+    "registerSuccess": "Registration successful! Please check your email to verify your account.",
+    "registerError": "Registration failed. Please try again.",
+    "forgotPasswordSuccess": "Password reset email sent! Please check your inbox.",
+    "forgotPasswordError": "Failed to send reset email. Please try again.",
+    "resetPasswordSuccess": "Password reset successful! You can now login with your new password.",
+    "resetPasswordError": "Failed to reset password. Please try again."
+  },
   "eyeMasking": {
     "title": "Eye Detection & Masking Tool",
     "uploadImage": "Upload Image",

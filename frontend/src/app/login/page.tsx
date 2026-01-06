@@ -7,9 +7,12 @@ import FormLabel from "@/components/reuseComponents/FormLabel";
 import PasswordInput from "@/components/reuseComponents/PasswordInput";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsEnvelope } from "react-icons/bs";
 import { useTranslations } from "next-intl";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/contexts/ToastContext";
 
 interface loginFormType {
   email?: string;
@@ -21,6 +24,10 @@ type LoginFormErrors = Partial<Record<keyof loginFormType, string>>;
 export default function LoginForm() {
   const t = useTranslations("auth.loginPage");
   const tAuth = useTranslations("auth");
+  const tToast = useTranslations("toast");
+  const { login: authLogin, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState<loginFormType>({
     email: "",
     password: "",
@@ -28,7 +35,6 @@ export default function LoginForm() {
 
   const [errors, setErrors] = useState<any>({});
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
@@ -68,19 +74,24 @@ export default function LoginForm() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Login submitted:", { ...formData, rememberMe });
-      setIsLoading(false);
-      setIsLoggedIn(true);
+    try {
+      // Call the real API through AuthContext
+      await authLogin(formData.email!, formData.password!);
 
-      // Reset after 3 seconds
-      setTimeout(() => {
-        setIsLoggedIn(false);
-        setFormData({ email: "", password: "" });
-        setRememberMe(false);
-      }, 3000);
-    }, 1500);
+      // Success - show toast and redirect
+      showSuccess(tToast("loginSuccess"));
+      setIsLoading(false)
+      // Redirect to home
+      router.push(ROUTE_PATHS.HOME);
+    } catch (error: any) {
+      // Handle API errors
+      setIsLoading(false);
+      const errorMessage = error?.message || tToast("loginError");
+      showError(errorMessage);
+
+      // Clear password field on error
+      setFormData((prev) => ({ ...prev, password: "" }));
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -89,9 +100,11 @@ export default function LoginForm() {
     }
   };
 
-  if (isLoggedIn) {
-    return <ConfirmationMessage message={t("loginSuccessMessage")} title={t("loginSuccessTitle")} />;
-  }
+  useEffect(() => {
+    if(isAuthenticated){
+      router.push(ROUTE_PATHS.HOME)
+    }
+  },[isAuthenticated])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { FiLock } from "react-icons/fi";
 import Link from "next/link";
@@ -10,14 +10,33 @@ import FormLabel from "@/components/reuseComponents/FormLabel";
 import PasswordInput from "@/components/reuseComponents/PasswordInput";
 import FormButton from "@/components/reuseComponents/FormButton";
 import { useTranslations } from "next-intl";
+import { authApi } from "@/lib/api";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/contexts/ToastContext";
 
 const ResetPassword = () => {
   const t = useTranslations("auth.resetPasswordPage");
+  const tToast = useTranslations("toast");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { showSuccess, showError } = useToast();
   const [passwordErrors, setPasswordErrors] = useState<any>({});
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isReset, setIsReset] = useState(false);
+  const [resetToken, setResetToken] = useState<string>("");
+
+  // Get token from URL query parameter
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      setResetToken(token);
+    } else {
+      // If no token, show error toast
+      showError("Invalid or missing reset token. Please request a new password reset.");
+    }
+  }, [searchParams, showError]);
 
   const validatePassword = () => {
     const errors: any = {};
@@ -48,6 +67,11 @@ const ResetPassword = () => {
   };
 
   const handlePasswordReset = async () => {
+    if (!resetToken) {
+      showError("Invalid or missing reset token. Please request a new password reset.");
+      return;
+    }
+
     const errors = validatePassword();
 
     if (Object.keys(errors).length > 0) {
@@ -57,19 +81,27 @@ const ResetPassword = () => {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Password reset successfully");
+    try {
+      // Call the real API
+      await authApi.resetPassword(resetToken, newPassword);
       setIsLoading(false);
+      showSuccess(tToast("resetPasswordSuccess"));
       setIsReset(true);
 
-      // Redirect after 3 seconds
+      // Redirect to login after 2 seconds
       setTimeout(() => {
-        setIsReset(false);
-        setNewPassword("");
-        setConfirmPassword("");
-      }, 3000);
-    }, 1500);
+        router.push(ROUTE_PATHS.LOGIN);
+      }, 2000);
+    } catch (error: any) {
+      // Handle API errors
+      setIsLoading(false);
+      const errorMessage = error?.message || tToast("resetPasswordError");
+      showError(errorMessage);
+      
+      // Clear password fields on error
+      setNewPassword("");
+      setConfirmPassword("");
+    }
   };
 
   if (isReset) {
@@ -120,7 +152,12 @@ const ResetPassword = () => {
           </div>
 
           {/* Submit */}
-          <FormButton title={t("resetPassword")} loadingTitle={t("resetting")} handleSubmit={handlePasswordReset} disabled={isLoading} />
+          <FormButton 
+            title={t("resetPassword")} 
+            loadingTitle={t("resetting")} 
+            handleSubmit={handlePasswordReset} 
+            disabled={isLoading || !resetToken} 
+          />
         </div>
       </div>
     </div>

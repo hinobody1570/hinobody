@@ -11,6 +11,10 @@ import { useState } from "react";
 import { BsEnvelope } from "react-icons/bs";
 import { FiUser } from "react-icons/fi";
 import { useTranslations } from "next-intl";
+import { register } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/contexts/ToastContext";
 
 interface SignUpFormType {
   email?: string;
@@ -23,6 +27,10 @@ type SignUpFormErrors = Partial<Record<keyof SignUpFormType, string>>;
 export default function SignupForm() {
   const t = useTranslations("auth.registerPage");
   const tAuth = useTranslations("auth");
+  const tToast = useTranslations("toast");
+  const router = useRouter();
+  const { locale } = useLanguage();
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState<SignUpFormType>({
     email: "",
     nickname: "",
@@ -76,18 +84,29 @@ export default function SignupForm() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form submitted:", formData);
-      setIsLoading(false);
+    try {
+      // Call the real API
+      await register({
+        email: formData.email!,
+        password: formData.password!,
+        nickname: formData.nickname!,
+        language: locale.toUpperCase() as any, // Convert to Language enum format
+      });
+
+      // Success - show toast and redirect
+      showSuccess(tToast("registerSuccess"));
       setIsSubmitted(true);
 
-      // Reset after 3 seconds
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setFormData({ email: "", nickname: "", password: "" });
-      }, 3000);
-    }, 1500);
+      
+    } catch (error: any) {
+      // Handle API errors
+      setIsLoading(false);
+      const errorMessage = error?.message || tToast("registerError");
+      showError(errorMessage);
+      
+      // Clear password field on error
+      setFormData((prev) => ({ ...prev, password: "" }));
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -98,7 +117,10 @@ export default function SignupForm() {
 
   if (isSubmitted) {
     return (
-      <ConfirmationMessage message={t("accountCreatedMessage", { nickname: formData.nickname })} title={t("accountCreatedTitle")} />
+      <ConfirmationMessage 
+        message={tAuth("registrationSuccessful")} 
+        title={t("accountCreatedTitle")} 
+      />
     );
   }
 

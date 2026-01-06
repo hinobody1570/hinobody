@@ -42,10 +42,10 @@ export default function Home() {
             <button
               className="p-2 rounded-xl bg-white text-black text-lg cursor-pointer"
               onClick={() => {
-                return router.push(ROUTE_PATHS.HOME);
+                return router.push(ROUTE_PATHS.LOGIN);
               }}
             >
-              Home
+              Login
             </button>
             <LanguageSwitcher />
           </div>
