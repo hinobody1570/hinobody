@@ -1,0 +1,135 @@
+import { useState } from "react";
+import { FaRegCircleUser } from "react-icons/fa6";
+import { FiEdit } from "react-icons/fi";
+import { LuFileText } from "react-icons/lu";
+import { GoTrophy } from "react-icons/go";
+import { LuDollarSign } from "react-icons/lu";
+import { GiQueenCrown } from "react-icons/gi";
+import { IoMoonOutline } from "react-icons/io5";
+import { MdLogout } from "react-icons/md";
+import { FaRegClock } from "react-icons/fa6";
+import { IoSettingsOutline } from "react-icons/io5";
+import { useAuth } from "@/contexts/AuthContext";
+
+export default function ProfileDropdown() {
+  const [darkMode, setDarkMode] = useState(false);
+  const { logout, user} = useAuth()
+
+  const menuItems = [
+    {
+      icon: FaRegCircleUser,
+      label: "View Profile",
+      subtitle: "u/ResultRight8391",
+      onClick: () => console.log("View Profile"),
+    },
+    {
+      icon: FiEdit,
+      label: "Edit Avatar",
+      onClick: () => console.log("Edit Avatar"),
+    },
+    {
+      icon: LuFileText,
+      label: "Drafts",
+      onClick: () => console.log("Drafts"),
+    },
+    {
+      icon: GoTrophy,
+      label: "Achievements",
+      subtitle: "5 unlocked",
+      onClick: () => console.log("Achievements"),
+    },
+    {
+      icon: LuDollarSign,
+      label: "Earn",
+      subtitle: "Earn cash on Reddit",
+      onClick: () => console.log("Earn"),
+    },
+    {
+      icon: GiQueenCrown,
+      label: "Premium",
+      onClick: () => console.log("Premium"),
+    },
+  ];
+
+  const bottomItems = [
+    {
+      icon: IoMoonOutline,
+      label: "Advertise on Reddit",
+      onClick: () => console.log("Advertise"),
+    },
+    {
+      icon: FaRegClock,
+      label: "Try Reddit Pro",
+      badge: "BETA",
+      onClick: () => console.log("Try Reddit Pro"),
+    },
+    {
+      icon: IoSettingsOutline,
+      label: "Settings",
+      onClick: () => console.log("Settings"),
+    },
+  ];
+
+  return (
+    <div className="absolute right-0 top-16 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-fadeIn">
+      {/* Profile Section */}
+      <button onClick={menuItems[0].onClick} className="w-full px-4 py-3 hover:bg-gray-50 transition flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <span className="text-white text-lg font-bold">R</span>
+        </div>
+        <div className="text-left">
+          <p className="text-sm font-medium text-gray-900">View Profile</p>
+          <p className="text-xs text-gray-500">{user?.nickname}</p>
+        </div>
+      </button>
+
+      <div className="border-t border-gray-200 my-2"></div>
+
+      {/* Menu Items */}
+      {menuItems.slice(1).map((item, index) => (
+        <button key={index} onClick={item.onClick} className="w-full px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition flex items-center gap-3">
+          <item.icon className="w-5 h-5 text-gray-700 flex-shrink-0" />
+          <div className="text-left flex-1">
+            <p className="text-sm font-medium text-gray-900">{item.label}</p>
+            {item.subtitle && <p className="text-xs text-gray-500">{item.subtitle}</p>}
+          </div>
+        </button>
+      ))}
+
+      <div className="border-t border-gray-200 my-2"></div>
+
+      {/* Dark Mode Toggle */}
+      <div className="px-4 py-2.5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <IoMoonOutline className="w-5 h-5 text-gray-700" />
+          <span className="text-sm font-medium text-gray-900">Dark Mode</span>
+        </div>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className={`relative w-11 cursor-pointer h-6 rounded-full transition ${darkMode ? "bg-teal-500" : "bg-gray-300"}`}
+        >
+          <div
+            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${darkMode ? "translate-x-5" : "translate-x-0"}`}
+          ></div>
+        </button>
+      </div>
+
+      {/* Log Out */}
+      <button onClick={() => logout()} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
+        <MdLogout className="w-5 h-5 text-gray-700" />
+        <span className="text-sm font-medium text-gray-900">Log Out</span>
+      </button>
+
+      <div className="border-t border-gray-200 my-2"></div>
+
+      {/* Bottom Items */}
+      {bottomItems.map((item, index) => (
+        <button key={index} onClick={item.onClick} className="w-full px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
+          <item.icon className="w-5 h-5 text-gray-700 flex-shrink-0" />
+          <span className="text-sm font-medium text-gray-900">{item.label}</span>
+          {item.badge && <span className="ml-auto text-xs font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded">{item.badge}</span>}
+        </button>
+      ))}
+    </div>
+  );
+}

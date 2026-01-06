@@ -9,48 +9,56 @@ import { Avatar } from "../reuseComponents/Avatar";
 import { Logo } from "../reuseComponents/Logo";
 import { IconButton } from "../reuseComponents/NavBarIconButton";
 import { SearchBar } from "../reuseComponents/SearchBar";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useRef, useState } from "react";
+import ProfileDropdown from "../profileDropDown/ProfileDropdown";
 
 export const RedditHeader = () => {
-  const t = useTranslations('header');
+  const t = useTranslations("header");
   const router = useRouter();
-  const {user} = useAuth()
-  
+  const { user } = useAuth();
+  const dropdownRef = useRef(null);
+
+  const [profileDropdown, setProfileDropDown] = useState(false);
+
   const headerActions = [
     { icon: BsBadgeAd, onClick: () => console.log("Ads") },
     { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
-    { icon: VscDiffAdded, label: t('create'), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
+    { icon: VscDiffAdded, label: t("create"), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
     { icon: BsBell, onClick: () => console.log("Notifications") },
   ];
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropDown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="flex items-center justify-between gap-4 px-6 py-3 lg:px-16">
-
         <Logo text="reddit" onClick={() => console.log("Logo clicked")} />
 
         <div className="flex-1 max-w-2xl">
-          <SearchBar placeholder={t('findAnything')} />
+          <SearchBar placeholder={t("findAnything")} />
         </div>
 
         <div className="flex items-center gap-4">
           <LanguageSwitcher />
           {headerActions.map((action, index) => (
-            <IconButton
-              key={index}
-              icon={action.icon}
-              label={action.label}
-              onClick={action.onClick}
-            />
+            <IconButton key={index} icon={action.icon} label={action.label} onClick={action.onClick} />
           ))}
 
-          <Avatar
-            color="bg-teal-400"
-            onClick={() => console.log("Avatar")}
-          />
-          <h4>{user?.nickname}</h4>
+          <Avatar color="bg-teal-400" onClick={() => setProfileDropDown(!profileDropdown)} />
+
+          {profileDropdown && <ProfileDropdown />}
         </div>
       </div>
     </header>
