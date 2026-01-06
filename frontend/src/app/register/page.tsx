@@ -1,130 +1,160 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import ConfirmationMessage from "@/components/reuseComponents/ConfirmationMessage";
+import FormButton from "@/components/reuseComponents/FormButton";
+import FormInput from "@/components/reuseComponents/FormInput";
+import FormLabel from "@/components/reuseComponents/FormLabel";
+import PasswordInput from "@/components/reuseComponents/PasswordInput";
+import { ROUTE_PATHS } from "@/routes/paths";
+import Link from "next/link";
+import { useState } from "react";
+import { BsEnvelope } from "react-icons/bs";
+import { FiUser } from "react-icons/fi";
 
-export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const router = useRouter();
-  const t = useTranslations('auth');
+interface SignUpFormType {
+  email?: string;
+  nickname?: string;
+  password?: string;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+type SignUpFormErrors = Partial<Record<keyof SignUpFormType, string>>;
 
-    try {
-      // In production, call your backend API: /api/auth/register
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, nickname }),
-      });
+export default function SignupForm() {
+  const [formData, setFormData] = useState<SignUpFormType>({
+    email: "",
+    nickname: "",
+    password: "",
+  });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || t('registrationFailed'));
-      }
+  const [errors, setErrors] = useState<any>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-      setSuccess(true);
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        router.push('/login');
-      }, 2000);
-    } catch (err: any) {
-      setError(err.message || t('registrationFailed'));
-    } finally {
-      setLoading(false);
+  const validateForm = () => {
+    const newErrors: SignUpFormErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!formData.nickname) {
+      newErrors.nickname = "Nickname is required";
+    } else if (formData.nickname.length < 3) {
+      newErrors.nickname = "Nickname must be at least 3 characters";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
+
+    return newErrors;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev: any) => ({ ...prev, [name]: "" }));
     }
   };
 
+  const handleSubmit = async () => {
+    const newErrors = validateForm();
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      console.log("Form submitted:", formData);
+      setIsLoading(false);
+      setIsSubmitted(true);
+
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({ email: "", nickname: "", password: "" });
+      }, 3000);
+    }, 1500);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
+  if (isSubmitted) {
+    return (
+      <ConfirmationMessage message={`Welcome aboard, ${formData.nickname}! Your account has been successfully created`} title="Account Created!" />
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-500 to-teal-600 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">{t('register')}</h1>
-        
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
+          <p className="text-gray-600">Join us today and get started</p>
+        </div>
 
-        {success && (
-          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
-            {t('registrationSuccessful')}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-6">
+          {/* Email Field */}
           <div>
-            <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('nickname')}
-            </label>
-            <input
-              id="nickname"
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder={t('nicknamePlaceholder')}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('email')}
-            </label>
-            <input
-              id="email"
+            <FormLabel labelTitle="Email Address" htmlForTitle="email" />
+            <FormInput
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder={t('emailPlaceholder')}
+              icon={<BsEnvelope className="h-5 w-5 text-gray-400" />}
+              id="email"
+              onKeyPress={handleKeyPress}
+              name="email"
+              onChange={handleChange}
+              value={formData.email}
+              error={errors.email}
+              placeholder="you@example.com"
             />
           </div>
 
+          {/* Nickname Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('password')}
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder={t('passwordMinLength')}
+            <FormLabel labelTitle="Nickname" htmlForTitle="nickname" />
+            <FormInput
+              type="text"
+              icon={<FiUser className="h-5 w-5 text-gray-400" />}
+              id="nickname"
+              onKeyPress={handleKeyPress}
+              name="nickname"
+              onChange={handleChange}
+              value={formData.nickname}
+              error={errors.nickname}
+              placeholder="John"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || success}
-            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? t('registering') : success ? t('success') : t('register')}
-          </button>
-        </form>
+          {/* Password Field */}
+          <div>
+            <FormLabel labelTitle="Password" htmlForTitle="password" />
+            <PasswordInput onChange={handleChange} onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
+          </div>
 
-        <div className="mt-4 text-center">
+          {/* Submit Button */}
+          <FormButton title="Create Account" loadingTitle="Creating Account..." handleSubmit={handleSubmit} disabled={isLoading} />
+        </div>
+
+        <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            {t('alreadyHaveAccount')}{' '}
-            <Link href="/login" className="text-green-600 hover:underline">
-              {t('login')}
+            Already have an account?{" "}
+            <Link href={ROUTE_PATHS.LOGIN} className="text-blue-600 hover:text-blue-700 font-medium">
+              Sign in
             </Link>
           </p>
         </div>
@@ -132,4 +162,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

@@ -56,7 +56,21 @@ export const routesConfig: RouteConfig[] = [
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
     redirectTo: ROUTE_PATHS.DASHBOARD,
   },
-  
+  {
+    path: ROUTE_PATHS.VERIFY_EMAIL,
+    access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
+    redirectTo: ROUTE_PATHS.DASHBOARD,
+  },
+  {
+    path: ROUTE_PATHS.FORGOT_PASSWORD,
+    access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
+    redirectTo: ROUTE_PATHS.DASHBOARD,
+  },
+  {
+    path: ROUTE_PATHS.RESET_PASSWORD,
+    access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
+    redirectTo: ROUTE_PATHS.DASHBOARD,
+  },
   // Private Routes (require authentication)
   {
     path: ROUTE_PATHS.DASHBOARD,

@@ -1,101 +1,165 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import ConfirmationMessage from "@/components/reuseComponents/ConfirmationMessage";
+import FormButton from "@/components/reuseComponents/FormButton";
+import FormInput from "@/components/reuseComponents/FormInput";
+import FormLabel from "@/components/reuseComponents/FormLabel";
+import PasswordInput from "@/components/reuseComponents/PasswordInput";
+import { ROUTE_PATHS } from "@/routes/paths";
+import Link from "next/link";
+import { useState } from "react";
+import { BsEnvelope } from "react-icons/bs";
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const router = useRouter();
-  const t = useTranslations('auth');
+interface loginFormType {
+  email?: string;
+  password?: string;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+type LoginFormErrors = Partial<Record<keyof loginFormType, string>>;
 
-    try {
-      await login(email, password);
-      router.push('/main/dashboard');
-    } catch (err: any) {
-      setError(err.message || t('loginFailed'));
-    } finally {
-      setLoading(false);
+export default function LoginForm() {
+  const [formData, setFormData] = useState<loginFormType>({
+    email: "",
+    password: "",
+  });
+
+  const [errors, setErrors] = useState<any>({});
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: LoginFormErrors = {};
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
+
+    return newErrors;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (errors[name]) {
+      setErrors((prev: any) => ({ ...prev, [name]: "" }));
     }
   };
 
+  const handleSubmit = async () => {
+    const newErrors = validateForm();
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      console.log("Login submitted:", { ...formData, rememberMe });
+      setIsLoading(false);
+      setIsLoggedIn(true);
+
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setIsLoggedIn(false);
+        setFormData({ email: "", password: "" });
+        setRememberMe(false);
+      }, 3000);
+    }, 1500);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
+  if (isLoggedIn) {
+    return <ConfirmationMessage message="You have successfully logged in to your account." title="Welcome Back!" />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">{t('login')}</h1>
-        
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('email')}
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder={t('emailPlaceholder')}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('password')}
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder={t('passwordPlaceholder')}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? t('loggingIn') : t('login')}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">
-            {t('dontHaveAccount')}{' '}
-            <Link href="/register" className="text-blue-600 hover:underline">
-              {t('register')}
-            </Link>
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+          <p className="text-gray-600">Sign in to continue to your account</p>
         </div>
 
-        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-          <p className="font-semibold">{t('demoNote')}</p>
-          <p>{t('demoDescription')}</p>
+        <div className="space-y-6">
+          {/* Email Field */}
+          <div>
+            <FormLabel labelTitle="Email Address" htmlForTitle="email" />
+            <FormInput
+              type="email"
+              icon={<BsEnvelope className="h-5 w-5 text-gray-400" />}
+              id="email"
+              onKeyPress={handleKeyPress}
+              name="email"
+              onChange={handleChange}
+              value={formData.email}
+              error={errors.email}
+              placeholder="you@example.com"
+            />
+          </div>
+
+          {/* Password Field */}
+          <div>
+            <FormLabel labelTitle="Password" htmlForTitle="password" />
+            <PasswordInput onChange={handleChange} onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
+          </div>
+
+          {/* Remember Me & Forgot Password */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+              />
+              <label htmlFor="remember" className="ml-2 block text-sm text-gray-700 cursor-pointer">
+                Remember me
+              </label>
+            </div>
+            <Link href={ROUTE_PATHS.FORGOT_PASSWORD} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              Forgot password?
+            </Link>
+          </div>
+
+          {/* Submit Button */}
+          <FormButton title="Sign In" loadingTitle="Signing In..." handleSubmit={handleSubmit} disabled={isLoading} />
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link href={ROUTE_PATHS.REGISTER} className="text-blue-600 hover:text-blue-700 font-medium">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>
   );
 }
-
