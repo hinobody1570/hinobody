@@ -156,3 +156,75 @@ export const authApi = {
   },
 };
 
+// Boards API endpoints
+export interface Board {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BoardsResponse {
+  data: Board[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export const boardsApi = {
+  getAll: async (page: number = 1, limit: number = 20, search?: string): Promise<BoardsResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) {
+      params.append('search', search);
+    }
+    const response = await api.get<ApiResponse<BoardsResponse>>(`${API_END_POINT.BOARDS}?${params.toString()}`);
+    // The API returns { statusCode, message, error, data: { data: Board[], meta: {...} } }
+    return response.data;
+  },
+};
+
+// Posts API endpoints
+export type Language = 'EN' | 'KO' | 'ZH' | 'JA';
+
+export interface CreatePostDto {
+  title: string;
+  body: string;
+  originalLanguage: Language;
+  boardId: string;
+  imageIds?: string[];
+}
+
+export interface Post {
+  id: string;
+  title: string;
+  body: string;
+  originalLanguage: Language;
+  authorId: string;
+  boardId: string;
+  isActive: boolean;
+  isDeleted: boolean;
+  upvoteCount: number;
+  downvoteCount: number;
+  commentCount: number;
+  viewCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const postsApi = {
+  create: async (createPostDto: CreatePostDto): Promise<Post> => {
+    const response = await api.post<ApiResponse<Post>>(API_END_POINT.POSTS, createPostDto);
+    // The API returns { statusCode, message, error, data: Post }
+    return response.data;
+  },
+};
+

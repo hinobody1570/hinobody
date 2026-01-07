@@ -16,7 +16,9 @@
     "forgotPasswordSuccess": "パスワードリセットメールが送信されました！受信トレイを確認してください。",
     "forgotPasswordError": "リセットメールの送信に失敗しました。もう一度お試しください。",
     "resetPasswordSuccess": "パスワードリセット成功！新しいパスワードでログインできるようになりました。",
-    "resetPasswordError": "パスワードリセットに失敗しました。もう一度お試しください。"
+    "resetPasswordError": "パスワードリセットに失敗しました。もう一度お試しください。",
+    "postSuccess": "投稿が正常に作成されました！",
+    "postError": "投稿の作成に失敗しました。もう一度お試しください。"
   },
   "eyeMasking": {
     "title": "目の検出とマスキングツール",
@@ -338,7 +340,10 @@
       "searchDuplicates": "投稿前に重複を検索してください",
       "readRules": "コミュニティのルールを読んでください"
     },
-    "characters": "文字"
+    "characters": "文字",
+    "titleRequired": "タイトルは必須です",
+    "bodyRequired": "本文内容は必須です",
+    "communityRequired": "コミュニティを選択してください"
   },
   "profileDropdown": {
     "viewProfile": "プロフィールを表示",

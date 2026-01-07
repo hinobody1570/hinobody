@@ -16,7 +16,9 @@
     "forgotPasswordSuccess": "비밀번호 재설정 이메일이 전송되었습니다! 받은 편지함을 확인하세요.",
     "forgotPasswordError": "재설정 이메일 전송에 실패했습니다. 다시 시도해주세요.",
     "resetPasswordSuccess": "비밀번호 재설정 성공! 이제 새 비밀번호로 로그인할 수 있습니다.",
-    "resetPasswordError": "비밀번호 재설정에 실패했습니다. 다시 시도해주세요."
+    "resetPasswordError": "비밀번호 재설정에 실패했습니다. 다시 시도해주세요.",
+    "postSuccess": "게시물이 성공적으로 생성되었습니다!",
+    "postError": "게시물 생성에 실패했습니다. 다시 시도해주세요."
   },
   "eyeMasking": {
     "title": "눈 감지 및 마스킹 도구",
@@ -338,7 +340,10 @@
       "searchDuplicates": "게시하기 전에 중복을 검색하세요",
       "readRules": "커뮤니티 규칙을 읽으세요"
     },
-    "characters": "자"
+    "characters": "자",
+    "titleRequired": "제목은 필수입니다",
+    "bodyRequired": "본문 내용은 필수입니다",
+    "communityRequired": "커뮤니티를 선택해주세요"
   },
   "profileDropdown": {
     "viewProfile": "프로필 보기",

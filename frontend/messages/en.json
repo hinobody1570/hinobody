@@ -16,7 +16,9 @@
     "forgotPasswordSuccess": "Password reset email sent! Please check your inbox.",
     "forgotPasswordError": "Failed to send reset email. Please try again.",
     "resetPasswordSuccess": "Password reset successful! You can now login with your new password.",
-    "resetPasswordError": "Failed to reset password. Please try again."
+    "resetPasswordError": "Failed to reset password. Please try again.",
+    "postSuccess": "Post created successfully!",
+    "postError": "Failed to create post. Please try again."
   },
   "eyeMasking": {
     "title": "Eye Detection & Masking Tool",
@@ -338,7 +340,10 @@
       "searchDuplicates": "Search for duplicates before posting",
       "readRules": "Read the community's rules"
     },
-    "characters": "characters"
+    "characters": "characters",
+    "titleRequired": "Title is required",
+    "bodyRequired": "Body content is required",
+    "communityRequired": "Please select a community"
   },
   "profileDropdown": {
     "viewProfile": "View Profile",
