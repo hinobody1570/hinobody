@@ -201,6 +201,7 @@ export interface CreatePostDto {
   originalLanguage: Language;
   boardId: string;
   imageIds?: string[];
+  tags?: string[];
 }
 
 export interface Post {
@@ -218,12 +219,49 @@ export interface Post {
   viewCount: number;
   createdAt: string;
   updatedAt: string;
+  // Relations included in findAll response
+  author?: {
+    id: string;
+    nickname: string;
+    language: string;
+  };
+  board?: Board;
+  images?: Array<{
+    id: string;
+    key: string;
+    url: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  _count?: {
+    comments: number;
+    votes: number;
+  };
+}
+
+export interface PostsResponse {
+  data: Post[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export const postsApi = {
   create: async (createPostDto: CreatePostDto): Promise<Post> => {
     const response = await api.post<ApiResponse<Post>>(API_END_POINT.POSTS, createPostDto);
     // The API returns { statusCode, message, error, data: Post }
+    return response.data;
+  },
+  getAll: async (page: number = 1, limit: number = 20): Promise<PostsResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${params.toString()}`);
+    // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
     return response.data;
   },
 };

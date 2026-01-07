@@ -23,7 +23,7 @@ export class PostService {
       throw new NotFoundException('Board not found');
     }
 
-    // Create post with images
+    // Create post with images and tags
     const post = await this.prisma.post.create({
       data: {
         title: createPostDto.title,
@@ -31,6 +31,7 @@ export class PostService {
         originalLanguage: createPostDto.originalLanguage,
         authorId: userId,
         boardId: createPostDto.boardId,
+        tags: createPostDto.tags || [],
         images: createPostDto.imageIds
           ? {
               connect: createPostDto.imageIds.map((id) => ({ id })),

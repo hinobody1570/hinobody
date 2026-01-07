@@ -6,6 +6,7 @@ import { BiChevronDown, BiSearch } from "react-icons/bi";
 import { Tab } from "@/components/reuseComponents/Tabs";
 import RichTextEditor from "@/components/reuseComponents/RichTextEditor";
 import PostingGuide from "@/components/reuseComponents/PostingGuide";
+import TagsInput from "@/components/reuseComponents/TagsInput";
 import { boardsApi, Board, postsApi, Language } from "@/lib/api";
 import { useToast } from "@/contexts/ToastContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -29,6 +30,7 @@ const CreatePost = () => {
   const [isLoadingBoards, setIsLoadingBoards] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -72,6 +74,7 @@ const CreatePost = () => {
         body: body.trim(),
         originalLanguage: getLanguage(),
         boardId: selectedCommunity.id,
+        tags: tags.length > 0 ? tags : undefined,
         // imageIds can be added later when image upload is implemented
       };
       await postsApi.create(postData);
@@ -83,6 +86,7 @@ const CreatePost = () => {
       setTitle("");
       setBody("");
       setSelectedCommunity(null);
+      setTags([]);
       
       // Optionally navigate to the post or feed
       // router.push(`/main/feed`);
@@ -265,10 +269,8 @@ const CreatePost = () => {
               </div>
             </div>
 
-            {/* Tags Button */}
-            <button className="mb-4 px-4 py-2 bg-gray-100 text-gray-500 text-sm rounded-full hover:bg-gray-200 transition-colors">
-              {t("addTags")}
-            </button>
+            {/* Tags Input */}
+            <TagsInput tags={tags} onChange={setTags} />
 
             {/* Rich Text Editor */}
             <div className="border border-gray-300 rounded-lg overflow-hidden">
