@@ -339,5 +339,21 @@
       "readRules": "阅读社区规则"
     },
     "characters": "字符"
+  },
+  "profileDropdown": {
+    "viewProfile": "查看个人资料",
+    "editAvatar": "编辑头像",
+    "drafts": "草稿",
+    "achievements": "成就",
+    "achievementsUnlocked": "已解锁 {count} 个",
+    "earn": "赚取",
+    "earnCashOnReddit": "在 Reddit 上赚取现金",
+    "premium": "高级版",
+    "advertiseOnReddit": "在 Reddit 上做广告",
+    "tryRedditPro": "试用 Reddit Pro",
+    "beta": "测试版",
+    "settings": "设置",
+    "darkMode": "深色模式",
+    "logOut": "登出"
   }
 }

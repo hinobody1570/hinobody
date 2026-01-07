@@ -10,43 +10,45 @@ import { MdLogout } from "react-icons/md";
 import { FaRegClock } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslations } from "next-intl";
 
 export default function ProfileDropdown() {
   const [darkMode, setDarkMode] = useState(false);
-  const { logout, user} = useAuth()
+  const { logout, user} = useAuth();
+  const t = useTranslations("profileDropdown");
 
   const menuItems = [
     {
       icon: FaRegCircleUser,
-      label: "View Profile",
-      subtitle: "u/ResultRight8391",
+      label: t("viewProfile"),
+      subtitle: `u/${user?.nickname || "ResultRight8391"}`,
       onClick: () => console.log("View Profile"),
     },
     {
       icon: FiEdit,
-      label: "Edit Avatar",
+      label: t("editAvatar"),
       onClick: () => console.log("Edit Avatar"),
     },
     {
       icon: LuFileText,
-      label: "Drafts",
+      label: t("drafts"),
       onClick: () => console.log("Drafts"),
     },
     {
       icon: GoTrophy,
-      label: "Achievements",
-      subtitle: "5 unlocked",
+      label: t("achievements"),
+      subtitle: t("achievementsUnlocked", { count: 5 }),
       onClick: () => console.log("Achievements"),
     },
     {
       icon: LuDollarSign,
-      label: "Earn",
-      subtitle: "Earn cash on Reddit",
+      label: t("earn"),
+      subtitle: t("earnCashOnReddit"),
       onClick: () => console.log("Earn"),
     },
     {
       icon: GiQueenCrown,
-      label: "Premium",
+      label: t("premium"),
       onClick: () => console.log("Premium"),
     },
   ];
@@ -54,18 +56,18 @@ export default function ProfileDropdown() {
   const bottomItems = [
     {
       icon: IoMoonOutline,
-      label: "Advertise on Reddit",
+      label: t("advertiseOnReddit"),
       onClick: () => console.log("Advertise"),
     },
     {
       icon: FaRegClock,
-      label: "Try Reddit Pro",
-      badge: "BETA",
+      label: t("tryRedditPro"),
+      badge: t("beta"),
       onClick: () => console.log("Try Reddit Pro"),
     },
     {
       icon: IoSettingsOutline,
-      label: "Settings",
+      label: t("settings"),
       onClick: () => console.log("Settings"),
     },
   ];
@@ -78,7 +80,7 @@ export default function ProfileDropdown() {
           <span className="text-white text-lg font-bold">R</span>
         </div>
         <div className="text-left">
-          <p className="text-sm font-medium text-gray-900">View Profile</p>
+          <p className="text-sm font-medium text-gray-900">{t("viewProfile")}</p>
           <p className="text-xs text-gray-500">{user?.nickname}</p>
         </div>
       </button>
@@ -102,7 +104,7 @@ export default function ProfileDropdown() {
       <div className="px-4 py-2.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <IoMoonOutline className="w-5 h-5 text-gray-700" />
-          <span className="text-sm font-medium text-gray-900">Dark Mode</span>
+          <span className="text-sm font-medium text-gray-900">{t("darkMode")}</span>
         </div>
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -117,7 +119,7 @@ export default function ProfileDropdown() {
       {/* Log Out */}
       <button onClick={() => logout()} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
         <MdLogout className="w-5 h-5 text-gray-700" />
-        <span className="text-sm font-medium text-gray-900">Log Out</span>
+        <span className="text-sm font-medium text-gray-900">{t("logOut")}</span>
       </button>
 
       <div className="border-t border-gray-200 my-2"></div>

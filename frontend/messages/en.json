@@ -339,5 +339,21 @@
       "readRules": "Read the community's rules"
     },
     "characters": "characters"
+  },
+  "profileDropdown": {
+    "viewProfile": "View Profile",
+    "editAvatar": "Edit Avatar",
+    "drafts": "Drafts",
+    "achievements": "Achievements",
+    "achievementsUnlocked": "{count} unlocked",
+    "earn": "Earn",
+    "earnCashOnReddit": "Earn cash on Reddit",
+    "premium": "Premium",
+    "advertiseOnReddit": "Advertise on Reddit",
+    "tryRedditPro": "Try Reddit Pro",
+    "beta": "BETA",
+    "settings": "Settings",
+    "darkMode": "Dark Mode",
+    "logOut": "Log Out"
   }
 }

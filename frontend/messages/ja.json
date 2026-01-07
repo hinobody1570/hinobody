@@ -339,5 +339,21 @@
       "readRules": "コミュニティのルールを読んでください"
     },
     "characters": "文字"
+  },
+  "profileDropdown": {
+    "viewProfile": "プロフィールを表示",
+    "editAvatar": "アバターを編集",
+    "drafts": "下書き",
+    "achievements": "実績",
+    "achievementsUnlocked": "{count}個のロック解除",
+    "earn": "収益",
+    "earnCashOnReddit": "Redditで収益を得る",
+    "premium": "プレミアム",
+    "advertiseOnReddit": "Redditに広告を出す",
+    "tryRedditPro": "Reddit Proを試す",
+    "beta": "ベータ",
+    "settings": "設定",
+    "darkMode": "ダークモード",
+    "logOut": "ログアウト"
   }
 }

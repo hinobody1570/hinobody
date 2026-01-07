@@ -120,6 +120,8 @@ export default function SignupForm() {
       <ConfirmationMessage 
         message={tAuth("registrationSuccessful")} 
         title={t("accountCreatedTitle")} 
+        buttonTitle="Login"
+        onClick={()=> router.push(ROUTE_PATHS.LOGIN)}
       />
     );
   }

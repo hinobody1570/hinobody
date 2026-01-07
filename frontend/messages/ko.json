@@ -339,5 +339,21 @@
       "readRules": "커뮤니티 규칙을 읽으세요"
     },
     "characters": "자"
+  },
+  "profileDropdown": {
+    "viewProfile": "프로필 보기",
+    "editAvatar": "아바타 편집",
+    "drafts": "초안",
+    "achievements": "업적",
+    "achievementsUnlocked": "{count}개 잠금 해제",
+    "earn": "수익 창출",
+    "earnCashOnReddit": "Reddit에서 수익 창출",
+    "premium": "프리미엄",
+    "advertiseOnReddit": "Reddit에 광고하기",
+    "tryRedditPro": "Reddit Pro 사용해보기",
+    "beta": "베타",
+    "settings": "설정",
+    "darkMode": "다크 모드",
+    "logOut": "로그아웃"
   }
 }
