@@ -19,7 +19,7 @@ export const RedditHeader = () => {
   const t = useTranslations("header");
   const router = useRouter();
   const { user } = useAuth();
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const [profileDropdown, setProfileDropDown] = useState(false);
 

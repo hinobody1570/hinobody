@@ -80,7 +80,7 @@ export class S3Controller {
     @UploadedFile() file: Express.Multer.File,
     @Query() uploadFileDto: UploadFileDto,
   ) {
-    return this.s3Service.uploadFile(file, uploadFileDto.folder);
+    return this.s3Service.uploadFile(file, "uploads/contractor");
   }
 
   @Get('files')

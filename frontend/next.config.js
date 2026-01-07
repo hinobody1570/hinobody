@@ -1,23 +1,4 @@
 const createNextIntlPlugin = require('next-intl/plugin');
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development', // Disable PWA in development to avoid caching issues
-  buildExcludes: [/app-build-manifest\.json$/],
-  runtimeCaching: [
-    {
-      urlPattern: /^https?.*/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'offlineCache',
-        expiration: {
-          maxEntries: 200,
-        },
-      },
-    },
-  ],
-});
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
@@ -57,6 +38,40 @@ const nextConfig = {
   },
 };
 
-// Apply plugins in order: PWA first, then next-intl
-module.exports = withPWA(withNextIntl(nextConfig));
+// Temporarily disable PWA due to Next.js 16 compatibility issues
+// next-pwa v5.6.0 causes "manifests singleton" error with Next.js 16
+// TODO: Re-enable when next-pwa is updated or use alternative PWA solution
+// For now, PWA is completely disabled - rebuild required after re-enabling
+const ENABLE_PWA = process.env.ENABLE_PWA === 'true';
+
+if (ENABLE_PWA) {
+  try {
+    const withPWA = require('next-pwa')({
+      dest: 'public',
+      register: true,
+      skipWaiting: true,
+      disable: process.env.NODE_ENV === 'development',
+      buildExcludes: [/app-build-manifest\.json$/, /react-loadable-manifest\.json$/],
+      runtimeCaching: [
+        {
+          urlPattern: /^https?.*/,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'offlineCache',
+            expiration: {
+              maxEntries: 200,
+            },
+          },
+        },
+      ],
+    });
+    module.exports = withPWA(withNextIntl(nextConfig));
+  } catch (e) {
+    console.warn('PWA plugin not available, continuing without it');
+    module.exports = withNextIntl(nextConfig);
+  }
+} else {
+  // PWA disabled by default to avoid Next.js 16 compatibility issues
+  module.exports = withNextIntl(nextConfig);
+}
 

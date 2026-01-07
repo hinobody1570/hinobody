@@ -228,3 +228,42 @@ export const postsApi = {
   },
 };
 
+// S3 Upload API
+export interface S3UploadResponse {
+  key: string;
+  url: string;
+}
+
+export const s3Api = {
+  uploadFile: async (file: File, folder?: string): Promise<S3UploadResponse> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folder) {
+      formData.append('folder', folder);
+    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const url = `${API_BASE_URL}${API_END_POINT.S3_UPLOAD}${folder ? `?folder=${encodeURIComponent(folder)}` : ''}`;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to upload file');
+    }
+
+    const data = await response.json();
+    // The API returns { statusCode, message, error, data: { key, url } }
+    return data.data;
+  },
+};
+

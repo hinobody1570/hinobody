@@ -13,7 +13,13 @@ async function loadMessages(locale: string) {
   }
   
   try {
-    const messages = (await import(`../../messages/${locale}.json`)).default;
+    // Dynamic import of JSON files in Next.js
+    const messagesModule = await import(`../../messages/${locale}.json`);
+    // JSON modules in Next.js/webpack have the data in .default
+    const messages = messagesModule.default ?? messagesModule;
+    if (!messages || typeof messages !== 'object') {
+      throw new Error(`Invalid messages format for locale: ${locale}`);
+    }
     messagesCache[locale] = messages;
     return messages;
   } catch (error) {

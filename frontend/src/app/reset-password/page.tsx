@@ -29,7 +29,7 @@ const ResetPassword = () => {
 
   // Get token from URL query parameter
   useEffect(() => {
-    const token = searchParams.get("token");
+    const token = searchParams?.get("token");
     if (token) {
       setResetToken(token);
     } else {

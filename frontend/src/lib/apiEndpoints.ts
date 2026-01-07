@@ -7,5 +7,6 @@ export const API_END_POINT = {
     RESET_PASSWORD: "/auth/reset-password",
     BOARDS: "/boards",
     POSTS: "/posts",
+    S3_UPLOAD: "/s3/upload",
     
 }
