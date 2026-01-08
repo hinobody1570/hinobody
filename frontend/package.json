@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "powershell -Command \"if (Test-Path .next) { Remove-Item -Recurse -Force .next; Write-Host 'Cache cleared successfully' } else { Write-Host 'No cache to clear' }\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.952.0",

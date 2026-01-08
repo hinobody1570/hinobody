@@ -124,8 +124,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
       onClose();
     } catch (error: any) {
       console.error("Error creating community:", error);
-      const errorMessage =
-        error?.message || tToast("communityCreatedError") || t("communityCreatedError");
+      const errorMessage = error?.message || tToast("communityCreatedError") || t("communityCreatedError");
       showError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -136,10 +135,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
 
   const modalContent = (
     <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
-      <div
-        ref={popupRef}
-        className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto"
-      >
+      <div ref={popupRef} className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -147,38 +143,9 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
             {step === 2 && t("step2Title")}
             {step === 3 && t("step3Title")}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
             <IoClose className="w-6 h-6" />
           </button>
-        </div>
-
-        {/* Progress Indicator */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            {[1, 2, 3].map((s) => (
-              <div key={s} className="flex items-center flex-1">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    step >= s
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  {s}
-                </div>
-                {s < 3 && (
-                  <div
-                    className={`flex-1 h-1 mx-2 ${
-                      step > s ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Step Content */}
@@ -193,7 +160,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
                     key={category}
                     type="button"
                     onClick={() => handleCategorySelect(category)}
-                    className={`px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                    className={`px-4 py-3 cursor-pointer rounded-lg border-2 transition-all text-sm font-medium ${
                       selectedCategory === category
                         ? "border-blue-600 bg-blue-50 text-blue-700"
                         : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
@@ -221,9 +188,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
                   <label
                     key={option.value}
                     className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                      visibility === option.value
-                        ? "border-blue-600 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
+                      visibility === option.value ? "border-blue-600 bg-blue-50" : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <input
@@ -266,9 +231,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("descriptionLabel")}
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t("descriptionLabel")}</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -296,15 +259,20 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
             {step > 1 && <IoChevronBack className="w-4 h-4" />}
             {step === 1 ? t("cancel") : t("back")}
           </button>
+          {/* Progress Indicator */}
+          <div className="px-6 py-4">
+            <div className="flex items-center gap-3 align-center">
+              {[1, 2, 3].map((s) => (
+                <div className={`w-4 h-4 rounded-full ${step >= s ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"}`}></div>
+              ))}
+            </div>
+          </div>
           <div className="flex gap-3">
             {step < 3 ? (
               <button
                 type="button"
                 onClick={handleNext}
-                disabled={
-                  (step === 1 && !selectedCategory) ||
-                  (step === 2 && !visibility)
-                }
+                disabled={(step === 1 && !selectedCategory) || (step === 2 && !visibility)}
                 className={`px-6 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
                   (step === 1 && selectedCategory) || (step === 2 && visibility)
                     ? "bg-blue-600 text-white hover:bg-blue-700"
@@ -320,9 +288,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
                 onClick={handleSubmit}
                 disabled={!name.trim() || isSubmitting}
                 className={`px-6 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  name.trim() && !isSubmitting
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  name.trim() && !isSubmitting ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
                 {isSubmitting ? t("creating") : t("createCommunity")}
@@ -338,4 +304,3 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
 };
 
 export default StartCommunityPopup;
-

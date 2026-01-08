@@ -5,6 +5,10 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Disable static optimization in development for faster hot reload
+  experimental: {
+    optimizePackageImports: [],
+  },
   async rewrites() {
     return [
       {
@@ -13,7 +17,31 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
+    // Optimize caching and file watching for development hot reload
+    if (dev) {
+      // Use filesystem cache but ensure it invalidates properly
+      config.cache = {
+        type: 'filesystem',
+        buildDependencies: {
+          config: [__filename],
+        },
+        // Invalidate cache when config or dependencies change
+        cacheInvalidation: {
+          buildDependencies: true,
+          paths: ['package.json'],
+        },
+      };
+      
+      // Improve file watching on Windows (polling for reliable change detection)
+      config.watchOptions = {
+        poll: 1000, // Check for changes every second (important for Windows)
+        aggregateTimeout: 300, // Delay rebuild after first change
+        ignored: /node_modules/,
+        followSymlinks: false,
+      };
+    }
+
     // Handle MediaPipe and TensorFlow.js packages that are browser-only
     if (!isServer) {
       config.resolve.fallback = {
