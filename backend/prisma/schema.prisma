@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "binary"
 }
 
@@ -8,27 +8,29 @@ datasource db {
 }
 
 model User {
-  id                   String    @id @default(cuid())
-  email                String    @unique
+  id                   String        @id @default(cuid())
+  email                String        @unique
   passwordHash         String
-  nickname             String    @unique
-  language             Language  @default(EN)
-  role                 UserRole  @default(USER)
-  isActive             Boolean   @default(true)
-  emailVerified        Boolean   @default(false)
+  nickname             String        @unique
+  language             Language      @default(EN)
+  role                 UserRole      @default(USER)
+  isActive             Boolean       @default(true)
+  emailVerified        Boolean       @default(false)
   emailVerificationOTP String?
   otpExpiry            DateTime?
   passwordResetToken   String?
   passwordResetExpiry  DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  blockedBy            Block[]   @relation("Blocked")
-  blockedUsers         Block[]   @relation("Blocker")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  blockedBy            Block[]       @relation("Blocked")
+  blockedUsers         Block[]       @relation("Blocker")
   comments             Comment[]
   images               Image[]
   posts                Post[]
-  reports              Report[]  @relation("UserReports")
+  reports              Report[]      @relation("UserReports")
   votes                Vote[]
+  createdBoards        Board[]       @relation("BoardCreator")
+  boardMemberships     BoardMember[]
 
   @@index([email])
   @@index([nickname])
@@ -37,16 +39,20 @@ model User {
 }
 
 model Board {
-  id              String           @id @default(cuid())
-  name            String           @unique
-  category        String
-  description     String?
+  id               String          @id @default(cuid())
+  name             String          @unique
+  category         String
+  description      String?
   visibilityAccess BoardVisibility @default(PUBLIC)
-  isActive        Boolean          @default(true)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  posts           Post[]
+  creatorId        String
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  posts            Post[]
+  creator          User            @relation("BoardCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  members          BoardMember[]
 
+  @@index([creatorId])
   @@map("boards")
 }
 
@@ -211,4 +217,27 @@ enum ReportStatus {
   REVIEWED
   RESOLVED
   DISMISSED
+}
+
+enum BoardMemberStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model BoardMember {
+  id        String            @id @default(cuid())
+  userId    String
+  boardId   String
+  status    BoardMemberStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  board     Board             @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, boardId])
+  @@index([boardId])
+  @@index([userId])
+  @@index([status])
+  @@map("board_members")
 }

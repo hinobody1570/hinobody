@@ -13,7 +13,7 @@ import { Board, Prisma } from '@prisma/client';
 export class BoardService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createBoardDto: CreateBoardDto): Promise<Board> {
+  async create(createBoardDto: CreateBoardDto, creatorId: string): Promise<Board> {
     // Check if board name already exists
     const existing = await this.prisma.board.findUnique({
       where: { name: createBoardDto.name },
@@ -23,9 +23,30 @@ export class BoardService {
       throw new ConflictException('Board with this name already exists');
     }
 
-    return this.prisma.board.create({
-      data: createBoardDto,
+    // Create board with creator and auto-approve creator as member
+    const board = await this.prisma.board.create({
+      data: {
+        ...createBoardDto,
+        creatorId,
+        members: {
+          create: {
+            userId: creatorId,
+            status: 'APPROVED',
+          },
+        },
+      },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            nickname: true,
+            email: true,
+          },
+        },
+      },
     });
+
+    return board;
   }
 
   async findAll(query: QueryBoardsDto) {

@@ -17,7 +17,7 @@ import { TbMicrophone2 } from "react-icons/tb";
 import { VscBook } from "react-icons/vsc";
 import { CollapsibleSection } from "../reuseComponents/CollapseItems";
 import { MenuItem } from "../reuseComponents/MenuItem";
-import StartCommunityPopup from "../reuseComponents/StartCommunityPopup";
+import StartCommunityPopup from "../modals/StartCommunityPopup";
 
 /* ---------------- DATA CONFIG ---------------- */
 

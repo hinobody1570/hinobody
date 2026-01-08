@@ -2,8 +2,10 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { BoardMemberService } from '../board-member/board-member.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { QueryPostsDto } from './dto/query-posts.dto';
@@ -11,7 +13,10 @@ import { Post, Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private boardMemberService: BoardMemberService,
+  ) {}
 
   async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
     // Verify board exists
@@ -21,6 +26,20 @@ export class PostService {
 
     if (!board) {
       throw new NotFoundException('Board not found');
+    }
+
+    // Check if user is an approved member of the board
+    const isMember = await this.boardMemberService.isMember(createPostDto.boardId, userId);
+    if (!isMember) {
+      const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId, userId);
+      
+      if (!membership) {
+        throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
+      } else if (membership.status === 'PENDING') {
+        throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
+      } else if (membership.status === 'REJECTED') {
+        throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+      }
     }
 
     // Create post with images and tags

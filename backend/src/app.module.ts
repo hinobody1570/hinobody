@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { BlockModule } from './block/block.module';
 import { BoardModule } from './board/board.module';
+import { BoardMemberModule } from './board-member/board-member.module';
 import { CommentModule } from './comment/comment.module';
 import { ImageModule } from './image/image.module';
 import { PostModule } from './post/post.module';
@@ -26,6 +27,7 @@ import { EmailModule } from './email/email.module';
     AuthModule,
     BlockModule,
     BoardModule,
+    BoardMemberModule,
     CommentModule,
     ImageModule,
     PostModule,

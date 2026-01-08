@@ -7,6 +7,7 @@ import { Tab } from "@/components/reuseComponents/Tabs";
 import RichTextEditor from "@/components/reuseComponents/RichTextEditor";
 import PostingGuide from "@/components/reuseComponents/PostingGuide";
 import TagsInput from "@/components/reuseComponents/TagsInput";
+import { JoinBoardPopup } from "@/components/modals/JoinBoardPopup";
 import { boardsApi, Board, postsApi, Language } from "@/lib/api";
 import { useToast } from "@/contexts/ToastContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -31,6 +32,8 @@ const CreatePost = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
+  const [showJoinPopup, setShowJoinPopup] = useState(false);
+  const [boardToJoin, setBoardToJoin] = useState<Board | null>(null);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -67,6 +70,20 @@ const CreatePost = () => {
       return;
     }
 
+    // Check membership before posting
+    try {
+      const membership = await boardsApi.getMembershipStatus(selectedCommunity.id);
+      if (!membership || membership.status !== "APPROVED") {
+        // Show popup to join board
+        setBoardToJoin(selectedCommunity);
+        setShowJoinPopup(true);
+        return;
+      }
+    } catch (error: any) {
+      // If membership check fails, still try to post and let backend handle it
+      console.warn("Could not check membership status:", error);
+    }
+
     setIsPosting(true);
     try {
       const postData = {
@@ -93,7 +110,14 @@ const CreatePost = () => {
     } catch (error: any) {
       console.error("Error creating post:", error);
       const errorMessage = error?.message || tToast("postError") || "Failed to create post. Please try again.";
-      showError(errorMessage);
+      
+      // Check if error is about membership and show popup
+      if (errorMessage.includes("join") || errorMessage.includes("member") || errorMessage.includes("pending")) {
+        setBoardToJoin(selectedCommunity);
+        setShowJoinPopup(true);
+      } else {
+        showError(errorMessage);
+      }
     } finally {
       setIsPosting(false);
     }
@@ -136,11 +160,36 @@ const CreatePost = () => {
   }, [showCommunity, searchQuery, fetchBoards]);
 
   // Handle board selection
-  const handleSelectBoard = (board: Board) => {
+  const handleSelectBoard = async (board: Board) => {
     setSelectedCommunity(board);
     setShowCommunity(false);
     setShowDropdown(false);
     setSearchQuery("");
+    
+    // Check membership status when board is selected (optional - for UI feedback)
+    // This is optional and doesn't block selection
+    try {
+      const membership = await boardsApi.getMembershipStatus(board.id);
+      // Could show a visual indicator here if needed
+    } catch (error) {
+      // Silently fail - we'll check again when posting
+    }
+  };
+
+  const handleJoinSuccess = async () => {
+    // Refresh membership status and allow posting
+    if (boardToJoin) {
+      try {
+        const membership = await boardsApi.getMembershipStatus(boardToJoin.id);
+        if (membership && membership.status === "APPROVED") {
+          // User is now a member, they can post
+          setShowJoinPopup(false);
+          setBoardToJoin(null);
+        }
+      } catch (error) {
+        // Ignore errors
+      }
+    }
   };
 
   // Handle click outside
@@ -303,6 +352,17 @@ const CreatePost = () => {
         {/* Guidelines Card */}
         <PostingGuide />
       </div>
+
+      {/* Join Board Popup */}
+      <JoinBoardPopup
+        board={boardToJoin}
+        isOpen={showJoinPopup}
+        onClose={() => {
+          setShowJoinPopup(false);
+          setBoardToJoin(null);
+        }}
+        onJoinSuccess={handleJoinSuccess}
+      />
     </div>
   );
 };

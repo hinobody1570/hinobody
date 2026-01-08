@@ -15,6 +15,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { QueryBoardsDto } from './dto/query-boards.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 
 @ApiTags('Boards')
 @Controller('boards')
@@ -24,8 +25,8 @@ export class BoardController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  create(@Body() createBoardDto: CreateBoardDto) {
-    return this.boardService.create(createBoardDto);
+  create(@Body() createBoardDto: CreateBoardDto, @GetUser('id') userId: string) {
+    return this.boardService.create(createBoardDto, userId);
   }
 
   @Get()

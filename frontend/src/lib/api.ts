@@ -187,6 +187,24 @@ export interface BoardsResponse {
   };
 }
 
+export interface BoardMembership {
+  id: string;
+  userId: string;
+  boardId: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    nickname: string;
+  };
+  board?: {
+    id: string;
+    name: string;
+    visibilityAccess: BoardVisibility;
+  };
+}
+
 export const boardsApi = {
   getAll: async (page: number = 1, limit: number = 20, search?: string): Promise<BoardsResponse> => {
     const params = new URLSearchParams({
@@ -203,6 +221,14 @@ export const boardsApi = {
   create: async (createBoardDto: CreateBoardDto): Promise<Board> => {
     const response = await api.post<ApiResponse<Board>>(API_END_POINT.BOARDS, createBoardDto);
     // The API returns { statusCode, message, error, data: Board }
+    return response.data;
+  },
+  join: async (boardId: string): Promise<BoardMembership> => {
+    const response = await api.post<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/${boardId}/join`);
+    return response.data;
+  },
+  getMembershipStatus: async (boardId: string): Promise<BoardMembership | null> => {
+    const response = await api.get<ApiResponse<BoardMembership | null>>(`${API_END_POINT.BOARDS}/${boardId}/membership`);
     return response.data;
   },
 };
