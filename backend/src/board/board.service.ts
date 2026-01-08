@@ -14,13 +14,13 @@ export class BoardService {
   constructor(private prisma: PrismaService) {}
 
   async create(createBoardDto: CreateBoardDto): Promise<Board> {
-    // Check if slug already exists
+    // Check if board name already exists
     const existing = await this.prisma.board.findUnique({
-      where: { slug: createBoardDto.slug },
+      where: { name: createBoardDto.name },
     });
 
     if (existing) {
-      throw new ConflictException('Board with this slug already exists');
+      throw new ConflictException('Board with this name already exists');
     }
 
     return this.prisma.board.create({
@@ -84,8 +84,9 @@ export class BoardService {
       SELECT 
         b.id,
         b.name,
-        b.slug,
+        b.category,
         b.description,
+        b."visibilityAccess",
         b."isActive",
         b."createdAt",
         b."updatedAt",
@@ -112,8 +113,9 @@ export class BoardService {
     const boards = (boardsResult as any[]).map((row: any) => ({
       id: row.id,
       name: row.name,
-      slug: row.slug,
+      category: row.category,
       description: row.description,
+      visibilityAccess: row.visibilityAccess,
       isActive: row.isActive,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -144,17 +146,6 @@ export class BoardService {
     return board;
   }
 
-  async findBySlug(slug: string): Promise<Board> {
-    const board = await this.prisma.board.findUnique({
-      where: { slug },
-    });
-
-    if (!board) {
-      throw new NotFoundException(`Board with slug ${slug} not found`);
-    }
-
-    return board;
-  }
 
   async update(id: string, updateBoardDto: UpdateBoardDto): Promise<Board> {
     await this.findOne(id); // Check if exists

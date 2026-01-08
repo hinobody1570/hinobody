@@ -46,13 +46,6 @@ export class BoardController {
     return this.boardService.findOne(id);
   }
 
-  @Get('slug/:slug')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  findBySlug(@Param('slug') slug: string) {
-    return this.boardService.findBySlug(slug);
-  }
-
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

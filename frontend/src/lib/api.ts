@@ -157,14 +157,24 @@ export const authApi = {
 };
 
 // Boards API endpoints
+export type BoardVisibility = 'PUBLIC' | 'PRIVATE' | 'RESTRICTED';
+
 export interface Board {
   id: string;
   name: string;
-  slug: string;
+  category: string;
   description: string | null;
+  visibilityAccess: BoardVisibility;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CreateBoardDto {
+  name: string;
+  category: string;
+  description?: string;
+  visibilityAccess?: BoardVisibility;
 }
 
 export interface BoardsResponse {
@@ -188,6 +198,11 @@ export const boardsApi = {
     }
     const response = await api.get<ApiResponse<BoardsResponse>>(`${API_END_POINT.BOARDS}?${params.toString()}`);
     // The API returns { statusCode, message, error, data: { data: Board[], meta: {...} } }
+    return response.data;
+  },
+  create: async (createBoardDto: CreateBoardDto): Promise<Board> => {
+    const response = await api.post<ApiResponse<Board>>(API_END_POINT.BOARDS, createBoardDto);
+    // The API returns { statusCode, message, error, data: Board }
     return response.data;
   },
 };

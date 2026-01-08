@@ -18,7 +18,9 @@
     "resetPasswordSuccess": "Password reset successful! You can now login with your new password.",
     "resetPasswordError": "Failed to reset password. Please try again.",
     "postSuccess": "Post created successfully!",
-    "postError": "Failed to create post. Please try again."
+    "postError": "Failed to create post. Please try again.",
+    "communityCreatedSuccess": "Community created successfully!",
+    "communityCreatedError": "Failed to create community. Please try again."
   },
   "eyeMasking": {
     "title": "Eye Detection & Masking Tool",
@@ -365,5 +367,57 @@
     "settings": "Settings",
     "darkMode": "Dark Mode",
     "logOut": "Log Out"
+  },
+  "startCommunity": {
+    "step1Title": "Choose a category",
+    "step1Description": "Select a category that best describes your community",
+    "step2Title": "Choose visibility",
+    "step2Description": "Select who can view and join your community",
+    "step3Title": "Name your community",
+    "step3Description": "Give your community a name and description",
+    "categories": {
+      "health": "Health",
+      "sport": "Sport",
+      "study": "Study",
+      "tourist": "Tourist",
+      "entertainment": "Entertainment",
+      "technology": "Technology",
+      "food": "Food",
+      "travel": "Travel",
+      "fashion": "Fashion",
+      "music": "Music",
+      "art": "Art",
+      "photography": "Photography",
+      "gaming": "Gaming",
+      "books": "Books",
+      "movies": "Movies",
+      "science": "Science",
+      "business": "Business",
+      "education": "Education",
+      "lifestyle": "Lifestyle",
+      "pets": "Pets"
+    },
+    "visibility": {
+      "public": "Public",
+      "publicDesc": "Anyone can view, post, and comment",
+      "private": "Private",
+      "privateDesc": "Only approved members can view and participate",
+      "restricted": "Restricted",
+      "restrictedDesc": "Anyone can view, but only approved members can post"
+    },
+    "nameLabel": "Name",
+    "namePlaceholder": "Community name",
+    "nameRequired": "Community name is required",
+    "categoryRequired": "Please select a category",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe your community (optional)",
+    "characters": "characters",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "createCommunity": "Create Community",
+    "creating": "Creating...",
+    "communityCreatedSuccess": "Community created successfully!",
+    "communityCreatedError": "Failed to create community. Please try again."
   }
 }

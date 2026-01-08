@@ -17,6 +17,7 @@ import { TbMicrophone2 } from "react-icons/tb";
 import { VscBook } from "react-icons/vsc";
 import { CollapsibleSection } from "../reuseComponents/CollapseItems";
 import { MenuItem } from "../reuseComponents/MenuItem";
+import StartCommunityPopup from "../reuseComponents/StartCommunityPopup";
 
 /* ---------------- DATA CONFIG ---------------- */
 
@@ -24,6 +25,7 @@ import { MenuItem } from "../reuseComponents/MenuItem";
 
 const RedditSidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
   const t = useTranslations("sidebar");
   const router = useRouter();
 
@@ -68,7 +70,18 @@ const RedditSidebar = () => {
           {/* Main Navigation */}
           <nav className="flex flex-col gap-2">
             {MAIN_MENU.map((item, index) => (
-              <MenuItem key={index} {...item} onClick={() => router.push(item?.navigate)} />
+              <MenuItem
+                key={index}
+                {...item}
+                onClick={() => {
+                  if (item.label === t("startCommunity")) {
+                    console.log("true............")
+                    setIsCommunityPopupOpen(true);
+                  } else {
+                    router.push(item?.navigate);
+                  }
+                }}
+              />
             ))}
           </nav>
 
@@ -116,6 +129,12 @@ const RedditSidebar = () => {
       >
         <FaBars size={16} className="text-gray-700 m-1" />
       </button>
+
+      {/* Start Community Popup */}
+      <StartCommunityPopup
+        isOpen={isCommunityPopupOpen}
+        onClose={() => setIsCommunityPopupOpen(false)}
+      />
     </div>
   );
 };

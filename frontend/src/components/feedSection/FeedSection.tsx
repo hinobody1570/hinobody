@@ -122,7 +122,7 @@ export const RedditFeed = () => {
 
           {/* Sidebar - Recent Posts */}
           <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-300 rounded-lg p-4 sticky top-8">
+            <div className="bg-white border border-gray-300 rounded-lg p-4 sticky top-8 z-0">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-gray-600 uppercase">{t('recentPosts')}</h3>
                 <button className="text-sm text-blue-600 hover:underline font-semibold">{t('clear')}</button>

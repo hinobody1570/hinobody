@@ -37,14 +37,15 @@ model User {
 }
 
 model Board {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
-  description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  posts       Post[]
+  id              String           @id @default(cuid())
+  name            String           @unique
+  category        String
+  description     String?
+  visibilityAccess BoardVisibility @default(PUBLIC)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  posts           Post[]
 
   @@map("boards")
 }
@@ -197,6 +198,12 @@ enum UserRole {
 enum VoteType {
   UPVOTE
   DOWNVOTE
+}
+
+enum BoardVisibility {
+  PUBLIC
+  PRIVATE
+  RESTRICTED
 }
 
 enum ReportStatus {

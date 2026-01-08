@@ -18,7 +18,9 @@
     "resetPasswordSuccess": "비밀번호 재설정 성공! 이제 새 비밀번호로 로그인할 수 있습니다.",
     "resetPasswordError": "비밀번호 재설정에 실패했습니다. 다시 시도해주세요.",
     "postSuccess": "게시물이 성공적으로 생성되었습니다!",
-    "postError": "게시물 생성에 실패했습니다. 다시 시도해주세요."
+    "postError": "게시물 생성에 실패했습니다. 다시 시도해주세요.",
+    "communityCreatedSuccess": "커뮤니티가 성공적으로 생성되었습니다!",
+    "communityCreatedError": "커뮤니티 생성에 실패했습니다. 다시 시도해주세요."
   },
   "eyeMasking": {
     "title": "눈 감지 및 마스킹 도구",
@@ -365,5 +367,57 @@
     "settings": "설정",
     "darkMode": "다크 모드",
     "logOut": "로그아웃"
+  },
+  "startCommunity": {
+    "step1Title": "카테고리 선택",
+    "step1Description": "커뮤니티를 가장 잘 설명하는 카테고리를 선택하세요",
+    "step2Title": "공개 설정 선택",
+    "step2Description": "커뮤니티를 볼 수 있고 참여할 수 있는 사람을 선택하세요",
+    "step3Title": "커뮤니티 이름 지정",
+    "step3Description": "커뮤니티 이름과 설명을 입력하세요",
+    "categories": {
+      "health": "건강",
+      "sport": "스포츠",
+      "study": "학습",
+      "tourist": "관광",
+      "entertainment": "엔터테인먼트",
+      "technology": "기술",
+      "food": "음식",
+      "travel": "여행",
+      "fashion": "패션",
+      "music": "음악",
+      "art": "예술",
+      "photography": "사진",
+      "gaming": "게임",
+      "books": "도서",
+      "movies": "영화",
+      "science": "과학",
+      "business": "비즈니스",
+      "education": "교육",
+      "lifestyle": "라이프스타일",
+      "pets": "반려동물"
+    },
+    "visibility": {
+      "public": "공개",
+      "publicDesc": "누구나 볼 수 있고 게시하고 댓글을 달 수 있습니다",
+      "private": "비공개",
+      "privateDesc": "승인된 회원만 볼 수 있고 참여할 수 있습니다",
+      "restricted": "제한됨",
+      "restrictedDesc": "누구나 볼 수 있지만 승인된 회원만 게시할 수 있습니다"
+    },
+    "nameLabel": "이름",
+    "namePlaceholder": "커뮤니티 이름",
+    "nameRequired": "커뮤니티 이름은 필수입니다",
+    "categoryRequired": "카테고리를 선택해주세요",
+    "descriptionLabel": "설명",
+    "descriptionPlaceholder": "커뮤니티를 설명하세요 (선택사항)",
+    "characters": "자",
+    "cancel": "취소",
+    "back": "뒤로",
+    "next": "다음",
+    "createCommunity": "커뮤니티 만들기",
+    "creating": "만드는 중...",
+    "communityCreatedSuccess": "커뮤니티가 성공적으로 생성되었습니다!",
+    "communityCreatedError": "커뮤니티 생성에 실패했습니다. 다시 시도해주세요."
   }
 }

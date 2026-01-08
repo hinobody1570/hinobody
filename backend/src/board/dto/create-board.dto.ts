@@ -1,5 +1,6 @@
-import { IsString, IsOptional, MinLength, Matches } from 'class-validator';
+import { IsString, IsOptional, MinLength, Matches, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { BoardVisibility } from '@prisma/client';
 
 export class CreateBoardDto {
   @ApiProperty({
@@ -12,16 +13,13 @@ export class CreateBoardDto {
   name: string;
 
   @ApiProperty({
-    example: 'project-board',
+    example: 'technology',
     minLength: 1,
-    description: 'URL-friendly unique slug (lowercase, hyphen-separated)',
+    description: 'Category of the board',
   })
   @IsString()
   @MinLength(1)
-  @Matches(/^[a-z0-9-]+$/, {
-    message: 'Slug must be lowercase alphanumeric with hyphens only',
-  })
-  slug: string;
+  category: string;
 
   @ApiPropertyOptional({
     example: 'This board is used to manage project tasks',
@@ -30,4 +28,14 @@ export class CreateBoardDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiPropertyOptional({
+    enum: BoardVisibility,
+    example: BoardVisibility.PUBLIC,
+    description: 'Visibility access level for the board',
+    default: BoardVisibility.PUBLIC,
+  })
+  @IsEnum(BoardVisibility)
+  @IsOptional()
+  visibilityAccess?: BoardVisibility;
 }
