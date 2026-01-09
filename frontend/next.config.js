@@ -5,9 +5,17 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Fast Refresh is enabled by default in Next.js
   // Disable static optimization in development for faster hot reload
   experimental: {
     optimizePackageImports: [],
+  },
+  // Ensure pages are served fresh in development
+  onDemandEntries: {
+    // Period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // Number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
   },
   async rewrites() {
     return [
@@ -17,29 +25,61 @@ const nextConfig = {
       },
     ];
   },
+  async headers() {
+    // Disable caching in development for immediate updates
+    if (process.env.NODE_ENV === 'development') {
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            },
+            {
+              key: 'Pragma',
+              value: 'no-cache',
+            },
+            {
+              key: 'Expires',
+              value: '0',
+            },
+          ],
+        },
+      ];
+    }
+    return [];
+  },
   webpack: (config, { isServer, dev }) => {
     // Optimize caching and file watching for development hot reload
     if (dev) {
-      // Use filesystem cache but ensure it invalidates properly
+      // Use memory cache for faster invalidation in development
+      // This ensures changes are detected immediately while still benefiting from cache
       config.cache = {
-        type: 'filesystem',
-        buildDependencies: {
-          config: [__filename],
-        },
-        // Invalidate cache when config or dependencies change
-        cacheInvalidation: {
-          buildDependencies: true,
-          paths: ['package.json'],
-        },
+        type: 'memory',
       };
       
-      // Improve file watching on Windows (polling for reliable change detection)
+      // Improve file watching on Windows (aggressive polling for reliable change detection)
+      // Windows file system events can be unreliable, so polling is recommended
       config.watchOptions = {
-        poll: 1000, // Check for changes every second (important for Windows)
-        aggregateTimeout: 300, // Delay rebuild after first change
-        ignored: /node_modules/,
+        poll: 300, // Check for changes every 300ms (faster detection on Windows)
+        aggregateTimeout: 200, // Shorter delay for faster rebuild after first change
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/.next/**',
+        ],
         followSymlinks: false,
       };
+      
+      // Optimize for Fast Refresh
+      if (!isServer) {
+        config.optimization = {
+          ...config.optimization,
+          removeAvailableModules: false,
+          removeEmptyChunks: false,
+        };
+      }
     }
 
     // Handle MediaPipe and TensorFlow.js packages that are browser-only

@@ -123,7 +123,7 @@ const RedditSidebar = () => {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed cursor-pointer top-20 ${
+        className={`fixed cursor-pointer top-24 ${
           isOpen ? "left-63" : "left-3"
         } z-50 p-2 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors`}
       >

@@ -44,7 +44,7 @@ export const RedditHeader = () => {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="flex items-center justify-between gap-4 px-6 py-3 lg:px-16">
-        <Logo text="HiNobody" onClick={() => console.log("Logo clicked")} />
+        <Logo text="HiNobody" onClick={() => router.push(ROUTE_PATHS.HOME)} />
 
         <div className="flex-1 max-w-2xl">
           <SearchBar placeholder={t("findAnything")} />

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { BiCheck, BiChevronDown } from "react-icons/bi";
 import CHINA_FLAG from "./../../public/assets/images/flag/chinease.webp";
-import ENGLISH_FLAG from "./../../public/assets/images/flag/english.png";
+import ENGLISH_FLAG from "./../../public/assets/images/flag/english.webp";
 import JAPAN_FLAG from "./../../public/assets/images/flag/japan.png";
 import KOREAN_FLAG from "./../../public/assets/images/flag/koren.webp";
 

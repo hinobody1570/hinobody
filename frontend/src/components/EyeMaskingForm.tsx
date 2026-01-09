@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import imageCompression from "browser-image-compression";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import "./EyeMaskingForm.css";
+import ButtonLoader from "./reuseComponents/ButtonLoader";
 
 // Dynamic import for face-api.js to avoid SSR issues
 let faceapi: any = null;
@@ -276,9 +277,7 @@ const EyeMaskingForm = () => {
       }
 
       // Use face-api.js to detect faces with landmarks
-      const detections = await faceapi
-        .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks();
+      const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
 
       console.log(`✅ Detected ${detections.length} face(s)`);
       setDebugInfo((prev: any) => ({ ...prev, facesDetected: detections.length }));
@@ -1005,15 +1004,44 @@ const EyeMaskingForm = () => {
             </div>
 
             <div className="canvas-container">
-              <canvas
-                ref={canvasRef}
-                className="masking-canvas"
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                style={{ maxWidth: "100%", height: "auto", cursor: mode === "manual" ? "crosshair" : "default" }}
-              />
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  display: "inline-block",
+                }}
+              >
+                <canvas
+                  ref={canvasRef}
+                  className="masking-canvas"
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  style={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    cursor: mode === "manual" ? "crosshair" : "default",
+                  }}
+                />
+
+                {isProcessing && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      backgroundColor: "rgba(0, 0, 0, 0.45)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      pointerEvents: "none", 
+                      color: "white"
+                    }}
+                  >
+                    <ButtonLoader /> detecting....
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="controls">
