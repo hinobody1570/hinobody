@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
-import * as sgMail from '@sendgrid/mail';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
-  private emailProvider: typeof sgMail;
+  private resend: Resend;
   private emailSender: string;
-  private readonly mailjetUrl = 'https://api.mailjet.com/v3.1/send';
 
   constructor() {
-    this.emailProvider = sgMail;
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    this.resend = new Resend(apiKey);
     this.emailSender = process.env.VERIFIED_EMAIL_SENDER;
   }
 
@@ -19,33 +21,22 @@ export class EmailService {
     mailText: string,
     html?: string,
   ): Promise<any> {
-    const token = Buffer.from(
-      `${process.env.MJ_APIKEY_PUBLIC}:${process.env.MJ_APIKEY_PRIVATE}`,
-    ).toString('base64');
-
-    const headers = {
-      Authorization: `Basic ${token}`,
-      'Content-Type': 'application/json',
-    };
-
-    const body = {
-      Messages: [
-        {
-          From: { Email: this.emailSender, Name: 'Task Manager' },
-          To: [{ Email: toEmail }],
-          Subject: subject,
-          TextPart: mailText,
-          HTMLPart: html,
-        },
-      ],
-    };
-
     try {
-      const response = await axios.post(this.mailjetUrl, body, { headers });
-      return response.data;
+      const { data, error } = await this.resend.emails.send({
+        from: this.emailSender || 'onboarding@resend.dev',
+        to: toEmail,
+        subject: subject,
+        html: html || mailText,
+        text: mailText,
+      });
+
+      if (error) {
+        throw new Error(`Resend API error: ${JSON.stringify(error)}`);
+      }
+
+      return data;
     } catch (error: any) {
-      const details = error.response?.data || error.message;
-      throw new Error(`Mailjet API error: ${JSON.stringify(details)}`);
+      throw new Error(`Resend API error: ${error.message || JSON.stringify(error)}`);
     }
   }
 
@@ -68,7 +59,9 @@ export class EmailService {
       </html>
     `;
 
-    return this.sendEmail(email, subject, htmlContent);
+    const textContent = `Welcome to HiNobody\n\nHello${nickname ? ` ${nickname}` : ''},\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.`;
+
+    return this.sendEmail(email, subject, textContent, htmlContent);
   }
 
   async sendPasswordResetEmail(
@@ -95,7 +88,9 @@ export class EmailService {
       </html>
     `;
 
-    return this.sendEmail(email, subject, htmlContent);
+    const textContent = `Password Reset\n\nHello${nickname ? ` ${nickname}` : ''},\n\nClick the link below to reset your password:\n${resetUrl}\n\nThis link will expire in 1 hour.`;
+
+    return this.sendEmail(email, subject, textContent, htmlContent);
   }
 
   private stripHtml(html: string): string {

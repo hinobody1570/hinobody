@@ -46,6 +46,11 @@ AWS_S3_BUCKET_NAME="hinobody-images"
 TRANSLATION_API_KEY="your-translation-api-key"
 TRANSLATION_API_TYPE="google"
 
+# Email (Resend)
+RESEND_API_KEY="re_your-resend-api-key"
+VERIFIED_EMAIL_SENDER="your-verified-email@yourdomain.com"
+FRONTEND_URL="http://localhost:3000"
+
 # App
 NODE_ENV="development"
 PORT=3001
