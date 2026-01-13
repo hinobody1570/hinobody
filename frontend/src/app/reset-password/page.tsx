@@ -90,7 +90,7 @@ const ResetPassword = () => {
 
       // Redirect to login after 2 seconds
       setTimeout(() => {
-        router.push(ROUTE_PATHS.LOGIN);
+        router.push(ROUTE_PATHS.DEFAULT);
       }, 2000);
     } catch (error: any) {
       // Handle API errors
@@ -117,7 +117,7 @@ const ResetPassword = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
         {/* Back button */}
-        <Link href={ROUTE_PATHS.LOGIN} className="cursor-pointer flex items-center text-gray-600 hover:text-gray-800 mb-6 transition">
+        <Link href={ROUTE_PATHS.DEFAULT} className="cursor-pointer flex items-center text-gray-600 hover:text-gray-800 mb-6 transition">
           <GoArrowLeft className="w-5 h-5 mr-2" />
           <span className="text-sm font-medium">{t("back")}</span>
         </Link>

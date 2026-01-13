@@ -121,7 +121,7 @@ export default function SignupForm() {
         message={tAuth("registrationSuccessful")} 
         title={t("accountCreatedTitle")} 
         buttonTitle="Login"
-        onClick={()=> router.push(ROUTE_PATHS.LOGIN)}
+        onClick={()=> router.push(ROUTE_PATHS.DEFAULT)}
       />
     );
   }
@@ -180,7 +180,7 @@ export default function SignupForm() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             {tAuth("alreadyHaveAccount")}{" "}
-            <Link href={ROUTE_PATHS.LOGIN} className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href={ROUTE_PATHS.DEFAULT} className="text-blue-600 hover:text-blue-700 font-medium">
               {t("signIn")}
             </Link>
           </p>

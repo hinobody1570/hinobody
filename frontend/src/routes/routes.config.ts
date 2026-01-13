@@ -43,7 +43,7 @@ export const routesConfig: RouteConfig[] = [
   
   // Public Routes that redirect if authenticated
   {
-    path: ROUTE_PATHS.LOGIN,
+    path: ROUTE_PATHS.DEFAULT,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
     redirectTo: ROUTE_PATHS.HOME,
   },
@@ -55,7 +55,7 @@ export const routesConfig: RouteConfig[] = [
   {
     path: ROUTE_PATHS.VERIFY_EMAIL,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.LOGIN,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
     path: ROUTE_PATHS.FORGOT_PASSWORD,
@@ -71,27 +71,27 @@ export const routesConfig: RouteConfig[] = [
   {
     path: ROUTE_PATHS.HOME,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.LOGIN,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
     path: ROUTE_PATHS.EYE_MASKING,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.LOGIN,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
     path: ROUTE_PATHS.DASHBOARD,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.LOGIN,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
     path: ROUTE_PATHS.PROFILE,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.LOGIN,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
     path: ROUTE_PATHS.SETTINGS,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.LOGIN,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
 ];
 

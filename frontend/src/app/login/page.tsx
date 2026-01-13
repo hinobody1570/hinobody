@@ -107,75 +107,76 @@ export default function LoginForm() {
   },[isAuthenticated])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("welcomeBack")}</h1>
-          <p className="text-gray-600">{t("signInToContinue")}</p>
-        </div>
+    <></>
+    // <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    //   <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+    //     <div className="text-center mb-8">
+    //       <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("welcomeBack")}</h1>
+    //       <p className="text-gray-600">{t("signInToContinue")}</p>
+    //     </div>
 
-        <div className="space-y-6">
-          {/* Email Field */}
-          <div>
-            <FormLabel labelTitle={t("emailAddress")} htmlForTitle="email" />
-            <FormInput
-              type="email"
-              icon={<BsEnvelope className="h-5 w-5 text-gray-400" />}
-              id="email"
-              onKeyPress={handleKeyPress}
-              name="email"
-              onChange={handleChange}
-              value={formData.email}
-              error={errors.email}
-              placeholder="you@example.com"
-            />
-          </div>
+    //     <div className="space-y-6">
+    //       {/* Email Field */}
+    //       <div>
+    //         <FormLabel labelTitle={t("emailAddress")} htmlForTitle="email" />
+    //         <FormInput
+    //           type="email"
+    //           icon={<BsEnvelope className="h-5 w-5 text-gray-400" />}
+    //           id="email"
+    //           onKeyPress={handleKeyPress}
+    //           name="email"
+    //           onChange={handleChange}
+    //           value={formData.email}
+    //           error={errors.email}
+    //           placeholder="you@example.com"
+    //         />
+    //       </div>
 
-          {/* Password Field */}
-          <div>
-            <FormLabel labelTitle={tAuth("password")} htmlForTitle="password" />
-            <PasswordInput onChange={handleChange} onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
-          </div>
+    //       {/* Password Field */}
+    //       <div>
+    //         <FormLabel labelTitle={tAuth("password")} htmlForTitle="password" />
+    //         <PasswordInput onChange={handleChange} onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
+    //       </div>
 
-          {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="remember"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
-              />
-              <label htmlFor="remember" className="ml-2 block text-sm text-gray-700 cursor-pointer">
-                {t("rememberMe")}
-              </label>
-            </div>
-            <Link href={ROUTE_PATHS.FORGOT_PASSWORD} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-              {t("forgotPassword")}
-            </Link>
-          </div>
+    //       {/* Remember Me & Forgot Password */}
+    //       <div className="flex items-center justify-between">
+    //         <div className="flex items-center">
+    //           <input
+    //             type="checkbox"
+    //             id="remember"
+    //             checked={rememberMe}
+    //             onChange={(e) => setRememberMe(e.target.checked)}
+    //             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+    //           />
+    //           <label htmlFor="remember" className="ml-2 block text-sm text-gray-700 cursor-pointer">
+    //             {t("rememberMe")}
+    //           </label>
+    //         </div>
+    //         <Link href={ROUTE_PATHS.FORGOT_PASSWORD} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+    //           {t("forgotPassword")}
+    //         </Link>
+    //       </div>
 
-          {/* Submit Button */}
-          <FormButton title={t("signIn")} loadingTitle={t("signingIn")} handleSubmit={handleSubmit} disabled={isLoading} />
+    //       {/* Submit Button */}
+    //       <FormButton title={t("signIn")} loadingTitle={t("signingIn")} handleSubmit={handleSubmit} disabled={isLoading} />
 
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-          </div>
-        </div>
+    //       {/* Divider */}
+    //       <div className="relative">
+    //         <div className="absolute inset-0 flex items-center">
+    //           <div className="w-full border-t border-gray-300"></div>
+    //         </div>
+    //       </div>
+    //     </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            {tAuth("dontHaveAccount")}{" "}
-            <Link href={ROUTE_PATHS.REGISTER} className="text-blue-600 hover:text-blue-700 font-medium">
-              {t("signUp")}
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+    //     <div className="mt-6 text-center">
+    //       <p className="text-sm text-gray-600">
+    //         {tAuth("dontHaveAccount")}{" "}
+    //         <Link href={ROUTE_PATHS.REGISTER} className="text-blue-600 hover:text-blue-700 font-medium">
+    //           {t("signUp")}
+    //         </Link>
+    //       </p>
+    //     </div>
+    //   </div>
+    // </div>
   );
 }
