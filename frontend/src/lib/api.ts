@@ -344,5 +344,84 @@ export const s3Api = {
     // The API returns { statusCode, message, error, data: { key, url } }
     return data.data;
   },
+
+  uploadFiles: async (files: File[], folder?: string): Promise<S3UploadResponse[]> => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+    if (folder) {
+      formData.append('folder', folder);
+    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const url = `${API_BASE_URL}${API_END_POINT.S3_UPLOAD_BULK}${folder ? `?folder=${encodeURIComponent(folder)}` : ''}`;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to upload files');
+    }
+
+    const data = await response.json();
+    // The API returns { statusCode, message, error, data: Array<{ key, url }> }
+    return data.data;
+  },
+};
+
+// Eye Masked Images API
+export interface EyeMaskedImage {
+  id: string;
+  url: string;
+  key: string;
+  userId: string;
+  size?: number;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+  createdAt: string;
+}
+
+export interface CreateEyeMaskedImageDto {
+  url: string;
+  key: string;
+  size?: number;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+}
+
+export const eyeMaskedImagesApi = {
+  createBulk: async (images: CreateEyeMaskedImageDto[]): Promise<EyeMaskedImage[]> => {
+    const response = await api.post<ApiResponse<EyeMaskedImage[]>>(
+      API_END_POINT.EYE_MASKED_IMAGES_BULK,
+      { images }
+    );
+    return response.data;
+  },
+
+  getAll: async (): Promise<EyeMaskedImage[]> => {
+    const response = await api.get<ApiResponse<EyeMaskedImage[]>>(API_END_POINT.EYE_MASKED_IMAGES);
+    return response.data;
+  },
+
+  getById: async (id: string): Promise<EyeMaskedImage> => {
+    const response = await api.get<ApiResponse<EyeMaskedImage>>(`${API_END_POINT.EYE_MASKED_IMAGES}/${id}`);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.EYE_MASKED_IMAGES}/${id}`);
+  },
 };
 

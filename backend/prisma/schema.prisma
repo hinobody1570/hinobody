@@ -31,6 +31,7 @@ model User {
   votes                Vote[]
   createdBoards        Board[]       @relation("BoardCreator")
   boardMemberships     BoardMember[]
+  eyeMaskedImages      EyeMaskedImage[] @relation("EyeMaskedImages")
 
   @@index([email])
   @@index([nickname])
@@ -187,6 +188,23 @@ model Image {
   @@index([userId])
   @@index([createdAt])
   @@map("images")
+}
+
+model EyeMaskedImage {
+  id        String   @id @default(cuid())
+  url       String
+  key       String
+  userId    String
+  size      Int?
+  mimeType  String?
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+  user      User     @relation("EyeMaskedImages", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("eye_masked_images")
 }
 
 enum Language {

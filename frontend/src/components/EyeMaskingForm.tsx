@@ -3,21 +3,23 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import imageCompression from "browser-image-compression";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import "./EyeMaskingForm.css";
 import ButtonLoader from "./reuseComponents/ButtonLoader";
+import { s3Api, eyeMaskedImagesApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Dynamic import for face-api.js to avoid SSR issues
 let faceapi: any = null;
 
 const EyeMaskingForm = () => {
   const t = useTranslations("eyeMasking");
+  const { isAuthenticated } = useAuth();
   const [imageFile, setImageFile] = useState<any>(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [model, setModel] = useState<any>(null);
   const [masks, setMasks] = useState<any>([]); // Array of {x, y, width, height}
-  const [croppedMasks, setCroppedMasks] = useState([]); // Array of {image: blob/dataURL, x, y, width, height}
+  const [croppedMasks, setCroppedMasks] = useState<any[]>([]); // Array of {image: blob/dataURL, x, y, width, height}
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [currentMask, setCurrentMask] = useState<any>(null);
@@ -776,13 +778,17 @@ const EyeMaskingForm = () => {
 
   // Get masked image as blob
   // Note: Canvas already has semi-transparent masks with borders drawn on it via drawCanvas()
-  const getMaskedImageBlob = async () => {
+  const getMaskedImageBlob = async (): Promise<Blob | null> => {
     if (!canvasRef.current) return null;
 
-    return new Promise((resolve) => {
+    return new Promise<Blob | null>((resolve) => {
       // Canvas already has the image and semi-transparent masks with borders
       canvasRef.current.toBlob(
-        async (blob: any) => {
+        async (blob: Blob | null) => {
+          if (!blob) {
+            resolve(null);
+            return;
+          }
           // Compress the image
           const compressedBlob = await compressImage(blob);
           resolve(compressedBlob);
@@ -793,37 +799,9 @@ const EyeMaskingForm = () => {
     });
   };
 
-  // Upload to AWS S3
-  const uploadToS3 = async (blob: any, fileName: any) => {
-    // NOTE: AWS credentials should be configured via environment variables
-    // or AWS credentials file. For security, never hardcode credentials.
-    console.log("blob", blob);
-    console.log("fileName", fileName);
-    const s3Client = new S3Client({
-      // region: import.meta.env.VITE_AWS_REGION || "us-east-1",
-      // credentials: {
-      //   accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID || "",
-      //   secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY || "",
-      // },
-    });
-
-    // const bucketName = import.meta.env.VITE_AWS_S3_BUCKET || "";
-    const bucketName = "";
-    if (!bucketName) {
-      throw new Error(t("awsBucketNotConfigured"));
-    }
-
-    const key = `masked-images/${Date.now()}-${fileName}`;
-
-    const command = new PutObjectCommand({
-      Bucket: bucketName,
-      Key: key,
-      Body: blob,
-      ContentType: "image/jpeg",
-    });
-
-    await s3Client.send(command);
-    return key;
+  // Helper function to convert blob to File
+  const blobToFile = (blob: Blob, fileName: string): File => {
+    return new File([blob], fileName, { type: blob.type || "image/jpeg" });
   };
 
   // Handle form submission
@@ -844,32 +822,113 @@ const EyeMaskingForm = () => {
       return;
     }
 
+    if (!isAuthenticated) {
+      alert("Please login to upload images");
+      return;
+    }
+
     setIsProcessing(true);
     setUploadStatus("Processing...");
-    console.log(`📤 Starting upload process... Mode: ${mode}, Masks: ${masks.length}`);
+    console.log(`📤 Starting upload process... Mode: ${mode}, Masks: ${masks.length}, Cropped Masks: ${croppedMasks.length}`);
 
     try {
-      // Get masked image blob (this creates the final masked image)
-      // The canvas already has masks drawn on it, so toBlob() captures the masked version
-      console.log("🎨 Creating masked image blob from canvas...");
-      const maskedBlob = await getMaskedImageBlob();
+      let filesToUpload: File[] = [];
+      let imageDataArray: any[] = [];
 
-      if (!maskedBlob) {
-        throw new Error(t("failedToCreateMaskedImage"));
+      // Check if we have cropped masks - if yes, upload all cropped masks
+      if (croppedMasks && croppedMasks.length > 0) {
+        console.log(`📦 Found ${croppedMasks.length} cropped mask(s), uploading all...`);
+        setUploadStatus(`Preparing ${croppedMasks.length} cropped image(s)...`);
+
+        // Convert all cropped masks to Files
+        for (let i = 0; i < croppedMasks.length; i++) {
+          const cropped = croppedMasks[i];
+          if (cropped.image && cropped.image instanceof Blob) {
+            const fileName = `masked-crop-${i + 1}-${Date.now()}-${imageFile.name}`;
+            const file = blobToFile(cropped.image, fileName);
+            filesToUpload.push(file);
+            
+            // Prepare image data for database
+            imageDataArray.push({
+              url: "", // Will be filled after upload
+              key: "", // Will be filled after upload
+              size: cropped.image.size,
+              mimeType: cropped.image.type || "image/jpeg",
+              width: cropped.width,
+              height: cropped.height,
+            });
+          }
+        }
+
+        if (filesToUpload.length === 0) {
+          throw new Error("No valid cropped masks to upload");
+        }
+
+        console.log(`✅ Prepared ${filesToUpload.length} cropped image(s) for upload`);
+      } else {
+        // Fallback: Upload the main masked image from canvas
+        console.log("🎨 No cropped masks found, uploading main masked image from canvas...");
+        setUploadStatus("Creating masked image from canvas...");
+        
+        const maskedBlob = await getMaskedImageBlob();
+        if (!maskedBlob) {
+          throw new Error(t("failedToCreateMaskedImage"));
+        }
+
+        console.log("✅ Masked image blob created successfully");
+        const maskedFile = blobToFile(maskedBlob, `masked-${imageFile.name}`);
+        filesToUpload.push(maskedFile);
+
+        // Prepare image data for database
+        imageDataArray.push({
+          url: "", // Will be filled after upload
+          key: "", // Will be filled after upload
+          size: maskedBlob.size,
+          mimeType: maskedBlob.type || "image/jpeg",
+          width: imageRef.current?.width || undefined,
+          height: imageRef.current?.height || undefined,
+        });
       }
 
-      console.log("✅ Masked image blob created successfully");
-      console.log("🔒 Original image remains in browser memory only (not uploaded)");
+      // Upload all files to S3 using bulk upload API
+      setUploadStatus(`Uploading ${filesToUpload.length} image(s) to S3...`);
+      console.log(`☁️ Uploading ${filesToUpload.length} image(s) to S3...`);
+      console.log("⚠️ Note: Only the masked/cropped images are uploaded. Original image stays in browser.");
+      
+      const uploadResults = await s3Api.uploadFiles(filesToUpload, "uploads/contractor");
+      
+      if (!uploadResults || uploadResults.length === 0) {
+        throw new Error("Failed to upload images to S3");
+      }
 
-      // Upload to S3 (only the masked image, not the original)
-      setUploadStatus("Uploading to S3...");
-      console.log("☁️ Uploading masked image to S3...");
-      console.log("⚠️ Note: Only the masked image is uploaded. Original image stays in browser.");
-      const s3Key = await uploadToS3(maskedBlob, imageFile.name);
+      if (uploadResults.length !== filesToUpload.length) {
+        console.warn(`⚠️ Uploaded ${uploadResults.length} images but expected ${filesToUpload.length}`);
+      }
 
-      console.log(`✅ Success! Image uploaded to S3: ${s3Key}`);
-      setUploadStatus(`Success! Image uploaded to S3: ${s3Key}`);
-      setDebugInfo((prev: any) => ({ ...prev, s3Key, uploadSuccess: true }));
+      console.log(`✅ Success! ${uploadResults.length} image(s) uploaded to S3`);
+
+      // Update image data with S3 URLs and keys
+      for (let i = 0; i < uploadResults.length && i < imageDataArray.length; i++) {
+        imageDataArray[i].url = uploadResults[i].url;
+        imageDataArray[i].key = uploadResults[i].key;
+      }
+
+      // Save all image URLs to database
+      setUploadStatus("Saving to database...");
+      console.log(`💾 Saving ${imageDataArray.length} image record(s) to database...`);
+      
+      const savedImages = await eyeMaskedImagesApi.createBulk(imageDataArray);
+      
+      console.log(`✅ Success! ${savedImages.length} image(s) saved to database`);
+      setUploadStatus(`Success! ${savedImages.length} image(s) uploaded and saved.`);
+      setDebugInfo((prev: any) => ({ 
+        ...prev, 
+        uploadedCount: savedImages.length,
+        s3Keys: uploadResults.map((r: any) => r.key),
+        s3Urls: uploadResults.map((r: any) => r.url),
+        dbIds: savedImages.map((img: any) => img.id),
+        uploadSuccess: true 
+      }));
 
       // Clear the original image from memory (privacy requirement)
       if (imagePreview) {
@@ -881,6 +940,7 @@ const EyeMaskingForm = () => {
         setImageFile(null);
         setImagePreview(null);
         setMasks([]);
+        setCroppedMasks([]);
         setUploadStatus("");
         if (fileInputRef.current) {
           fileInputRef.current.value = "";

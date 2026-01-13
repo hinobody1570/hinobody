@@ -64,9 +64,9 @@ export const PostCard = ({ post }: any) => {
           {/* <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
             <FiMoreHorizontal size={20} className="text-gray-600" />
           </button> */}
-          <button className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
+          <div className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
             <DropdownMenu items={menuItems} />
-          </button>
+          </div>
         </div>
       </div>
 
