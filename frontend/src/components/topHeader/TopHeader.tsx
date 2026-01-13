@@ -6,6 +6,7 @@ import { LuMessageCircleMore } from "react-icons/lu";
 import { VscDiffAdded } from "react-icons/vsc";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { Avatar } from "../reuseComponents/Avatar";
+import { LuCamera } from "react-icons/lu";
 import { Logo } from "../reuseComponents/Logo";
 import { IconButton } from "../reuseComponents/NavBarIconButton";
 import { SearchBar } from "../reuseComponents/SearchBar";
@@ -28,6 +29,7 @@ export const RedditHeader = () => {
     { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
     { icon: VscDiffAdded, label: t("create"), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
     { icon: BsBell, onClick: () => console.log("Notifications") },
+    { icon: LuCamera, onClick: ()=> router.push(ROUTE_PATHS.EYE_MASKING)} 
   ];
 
   useEffect(() => {
@@ -55,7 +57,6 @@ export const RedditHeader = () => {
           {headerActions.map((action, index) => (
             <IconButton key={index} icon={action.icon} label={action.label} onClick={action.onClick} />
           ))}
-
           <Avatar color="bg-teal-400" onClick={() => setProfileDropDown(!profileDropdown)} />
 
           {profileDropdown && <ProfileDropdown />}

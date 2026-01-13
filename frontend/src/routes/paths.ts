@@ -19,4 +19,5 @@ export const ROUTE_PATHS = {
     DUMMY_EXAMPLE : "/main/dummy-example",
     CREATE_POST: "/main/create-post",
     HOME: "/main/home",
+    EYE_MASKING: "/main/eye-masking"
 }

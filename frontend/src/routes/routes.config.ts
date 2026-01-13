@@ -74,6 +74,11 @@ export const routesConfig: RouteConfig[] = [
     redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
+    path: ROUTE_PATHS.EYE_MASKING,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.LOGIN,
+  },
+  {
     path: ROUTE_PATHS.DASHBOARD,
     access: ROUTE_ACCESS.PRIVATE,
     redirectTo: ROUTE_PATHS.LOGIN,
