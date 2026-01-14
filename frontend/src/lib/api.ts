@@ -290,18 +290,36 @@ export interface PostsResponse {
   };
 }
 
+export interface QueryPostsParams {
+  page?: number;
+  limit?: number;
+  boardId?: string;
+  authorId?: string;
+  search?: string;
+}
+
 export const postsApi = {
   create: async (createPostDto: CreatePostDto): Promise<Post> => {
     const response = await api.post<ApiResponse<Post>>(API_END_POINT.POSTS, createPostDto);
     // The API returns { statusCode, message, error, data: Post }
     return response.data;
   },
-  getAll: async (page: number = 1, limit: number = 20): Promise<PostsResponse> => {
-    const params = new URLSearchParams({
+  getAll: async (params: QueryPostsParams = {}): Promise<PostsResponse> => {
+    const { page = 1, limit = 20, boardId, authorId, search } = params;
+    const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
     });
-    const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${params.toString()}`);
+    if (boardId) {
+      queryParams.append('boardId', boardId);
+    }
+    if (authorId) {
+      queryParams.append('authorId', authorId);
+    }
+    if (search) {
+      queryParams.append('search', search);
+    }
+    const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
     // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
     return response.data;
   },

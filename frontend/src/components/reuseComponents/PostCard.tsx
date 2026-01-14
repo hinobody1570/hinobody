@@ -41,7 +41,7 @@ export const PostCard = ({ post }: any) => {
       setVoteState("down");
     }
   };
-
+  console.log("body", post);
   return (
     <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
       {/* Post Header */}
@@ -76,11 +76,13 @@ export const PostCard = ({ post }: any) => {
       </div>
 
       {/* Post Image/Content */}
-      {post.image && (
+      {/* {post.image && (
         <div className="bg-black">
-          <Image src={post.image} alt={post.title} className="w-full max-h-[600px] object-contain" />
+          <Image src={post?.image ?? ""} width={300} height={300} alt={post.title} className="w-full max-h-[600px] object-contain" />
         </div>
-      )}
+      )} */}
+
+      {post.body && <div className="" dangerouslySetInnerHTML={{ __html: post.body }} />}
 
       {/* Post Actions */}
       <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200">

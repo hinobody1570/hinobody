@@ -1,63 +1,52 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
 import { CiCalendar } from "react-icons/ci";
 import { IoChevronDown } from "react-icons/io5";
 import { PostCard } from "../reuseComponents/PostCard";
 import { RecentPostCard } from "../reuseComponents/RecentPostCard";
+import { postsApi, Post } from "@/lib/api";
 import DP from "./../../../public/assets/images/avatar_default_4.png";
-import POST_1 from "./../../../public/assets/images/post_1.webp";
-import POST_2 from "./../../../public/assets/images/post_2.webp";
-import POST_3 from "./../../../public/assets/images/post_3.webp";
-import POST_4 from "./../../../public/assets/images/post_4.png";
 
-const dummyPosts = [
-  {
-    id: 1,
-    community: "r/pakistan",
-    communityAvatar: DP,
-    verified: true,
-    timestamp: "15 hr. ago",
-    title: "Found in the wild",
-    image: POST_1,
-    upvotes: 109,
-    comments: 25,
-  },
-  {
-    id: 2,
-    community: "r/Pakistani_Art",
-    communityAvatar: DP,
-    verified: false,
-    timestamp: "3 days ago",
-    badge: "Popular near you",
-    title: "MADE THIS PAINTING A YEAR AGO......",
-    image: POST_2,
-    upvotes: 342,
-    comments: 48,
-  },
-  {
-    id: 3,
-    community: "r/technology",
-    communityAvatar: DP,
-    verified: true,
-    timestamp: "8 hr. ago",
-    title: "New AI breakthrough changes everything we know",
-    image: POST_3,
-    upvotes: 2547,
-    comments: 389,
-  },
-  {
-    id: 4,
-    community: "r/nature",
-    communityAvatar: DP,
-    verified: false,
-    timestamp: "12 hr. ago",
-    title: "Captured this beautiful sunset today",
-    image: POST_4,
-    upvotes: 876,
-    comments: 92,
-  },
-];
+// Helper function to format timestamp
+const formatTimestamp = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} sec. ago`;
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} ${minutes === 1 ? 'min' : 'mins'}. ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} ${hours === 1 ? 'hr' : 'hrs'}. ago`;
+  } else if (diffInSeconds < 604800) {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+  } else {
+    const weeks = Math.floor(diffInSeconds / 604800);
+    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+  }
+};
+
+// Transform API post to PostCard format
+const transformPost = (post: Post): any => {
+  return {
+    id: post.id,
+    community: post.board?.name ? `r/${post.board.name}` : "r/community",
+    communityAvatar: DP, // Default avatar
+    verified: false, // Can be enhanced later based on board settings
+    timestamp: formatTimestamp(post.createdAt),
+    title: post.title,
+    image: post.images && post.images.length > 0 ? post.images[0].url : null,
+    upvotes: post.upvoteCount || 0,
+    comments: post.commentCount || 0,
+    body: post.body || ""
+  };
+};
 
 const recentPosts = [
   {
@@ -91,6 +80,31 @@ const recentPosts = [
 
 export const RedditFeed = () => {
   const t = useTranslations('feed');
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await postsApi.getAll({
+          page: 1,
+          limit: 20,
+        });
+        const transformedPosts = response.data.map(transformPost);
+        setPosts(transformedPosts);
+      } catch (err: any) {
+        console.error('Error fetching posts:', err);
+        setError(err.message || 'Failed to load posts');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -114,8 +128,28 @@ export const RedditFeed = () => {
               </button>
             </div>
 
+            {/* Loading State */}
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-gray-500">Loading posts...</div>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && !loading && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <p className="text-red-600">{error}</p>
+              </div>
+            )}
+
             {/* Posts */}
-            {dummyPosts.map((post) => (
+            {!loading && !error && posts.length === 0 && (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-gray-500">No posts available</div>
+              </div>
+            )}
+
+            {!loading && !error && posts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>
