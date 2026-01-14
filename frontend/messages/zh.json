@@ -24,7 +24,10 @@
     "postSuccess": "帖子创建成功！",
     "postError": "创建帖子失败。请重试。",
     "communityCreatedSuccess": "社区创建成功！",
-    "communityCreatedError": "创建社区失败。请重试。"
+    "communityCreatedError": "创建社区失败。请重试。",
+    "joinedBoard": "成功加入板块！",
+    "leftBoard": "成功离开板块",
+    "joinRequestPending": "已提交加入请求！板块创建者将审核您的请求。"
   },
   "eyeMasking": {
     "title": "眼睛检测和遮罩工具",
@@ -102,6 +105,7 @@
     "accessibility": "无障碍",
     "redditCopyright": "Reddit, Inc. © 2025. 保留所有权利。",
     "join": "加入",
+    "joined": "已加入",
     "share": "分享",
     "upvotes": "赞",
     "comments": "评论"

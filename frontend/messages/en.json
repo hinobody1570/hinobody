@@ -24,7 +24,10 @@
     "postSuccess": "Post created successfully!",
     "postError": "Failed to create post. Please try again.",
     "communityCreatedSuccess": "Community created successfully!",
-    "communityCreatedError": "Failed to create community. Please try again."
+    "communityCreatedError": "Failed to create community. Please try again.",
+    "joinedBoard": "Successfully joined the board!",
+    "leftBoard": "Successfully left the board",
+    "joinRequestPending": "Join request submitted! The board creator will review your request."
   },
   "eyeMasking": {
     "title": "Eye Detection & Masking Tool",
@@ -102,6 +105,7 @@
     "accessibility": "Accessibility",
     "redditCopyright": "Reddit, Inc. © 2025. All rights reserved.",
     "join": "Join",
+    "joined": "Joined",
     "share": "Share",
     "upvotes": "upvotes",
     "comments": "comments"

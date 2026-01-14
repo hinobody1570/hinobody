@@ -24,7 +24,10 @@
     "postSuccess": "게시물이 성공적으로 생성되었습니다!",
     "postError": "게시물 생성에 실패했습니다. 다시 시도해주세요.",
     "communityCreatedSuccess": "커뮤니티가 성공적으로 생성되었습니다!",
-    "communityCreatedError": "커뮤니티 생성에 실패했습니다. 다시 시도해주세요."
+    "communityCreatedError": "커뮤니티 생성에 실패했습니다. 다시 시도해주세요.",
+    "joinedBoard": "보드에 성공적으로 가입했습니다!",
+    "leftBoard": "보드에서 성공적으로 나갔습니다",
+    "joinRequestPending": "가입 요청이 제출되었습니다! 보드 생성자가 요청을 검토할 것입니다."
   },
   "eyeMasking": {
     "title": "눈 감지 및 마스킹 도구",
@@ -102,6 +105,7 @@
     "accessibility": "접근성",
     "redditCopyright": "Reddit, Inc. © 2025. 모든 권리 보유.",
     "join": "가입",
+    "joined": "가입됨",
     "share": "공유",
     "upvotes": "추천",
     "comments": "댓글"

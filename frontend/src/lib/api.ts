@@ -231,6 +231,9 @@ export const boardsApi = {
     const response = await api.get<ApiResponse<BoardMembership | null>>(`${API_END_POINT.BOARDS}/${boardId}/membership`);
     return response.data;
   },
+  leave: async (boardId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/${boardId}/leave`);
+  },
 };
 
 // Posts API endpoints

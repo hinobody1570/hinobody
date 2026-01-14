@@ -22,7 +22,12 @@
     "otpResent": "確認コードが正常に再送信されました！",
     "resendFailed": "コードの再送信に失敗しました。もう一度お試しください。",
     "postSuccess": "投稿が正常に作成されました！",
-    "postError": "投稿の作成に失敗しました。もう一度お試しください。"
+    "postError": "投稿の作成に失敗しました。もう一度お試しください。",
+    "communityCreatedSuccess": "コミュニティが正常に作成されました！",
+    "communityCreatedError": "コミュニティの作成に失敗しました。もう一度お試しください。",
+    "joinedBoard": "ボードに正常に参加しました！",
+    "leftBoard": "ボードから正常に退出しました",
+    "joinRequestPending": "参加リクエストが送信されました！ボード作成者がリクエストを確認します。"
   },
   "eyeMasking": {
     "title": "目の検出とマスキングツール",
@@ -100,6 +105,7 @@
     "accessibility": "アクセシビリティ",
     "redditCopyright": "Reddit, Inc. © 2025. 全著作権所有。",
     "join": "参加",
+    "joined": "参加済み",
     "share": "共有",
     "upvotes": "アップ投票",
     "comments": "コメント"

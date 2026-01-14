@@ -36,6 +36,7 @@ const formatTimestamp = (dateString: string): string => {
 const transformPost = (post: Post): any => {
   return {
     id: post.id,
+    boardId: post.boardId, // Add boardId for membership checks
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP, // Default avatar
     verified: false, // Can be enhanced later based on board settings
