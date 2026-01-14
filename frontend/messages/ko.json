@@ -17,6 +17,10 @@
     "forgotPasswordError": "재설정 이메일 전송에 실패했습니다. 다시 시도해주세요.",
     "resetPasswordSuccess": "비밀번호 재설정 성공! 이제 새 비밀번호로 로그인할 수 있습니다.",
     "resetPasswordError": "비밀번호 재설정에 실패했습니다. 다시 시도해주세요.",
+    "emailVerified": "이메일이 성공적으로 확인되었습니다!",
+    "verificationFailed": "인증 코드가 올바르지 않습니다. 다시 시도해주세요.",
+    "otpResent": "인증 코드가 성공적으로 다시 전송되었습니다!",
+    "resendFailed": "코드 다시 보내기에 실패했습니다. 다시 시도해주세요.",
     "postSuccess": "게시물이 성공적으로 생성되었습니다!",
     "postError": "게시물 생성에 실패했습니다. 다시 시도해주세요.",
     "communityCreatedSuccess": "커뮤니티가 성공적으로 생성되었습니다!",
@@ -213,6 +217,21 @@
       "passwordMinLength8": "비밀번호는 최소 8자 이상이어야 합니다",
       "confirmPasswordRequired": "비밀번호를 확인해주세요",
       "passwordsDoNotMatch": "비밀번호가 일치하지 않습니다"
+    },
+    "verifyEmailPage": {
+      "back": "뒤로",
+      "verifyYourEmail": "이메일 확인",
+      "codeSentTo": "6자리 코드를 다음 주소로 보냈습니다",
+      "enterVerificationCode": "인증 코드 입력",
+      "verifyEmail": "이메일 확인",
+      "verifying": "확인 중...",
+      "didntReceiveCode": "코드를 받지 못하셨나요?",
+      "resendCode": "코드 다시 보내기",
+      "resendCodeIn": "다시 보내기",
+      "codeRequired": "6자리 코드를 모두 입력해주세요",
+      "emailNotFound": "이메일을 찾을 수 없습니다. 다시 등록해주세요.",
+      "emailVerifiedTitle": "이메일 확인 완료!",
+      "emailVerifiedMessage": "이메일이 성공적으로 확인되었습니다. 이제 계정에 액세스할 수 있습니다."
     }
   },
   "dashboard": {

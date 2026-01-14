@@ -17,6 +17,10 @@
     "forgotPasswordError": "发送重置电子邮件失败。请重试。",
     "resetPasswordSuccess": "密码重置成功！您现在可以使用新密码登录。",
     "resetPasswordError": "重置密码失败。请重试。",
+    "emailVerified": "电子邮件验证成功！",
+    "verificationFailed": "验证代码无效。请重试。",
+    "otpResent": "验证代码已成功重新发送！",
+    "resendFailed": "重新发送代码失败。请重试。",
     "postSuccess": "帖子创建成功！",
     "postError": "创建帖子失败。请重试。",
     "communityCreatedSuccess": "社区创建成功！",
@@ -213,6 +217,21 @@
       "passwordMinLength8": "密码必须至少 8 个字符",
       "confirmPasswordRequired": "请确认您的密码",
       "passwordsDoNotMatch": "密码不匹配"
+    },
+    "verifyEmailPage": {
+      "back": "返回",
+      "verifyYourEmail": "验证您的电子邮件",
+      "codeSentTo": "我们已向以下地址发送了 6 位数字代码",
+      "enterVerificationCode": "输入验证代码",
+      "verifyEmail": "验证电子邮件",
+      "verifying": "验证中...",
+      "didntReceiveCode": "没有收到代码？",
+      "resendCode": "重新发送代码",
+      "resendCodeIn": "重新发送代码",
+      "codeRequired": "请输入完整的 6 位数字代码",
+      "emailNotFound": "找不到电子邮件。请重新注册。",
+      "emailVerifiedTitle": "电子邮件已验证！",
+      "emailVerifiedMessage": "您的电子邮件已成功验证。您现在可以访问您的账户。"
     }
   },
   "dashboard": {

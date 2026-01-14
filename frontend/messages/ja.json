@@ -17,6 +17,10 @@
     "forgotPasswordError": "リセットメールの送信に失敗しました。もう一度お試しください。",
     "resetPasswordSuccess": "パスワードリセット成功！新しいパスワードでログインできるようになりました。",
     "resetPasswordError": "パスワードリセットに失敗しました。もう一度お試しください。",
+    "emailVerified": "メールアドレスが正常に確認されました！",
+    "verificationFailed": "確認コードが無効です。もう一度お試しください。",
+    "otpResent": "確認コードが正常に再送信されました！",
+    "resendFailed": "コードの再送信に失敗しました。もう一度お試しください。",
     "postSuccess": "投稿が正常に作成されました！",
     "postError": "投稿の作成に失敗しました。もう一度お試しください。"
   },
@@ -211,6 +215,21 @@
       "passwordMinLength8": "パスワードは少なくとも8文字である必要があります",
       "confirmPasswordRequired": "パスワードを確認してください",
       "passwordsDoNotMatch": "パスワードが一致しません"
+    },
+    "verifyEmailPage": {
+      "back": "戻る",
+      "verifyYourEmail": "メールアドレスを確認",
+      "codeSentTo": "6桁のコードを次のアドレスに送信しました",
+      "enterVerificationCode": "確認コードを入力",
+      "verifyEmail": "メールアドレスを確認",
+      "verifying": "確認中...",
+      "didntReceiveCode": "コードが届いていませんか？",
+      "resendCode": "コードを再送信",
+      "resendCodeIn": "再送信",
+      "codeRequired": "6桁のコードをすべて入力してください",
+      "emailNotFound": "メールアドレスが見つかりません。再度登録してください。",
+      "emailVerifiedTitle": "メールアドレスが確認されました！",
+      "emailVerifiedMessage": "メールアドレスが正常に確認されました。アカウントにアクセスできるようになりました。"
     }
   },
   "dashboard": {

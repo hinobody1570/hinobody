@@ -17,6 +17,10 @@
     "forgotPasswordError": "Failed to send reset email. Please try again.",
     "resetPasswordSuccess": "Password reset successful! You can now login with your new password.",
     "resetPasswordError": "Failed to reset password. Please try again.",
+    "emailVerified": "Email verified successfully!",
+    "verificationFailed": "Invalid verification code. Please try again.",
+    "otpResent": "Verification code resent successfully!",
+    "resendFailed": "Failed to resend code. Please try again.",
     "postSuccess": "Post created successfully!",
     "postError": "Failed to create post. Please try again.",
     "communityCreatedSuccess": "Community created successfully!",
@@ -140,7 +144,7 @@
     "success": "Success!",
     "loginFailed": "Login failed. Please try again.",
     "registrationFailed": "Registration failed. Please try again.",
-    "registrationSuccessful": "Registration successful! Redirecting to login...",
+    "registrationSuccessful": "Registration successful! Redirecting to verify email...",
     "dontHaveAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
     "emailPlaceholder": "user@example.com",
@@ -213,6 +217,21 @@
       "passwordMinLength8": "Password must be at least 8 characters",
       "confirmPasswordRequired": "Please confirm your password",
       "passwordsDoNotMatch": "Passwords do not match"
+    },
+    "verifyEmailPage": {
+      "back": "Back",
+      "verifyYourEmail": "Verify Your Email",
+      "codeSentTo": "We've sent a 6-digit code to",
+      "enterVerificationCode": "Enter Verification Code",
+      "verifyEmail": "Verify Email",
+      "verifying": "Verifying...",
+      "didntReceiveCode": "Didn't receive the code?",
+      "resendCode": "Resend Code",
+      "resendCodeIn": "Resend code in",
+      "codeRequired": "Please enter the complete 6-digit code",
+      "emailNotFound": "Email not found. Please register again.",
+      "emailVerifiedTitle": "Email Verified!",
+      "emailVerifiedMessage": "Your email has been successfully verified. You can now access your account."
     }
   },
   "dashboard": {

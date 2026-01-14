@@ -5,17 +5,35 @@ import FormButton from "@/components/reuseComponents/FormButton";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { BiCheckCircle } from "react-icons/bi";
 import { BsEnvelope } from "react-icons/bs";
 import { GoArrowLeft } from "react-icons/go";
+import { useSearchParams, useRouter } from "next/navigation";
+import { authApi } from "@/lib/api";
+import { useToast } from "@/contexts/ToastContext";
+import { useTranslations } from "next-intl";
 
 export default function EmailVerification() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { showSuccess, showError } = useToast();
+  const t = useTranslations("auth.verifyEmailPage");
+  const tToast = useTranslations("toast");
+  
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(60);
+  const [resendTimer, setResendTimer] = useState(600); // 10 minutes = 600 seconds
+  const [email, setEmail] = useState<string>("");
   const inputRefs = useRef<any>([]);
+
+  // Get email from URL params or localStorage
+  useEffect(() => {
+    const emailParam = searchParams?.get("email");
+    const storedEmail = typeof window !== "undefined" ? localStorage.getItem("pending_verification_email") : null;
+    const userEmail = emailParam || storedEmail || "";
+    setEmail(userEmail);
+  }, [searchParams]);
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -74,38 +92,84 @@ export default function EmailVerification() {
     const verificationCode = codeToVerify.join("");
 
     if (verificationCode.length !== 6) {
-      setError("Please enter the complete 6-digit code");
+      setError(t("codeRequired"));
+      return;
+    }
+
+    if (!email) {
+      setError(t("emailNotFound"));
       return;
     }
 
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Verification code submitted:", verificationCode);
+    try {
+      // Call the real verify email API
+      const response = await authApi.verifyEmail(email, verificationCode);
+      
+      // Success - show success message and redirect
+      console.log("Email verified successfully:", response);
       setIsLoading(false);
       setIsVerified(true);
-
-      // Reset after 3 seconds
+      
+      // Clear stored email
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("pending_verification_email");
+      }
+      
+      showSuccess(tToast("emailVerified"));
+      
+      // Redirect to login page after 2 seconds
       setTimeout(() => {
-        setIsVerified(false);
-        setCode(["", "", "", "", "", ""]);
-      }, 3000);
-    }, 1500);
+        router.push(ROUTE_PATHS.DEFAULT);
+      }, 2000);
+    } catch (error: any) {
+      // Handle API errors - stay on page
+      setIsLoading(false);
+      const errorMessage = error?.message || tToast("verificationFailed");
+      setError(errorMessage);
+      showError(errorMessage);
+      
+      // Clear the code inputs on error
+      setCode(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+    }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (resendTimer > 0) return;
 
-    console.log("Resending verification code");
-    setResendTimer(60);
-    setCode(["", "", "", "", "", ""]);
+    if (!email) {
+      setError(t("emailNotFound"));
+      return;
+    }
+
+    setIsLoading(true);
     setError("");
-    inputRefs.current[0]?.focus();
+
+    try {
+      // Call the resend OTP API
+      await authApi.resendOtp(email);
+      
+      // Success - reset timer and code
+      setResendTimer(600); // Reset to 10 minutes
+      setCode(["", "", "", "", "", ""]);
+      setError("");
+      setIsLoading(false);
+      showSuccess(tToast("otpResent"));
+      inputRefs.current[0]?.focus();
+    } catch (error: any) {
+      // Handle API errors
+      setIsLoading(false);
+      const errorMessage = error?.message || tToast("resendFailed");
+      setError(errorMessage);
+      showError(errorMessage);
+    }
   };
 
   if (isVerified) {
-    return <ConfirmationMessage message="Your email has been successfully verified. You can now access your account." title="Email Verified!" />;
+    return <ConfirmationMessage message={t("emailVerifiedMessage")} title={t("emailVerifiedTitle")} />;
   }
 
   return (
@@ -113,7 +177,7 @@ export default function EmailVerification() {
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
         <Link href={ROUTE_PATHS.REGISTER} className="cursor-pointer flex items-center text-gray-600 hover:text-gray-800 mb-6 transition">
           <GoArrowLeft className="w-5 h-5 mr-2" />
-          <span className="text-sm font-medium">Back</span>
+          <span className="text-sm font-medium">{t("back")}</span>
         </Link>
 
         <div className="text-center mb-8">
@@ -122,23 +186,23 @@ export default function EmailVerification() {
               <BsEnvelope className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Verify Your Email</h1>
-          <p className="text-gray-600">We've sent a 6-digit code to</p>
-          <p className="text-gray-800 font-medium mt-1">your@email.com</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">{t("verifyYourEmail")}</h1>
+          <p className="text-gray-600">{t("codeSentTo")}</p>
+          <p className="text-gray-800 font-medium mt-1">{email || "your@email.com"}</p>
         </div>
 
         <div className="space-y-6">
           {/* Verification Code Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3 text-center">Enter Verification Code</label>
+            <label className="block text-sm font-medium text-gray-700 mb-3 text-center">{t("enterVerificationCode")}</label>
             <div className="flex justify-center gap-2 mb-2">
               {code.map((digit, index) => (
                 <input
                   key={index}
-                  //   ref={(el) => (inputRefs.current[index] = el)}
+                  // ref={(el) => (inputRefs.current[index] = el)}
                   type="text"
                   inputMode="numeric"
-                  //   maxLength="1"
+                  maxLength={1}
                   value={digit}
                   onChange={(e) => handleChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
@@ -154,22 +218,28 @@ export default function EmailVerification() {
 
           {/* Verify Button */}
           <FormButton
-            title="Verify Email"
-            loadingTitle="Verifying..."
+            title={t("verifyEmail")}
+            loadingTitle={t("verifying")}
             handleSubmit={() => handleVerify()}
             disabled={isLoading || code.some((digit) => !digit)}
           />
 
           {/* Resend Code */}
           <div className="text-center">
-            <p className="text-sm text-gray-600 mb-2">Didn't receive the code?</p>
+            <p className="text-sm text-gray-600 mb-2">{t("didntReceiveCode")}</p>
             {resendTimer > 0 ? (
               <p className="text-sm text-gray-500">
-                Resend code in <span className="font-semibold text-blue-600">{resendTimer}s</span>
+                {t("resendCodeIn")} <span className="font-semibold text-blue-600">
+                  {Math.floor(resendTimer / 60)}:{(resendTimer % 60).toString().padStart(2, '0')}
+                </span>
               </p>
             ) : (
-              <button onClick={handleResend} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                Resend Code
+              <button 
+                onClick={handleResend} 
+                disabled={isLoading}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t("resendCode")}
               </button>
             )}
           </div>
