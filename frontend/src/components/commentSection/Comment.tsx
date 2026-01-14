@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { BiAward, BiGlobe, BiInfoCircle, BiMessageSquare, BiSearch } from "react-icons/bi";
 import { CiShare2 } from "react-icons/ci";
@@ -6,11 +8,19 @@ import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
 import { DropdownMenu } from "../reuseComponents/DropDownMenu";
 import { FaLayerGroup } from "react-icons/fa";
+import { commentsApi, Language, votesApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useEffect } from "react";
 import AVATAR from "./../../../public/assets/images/avatar_default_4.png";
 
 interface commentType {
   comment: any;
   level?: number;
+  postId?: string;
+  postAuthorId?: string;
+  onReplyAdded?: () => void;
 }
 
 export const menuItems = [
@@ -36,35 +46,142 @@ export const menuItems = [
   },
 ];
 
-const Comment = ({ comment, level = 0 }: commentType) => {
-  const [upvotes, setUpvotes] = useState(comment.upvotes);
-  const [voteState, setVoteState] = useState<any>(null);
+const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: commentType) => {
+  const { isAuthenticated } = useAuth();
+  const { showSuccess, showError } = useToast();
+  const { locale } = useLanguage();
+  const [upvotes, setUpvotes] = useState(comment.upvotes || 0);
+  const [downvotes, setDownvotes] = useState(comment.downvotes || 0);
+  const [voteState, setVoteState] = useState<'up' | 'down' | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showReplyComment, setShowReplyComment] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
 
-  const handleUpvote = () => {
-    if (voteState === "up") {
-      setUpvotes(upvotes - 1);
-      setVoteState(null);
-    } else if (voteState === "down") {
-      setUpvotes(upvotes + 2);
-      setVoteState("up");
-    } else {
-      setUpvotes(upvotes + 1);
-      setVoteState("up");
+  // Map locale to Language enum
+  const getLanguage = (): Language => {
+    const localeMap: Record<string, Language> = {
+      'en': 'EN',
+      'ko': 'KO',
+      'zh': 'ZH',
+      'ja': 'JA',
+    };
+    return localeMap[locale] || 'EN';
+  };
+
+  const handleSubmitReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      showError('Please login to reply');
+      return;
+    }
+
+    if (!replyText.trim() || !postId) {
+      showError('Please enter a reply');
+      return;
+    }
+
+    try {
+      setIsSubmittingReply(true);
+      await commentsApi.create({
+        body: replyText.trim(),
+        originalLanguage: getLanguage(),
+        postId: postId,
+        parentId: comment.id,
+      });
+      setReplyText('');
+      setShowReplyComment(false);
+      showSuccess('Reply added successfully!');
+      // Refresh comments
+      if (onReplyAdded) {
+        onReplyAdded();
+      }
+    } catch (err: any) {
+      console.error('Error creating reply:', err);
+      showError(err.message || 'Failed to add reply. Please try again.');
+    } finally {
+      setIsSubmittingReply(false);
     }
   };
 
-  const handleDownvote = () => {
-    if (voteState === "down") {
-      setUpvotes(upvotes + 1);
-      setVoteState(null);
-    } else if (voteState === "up") {
-      setUpvotes(upvotes - 2);
-      setVoteState("down");
-    } else {
-      setUpvotes(upvotes - 1);
-      setVoteState("down");
+  // Fetch user vote status on mount
+  useEffect(() => {
+    const fetchUserVote = async () => {
+      if (!isAuthenticated || !comment.id) {
+        setVoteState(null);
+        return;
+      }
+
+      try {
+        const vote = await votesApi.getUserVote(undefined, comment.id);
+        if (vote) {
+          setVoteState(vote.type === 'UPVOTE' ? 'up' : 'down');
+        } else {
+          setVoteState(null);
+        }
+      } catch (error) {
+        console.error('Error fetching user vote:', error);
+        setVoteState(null);
+      }
+    };
+
+    fetchUserVote();
+  }, [comment.id, isAuthenticated]);
+
+  const handleUpvote = async () => {
+    if (!isAuthenticated || !comment.id || isVoting) return;
+
+    try {
+      setIsVoting(true);
+      const response = await votesApi.createOrUpdate({
+        type: 'UPVOTE',
+        commentId: comment.id,
+      });
+
+      // Update vote state
+      if (response.action === 'removed') {
+        setVoteState(null);
+      } else {
+        setVoteState('up');
+      }
+
+      // Update counts based on API response
+      setUpvotes((prev: number) => prev + response.upvoteCount);
+      setDownvotes((prev: number) => prev + response.downvoteCount);
+    } catch (error: any) {
+      console.error('Error voting:', error);
+      showError(error.message || 'Failed to vote. Please try again.');
+    } finally {
+      setIsVoting(false);
+    }
+  };
+
+  const handleDownvote = async () => {
+    if (!isAuthenticated || !comment.id || isVoting) return;
+
+    try {
+      setIsVoting(true);
+      const response = await votesApi.createOrUpdate({
+        type: 'DOWNVOTE',
+        commentId: comment.id,
+      });
+
+      // Update vote state
+      if (response.action === 'removed') {
+        setVoteState(null);
+      } else {
+        setVoteState('down');
+      }
+
+      // Update counts based on API response
+      setUpvotes((prev: number) => prev + response.upvoteCount);
+      setDownvotes((prev: number) => prev + response.downvoteCount);
+    } catch (error: any) {
+      console.error('Error voting:', error);
+      showError(error.message || 'Failed to vote. Please try again.');
+    } finally {
+      setIsVoting(false);
     }
   };
   return (
@@ -111,14 +228,22 @@ const Comment = ({ comment, level = 0 }: commentType) => {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={handleUpvote}
-                    className={`p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors ${voteState === "up" ? "text-orange-500" : "text-gray-500"}`}
+                    disabled={!isAuthenticated || isVoting}
+                    className={`p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors ${
+                      voteState === "up" ? "text-orange-500" : "text-gray-500"
+                    } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <HiOutlineArrowUp size={18} fill={voteState === "up" ? "currentColor" : "none"} />
                   </button>
-                  <span className="text-xs font-bold text-gray-700 min-w-[30px] text-center">{upvotes}</span>
+                  <span className="text-xs font-bold text-gray-700 min-w-[30px] text-center">
+                    {upvotes - downvotes}
+                  </span>
                   <button
                     onClick={handleDownvote}
-                    className={`p-1 hover:bg-gray-100 rounded cursor-pointer transition-colors ${voteState === "down" ? "text-blue-500" : "text-gray-500"}`}
+                    disabled={!isAuthenticated || isVoting}
+                    className={`p-1 hover:bg-gray-100 rounded cursor-pointer transition-colors ${
+                      voteState === "down" ? "text-blue-500" : "text-gray-500"
+                    } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <HiOutlineArrowDown size={18} fill={voteState === "down" ? "currentColor" : "none"} />
                   </button>
@@ -163,21 +288,47 @@ const Comment = ({ comment, level = 0 }: commentType) => {
         </div>
       </div>
       {showReplyComment && (
-        <div className="relative flex-1 max-w-md ml-20">
-          <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <form onSubmit={handleSubmitReply} className="flex gap-2 mt-2 ml-20 max-w-md">
           <input
             type="text"
-            placeholder="Enter reply"
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder={isAuthenticated ? "Enter reply" : "Login to reply"}
+            disabled={!isAuthenticated || isSubmittingReply}
+            className="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
-        </div>
+          <button
+            type="submit"
+            disabled={!isAuthenticated || isSubmittingReply || !replyText.trim()}
+            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmittingReply ? '...' : 'Reply'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowReplyComment(false);
+              setReplyText('');
+            }}
+            className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            Cancel
+          </button>
+        </form>
       )}
 
       {/* Nested Comments */}
       {!isCollapsed && comment.replies && comment.replies.length > 0 && (
         <div className="mt-2">
           {comment.replies.map((reply: any) => (
-            <Comment key={reply.id} comment={reply} level={level + 1} />
+            <Comment 
+              key={reply.id} 
+              comment={reply} 
+              level={level + 1}
+              postId={postId}
+              postAuthorId={postAuthorId}
+              onReplyAdded={onReplyAdded}
+            />
           ))}
         </div>
       )}

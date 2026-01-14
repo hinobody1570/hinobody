@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import Comment from './Comment';
-import { commentsApi, Comment as CommentType } from '@/lib/api';
+import { commentsApi, Comment as CommentType, Language } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 
 // Helper function to format timestamp
@@ -39,6 +42,7 @@ const transformComment = (comment: CommentType, postAuthorId?: string): any => {
     timestamp: formatTimestamp(comment.createdAt),
     text: comment.body,
     upvotes: comment.upvoteCount || 0,
+    downvotes: comment.downvoteCount || 0,
     edited: comment.updatedAt !== comment.createdAt,
     editedTime: comment.updatedAt !== comment.createdAt ? formatTimestamp(comment.updatedAt) : undefined,
     replies: comment.replies ? comment.replies.map((reply) => transformComment(reply, postAuthorId)) : [],
@@ -52,46 +56,105 @@ interface CommentsSectionProps {
 
 // Main Comments Section Component
 export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
+  const { isAuthenticated } = useAuth();
+  const { showSuccess, showError } = useToast();
+  const { locale } = useLanguage();
   const [sortBy, setSortBy] = useState('Best');
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Map locale to Language enum
+  const getLanguage = (): Language => {
+    const localeMap: Record<string, Language> = {
+      'en': 'EN',
+      'ko': 'KO',
+      'zh': 'ZH',
+      'ja': 'JA',
+    };
+    return localeMap[locale] || 'EN';
+  };
+
+  const fetchComments = async () => {
+    if (!postId) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await commentsApi.getByPost(postId, 1, 50);
+      const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId));
+      setComments(transformedComments);
+    } catch (err: any) {
+      console.error('Error fetching comments:', err);
+      setError(err.message || 'Failed to load comments');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchComments = async () => {
-      if (!postId) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await commentsApi.getByPost(postId, 1, 50);
-        const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId));
-        setComments(transformedComments);
-      } catch (err: any) {
-        console.error('Error fetching comments:', err);
-        setError(err.message || 'Failed to load comments');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchComments();
   }, [postId, postAuthorId]);
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      showError('Please login to comment');
+      return;
+    }
+
+    if (!newComment.trim()) {
+      showError('Please enter a comment');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await commentsApi.create({
+        body: newComment.trim(),
+        originalLanguage: getLanguage(),
+        postId: postId,
+      });
+      setNewComment('');
+      showSuccess('Comment added successfully!');
+      // Refresh comments
+      await fetchComments();
+    } catch (err: any) {
+      console.error('Error creating comment:', err);
+      showError(err.message || 'Failed to add comment. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
 
       {/* Comment Input */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Join the conversation"
-          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-        />
-      </div>
+      <form onSubmit={handleSubmitComment} className="mb-6">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder={isAuthenticated ? "Join the conversation" : "Login to comment"}
+            disabled={!isAuthenticated || isSubmitting}
+            className="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          />
+          <button
+            type="submit"
+            disabled={!isAuthenticated || isSubmitting || !newComment.trim()}
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? 'Posting...' : 'Post'}
+          </button>
+        </div>
+      </form>
 
       {/* Sort and Search */}
       <div className="flex items-center gap-4 mb-6">
@@ -140,7 +203,13 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       {!loading && !error && (
         <div className="space-y-4">
           {comments.map((comment) => (
-            <Comment key={comment.id} comment={comment} />
+            <Comment 
+              key={comment.id} 
+              comment={comment}
+              postId={postId}
+              postAuthorId={postAuthorId}
+              onReplyAdded={fetchComments}
+            />
           ))}
         </div>
       )}
