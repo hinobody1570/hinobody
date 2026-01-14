@@ -246,6 +246,7 @@ export interface CreatePostDto {
   boardId: string;
   imageIds?: string[];
   tags?: string[];
+  isActive?: boolean; // false for draft, true (default) for published
 }
 
 export interface Post {

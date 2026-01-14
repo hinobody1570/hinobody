@@ -27,7 +27,9 @@
     "communityCreatedError": "コミュニティの作成に失敗しました。もう一度お試しください。",
     "joinedBoard": "ボードに正常に参加しました！",
     "leftBoard": "ボードから正常に退出しました",
-    "joinRequestPending": "参加リクエストが送信されました！ボード作成者がリクエストを確認します。"
+    "joinRequestPending": "参加リクエストが送信されました！ボード作成者がリクエストを確認します。",
+    "draftSaved": "下書きが正常に保存されました！",
+    "draftError": "下書きの保存に失敗しました。もう一度お試しください。"
   },
   "eyeMasking": {
     "title": "目の検出とマスキングツール",
@@ -373,7 +375,10 @@
     "characters": "文字",
     "titleRequired": "タイトルは必須です",
     "bodyRequired": "本文内容は必須です",
-    "communityRequired": "コミュニティを選択してください"
+    "communityRequired": "コミュニティを選択してください",
+    "draftEmpty": "下書きには少なくともタイトルまたは本文が必要です",
+    "untitledDraft": "タイトルなしの下書き",
+    "saving": "保存中..."
   },
   "profileDropdown": {
     "viewProfile": "プロフィールを表示",

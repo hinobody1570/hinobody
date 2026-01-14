@@ -27,7 +27,9 @@
     "communityCreatedError": "커뮤니티 생성에 실패했습니다. 다시 시도해주세요.",
     "joinedBoard": "보드에 성공적으로 가입했습니다!",
     "leftBoard": "보드에서 성공적으로 나갔습니다",
-    "joinRequestPending": "가입 요청이 제출되었습니다! 보드 생성자가 요청을 검토할 것입니다."
+    "joinRequestPending": "가입 요청이 제출되었습니다! 보드 생성자가 요청을 검토할 것입니다.",
+    "draftSaved": "초안이 성공적으로 저장되었습니다!",
+    "draftError": "초안 저장에 실패했습니다. 다시 시도해주세요."
   },
   "eyeMasking": {
     "title": "눈 감지 및 마스킹 도구",
@@ -373,7 +375,10 @@
     "characters": "자",
     "titleRequired": "제목은 필수입니다",
     "bodyRequired": "본문 내용은 필수입니다",
-    "communityRequired": "커뮤니티를 선택해주세요"
+    "communityRequired": "커뮤니티를 선택해주세요",
+    "draftEmpty": "초안에는 최소한 제목 또는 본문이 있어야 합니다",
+    "untitledDraft": "제목 없는 초안",
+    "saving": "저장 중..."
   },
   "profileDropdown": {
     "viewProfile": "프로필 보기",

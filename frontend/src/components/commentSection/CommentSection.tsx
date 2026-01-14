@@ -161,7 +161,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Sort by:</span>
           <button
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors cursor-pointer"
             onClick={() => setSortBy('Best')}
           >
             {sortBy}

@@ -65,4 +65,12 @@ export class CreatePostDto {
   @IsString({ each: true })
   @IsOptional()
   tags?: string[];
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Whether the post is active (published) or saved as draft',
+    default: true,
+  })
+  @IsOptional()
+  isActive?: boolean;
 }

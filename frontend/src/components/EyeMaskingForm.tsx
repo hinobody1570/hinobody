@@ -1043,7 +1043,7 @@ const EyeMaskingForm = () => {
             <div className="controls">
               {mode === "auto" && (
                 <>
-                  <button type="button" onClick={detectAndMaskEyes} disabled={isProcessing || !model || !model.loaded} className="btn btn-primary">
+                  <button type="button" onClick={detectAndMaskEyes} disabled={isProcessing || !model || !model.loaded} className="btn btn-primary cursor-pointer">
                     {isProcessing ? t("detecting") : t("detectAndMaskEyes")}
                   </button>
                   {masks.length === 0 && !debugInfo.validationFailed && (
@@ -1067,7 +1067,7 @@ const EyeMaskingForm = () => {
 
               {masks.length > 0 && (
                 <>
-                  <button type="button" onClick={clearMasks} disabled={isProcessing} className="btn btn-secondary">
+                  <button type="button" onClick={clearMasks} disabled={isProcessing} className="btn btn-secondary cursor-pointer">
                     {t("clearAllMasks")} ({masks.length})
                   </button>
 
@@ -1077,7 +1077,7 @@ const EyeMaskingForm = () => {
                         <span>
                           {t("mask")} {index + 1}
                         </span>
-                        <button type="button" onClick={() => removeMask(index)} className="btn-small">
+                        <button type="button" onClick={() => removeMask(index)} className="btn-small cursor-pointer">
                           {t("remove")}
                         </button>
                       </div>
@@ -1086,7 +1086,7 @@ const EyeMaskingForm = () => {
                 </>
               )}
 
-              <button type="submit" disabled={isProcessing || masks.length === 0} className="btn btn-success">
+              <button type="submit" disabled={isProcessing || masks.length === 0} className="btn btn-success cursor-pointer">
                 {isProcessing ? t("processing") : t("uploadMaskedImageButton")}
               </button>
               {masks.length > 0 && (
@@ -1111,7 +1111,7 @@ const EyeMaskingForm = () => {
               {t("error")} {debugInfo.modelError}
             </p>
             <p>{t("canUseManualMode")}</p>
-            <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary">
+            <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary cursor-pointer">
               {t("retryLoadingModel")}
             </button>
           </div>
@@ -1195,7 +1195,7 @@ const EyeMaskingForm = () => {
                 <strong>{t("uploadError")}</strong> {debugInfo.uploadError}
               </p>
             )}
-            <button type="button" onClick={() => setDebugInfo({})} className="btn btn-small">
+            <button type="button" onClick={() => setDebugInfo({})} className="btn btn-small cursor-pointer">
               {t("clearDebugInfo")}
             </button>
           </div>

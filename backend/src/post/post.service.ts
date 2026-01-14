@@ -28,21 +28,27 @@ export class PostService {
       throw new NotFoundException('Board not found');
     }
 
-    // Check if user is an approved member of the board
-    const isMember = await this.boardMemberService.isMember(createPostDto.boardId, userId);
-    if (!isMember) {
-      const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId, userId);
-      
-      if (!membership) {
-        throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
-      } else if (membership.status === 'PENDING') {
-        throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
-      } else if (membership.status === 'REJECTED') {
-        throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+    // If isActive is not provided, default to true (published)
+    // If isActive is false, it's a draft and we skip membership check
+    const isDraft = createPostDto.isActive === false;
+    
+    // Only check membership if posting (not saving as draft)
+    if (!isDraft) {
+      // Check if user is an approved member of the board
+      const isMember = await this.boardMemberService.isMember(createPostDto.boardId, userId);
+      if (!isMember) {
+        const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId, userId);
+        
+        if (!membership) {
+          throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
+        } else if (membership.status === 'PENDING') {
+          throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
+        } else if (membership.status === 'REJECTED') {
+          throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+        }
       }
     }
 
-    // Create post with images and tags
     const post = await this.prisma.post.create({
       data: {
         title: createPostDto.title,
@@ -51,6 +57,7 @@ export class PostService {
         authorId: userId,
         boardId: createPostDto.boardId,
         tags: createPostDto.tags || [],
+        isActive: createPostDto.isActive !== undefined ? createPostDto.isActive : true,
         images: createPostDto.imageIds
           ? {
               connect: createPostDto.imageIds.map((id) => ({ id })),

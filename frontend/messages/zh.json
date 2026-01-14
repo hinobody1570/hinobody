@@ -27,7 +27,9 @@
     "communityCreatedError": "创建社区失败。请重试。",
     "joinedBoard": "成功加入板块！",
     "leftBoard": "成功离开板块",
-    "joinRequestPending": "已提交加入请求！板块创建者将审核您的请求。"
+    "joinRequestPending": "已提交加入请求！板块创建者将审核您的请求。",
+    "draftSaved": "草稿保存成功！",
+    "draftError": "保存草稿失败。请重试。"
   },
   "eyeMasking": {
     "title": "眼睛检测和遮罩工具",
@@ -373,7 +375,10 @@
     "characters": "字符",
     "titleRequired": "标题是必填项",
     "bodyRequired": "正文内容是必填项",
-    "communityRequired": "请选择一个社区"
+    "communityRequired": "请选择一个社区",
+    "draftEmpty": "草稿必须至少包含标题或正文",
+    "untitledDraft": "未命名草稿",
+    "saving": "保存中..."
   },
   "profileDropdown": {
     "viewProfile": "查看个人资料",

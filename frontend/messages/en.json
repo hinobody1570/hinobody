@@ -27,7 +27,9 @@
     "communityCreatedError": "Failed to create community. Please try again.",
     "joinedBoard": "Successfully joined the board!",
     "leftBoard": "Successfully left the board",
-    "joinRequestPending": "Join request submitted! The board creator will review your request."
+    "joinRequestPending": "Join request submitted! The board creator will review your request.",
+    "draftSaved": "Draft saved successfully!",
+    "draftError": "Failed to save draft. Please try again."
   },
   "eyeMasking": {
     "title": "Eye Detection & Masking Tool",
@@ -373,7 +375,10 @@
     "characters": "characters",
     "titleRequired": "Title is required",
     "bodyRequired": "Body content is required",
-    "communityRequired": "Please select a community"
+    "communityRequired": "Please select a community",
+    "draftEmpty": "Draft must have at least a title or body",
+    "untitledDraft": "Untitled Draft",
+    "saving": "Saving..."
   },
   "profileDropdown": {
     "viewProfile": "View Profile",

@@ -188,7 +188,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
     <div className={`${level > 0 ? "ml-8 border-l-2 border-gray-200 pl-4" : ""}`}>
       <div className="flex gap-3 mb-4">
         {/* Collapse Button */}
-        <button onClick={() => setIsCollapsed(!isCollapsed)} className="flex-shrink-0 w-6 h-6 mt-1 hover:bg-gray-100 rounded transition-colors">
+        <button onClick={() => setIsCollapsed(!isCollapsed)} className="flex-shrink-0 w-6 h-6 mt-1 hover:bg-gray-100 rounded transition-colors cursor-pointer">
           <div className="w-full h-full flex items-center justify-center">
             <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
           </div>
@@ -252,20 +252,20 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                 {/* Reply Button */}
                 <button
                   onClick={() => setShowReplyComment(!showReplyComment)}
-                  className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                  className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer"
                 >
                   <BiMessageSquare size={16} />
                   <span>Reply</span>
                 </button>
 
                 {/* Award Button */}
-                <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
                   <BiAward size={16} />
                   <span>Award</span>
                 </button>
 
                 {/* Share Button */}
-                <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
                   <CiShare2 size={16} />
                   <span>Share</span>
                 </button>

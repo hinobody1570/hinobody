@@ -123,9 +123,46 @@ const CreatePost = () => {
     }
   };
 
-  const handleSaveDraft = () => {
-    console.log("Saving draft:", { title, body, community: selectedCommunity });
-    // Add your save draft logic here
+  const handleSaveDraft = async () => {
+    // Basic validation for draft
+    if (!title.trim() && !body.trim()) {
+      showError(t("draftEmpty"));
+      return;
+    }
+
+    if (!selectedCommunity) {
+      showError(t("communityRequired"));
+      return;
+    }
+
+    setIsPosting(true);
+    try {
+      const postData = {
+        title: title.trim() || t("untitledDraft"),
+        body: body.trim() || "",
+        originalLanguage: getLanguage(),
+        boardId: selectedCommunity.id,
+        tags: tags.length > 0 ? tags : undefined,
+        isActive: false, // Save as draft
+        // imageIds can be added later when image upload is implemented
+      };
+      await postsApi.create(postData);
+      
+      // Show success message
+      showSuccess(tToast("draftSaved"));
+      
+      // Reset form
+      setTitle("");
+      setBody("");
+      setSelectedCommunity(null);
+      setTags([]);
+    } catch (error: any) {
+      console.error("Error saving draft:", error);
+      const errorMessage = error?.message || tToast("draftError");
+      showError(errorMessage);
+    } finally {
+      setIsPosting(false);
+    }
   };
 
   // Fetch boards from API
@@ -213,7 +250,7 @@ const CreatePost = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800">{t("title")}</h1>
-          <button className="text-sm text-gray-600 hover:text-gray-800 font-semibold">{t("drafts")}</button>
+          <button className="text-sm text-gray-600 hover:text-gray-800 font-semibold cursor-pointer">{t("drafts")}</button>
         </div>
 
         {/* Main Card */}
@@ -228,7 +265,7 @@ const CreatePost = () => {
                     setShowDropdown(true);
                     fetchBoards("");
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
                 >
                   <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs font-bold">r</span>
@@ -267,7 +304,7 @@ const CreatePost = () => {
                         <button
                           key={board.id}
                           onClick={() => handleSelectBoard(board)}
-                          className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
+                          className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer"
                         >
                           <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs font-bold">r</span>
@@ -330,9 +367,14 @@ const CreatePost = () => {
             <div className="flex items-center justify-end gap-3 mt-6">
               <button
                 onClick={handleSaveDraft}
-                className="px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                disabled={isPosting || !selectedCommunity}
+                className={`px-6 py-2 text-sm font-semibold rounded-full transition-colors ${
+                  !isPosting && selectedCommunity
+                    ? "text-gray-700 hover:bg-gray-100"
+                    : "text-gray-400 cursor-not-allowed"
+                }`}
               >
-                {t("saveDraft")}
+                {isPosting ? t("saving") : t("saveDraft")}
               </button>
               <button
                 onClick={handlePost}

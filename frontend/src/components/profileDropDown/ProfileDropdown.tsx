@@ -75,7 +75,7 @@ export default function ProfileDropdown() {
   return (
     <div className="absolute right-0 top-16 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-fadeIn">
       {/* Profile Section */}
-      <button onClick={menuItems[0].onClick} className="w-full px-4 py-3 hover:bg-gray-50 transition flex items-center gap-3">
+      <button onClick={menuItems[0].onClick} className="w-full px-4 py-3 hover:bg-gray-50 transition flex items-center gap-3 cursor-pointer">
         <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
           <span className="text-white text-lg font-bold">R</span>
         </div>
@@ -126,7 +126,7 @@ export default function ProfileDropdown() {
 
       {/* Bottom Items */}
       {bottomItems.map((item, index) => (
-        <button key={index} onClick={item.onClick} className="w-full px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
+        <button key={index} onClick={item.onClick} className="w-full px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3 cursor-pointer">
           <item.icon className="w-5 h-5 text-gray-700 flex-shrink-0" />
           <span className="text-sm font-medium text-gray-900">{item.label}</span>
           {item.badge && <span className="ml-auto text-xs font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded">{item.badge}</span>}

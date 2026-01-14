@@ -115,13 +115,13 @@ export default function SettingsPage() {
             <div className="bg-gray-50 rounded-lg p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('security')}</h2>
               <div className="space-y-3">
-                <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors text-left">
+                <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors text-left cursor-pointer">
                   {t('changePassword')}
                 </button>
-                <button className="w-full bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition-colors text-left">
+                <button className="w-full bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition-colors text-left cursor-pointer">
                   {t('twoFactorAuth')}
                 </button>
-                <button className="w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors text-left">
+                <button className="w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors text-left cursor-pointer">
                   {t('deleteAccount')}
                 </button>
               </div>

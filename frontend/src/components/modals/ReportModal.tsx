@@ -60,7 +60,7 @@ export const ReportModal = ({
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             disabled={isLoading}
           >
             <FiX size={20} className="text-gray-600" />
@@ -106,14 +106,14 @@ export const ReportModal = ({
               type="button"
               onClick={handleClose}
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading || !reason.trim() || reason.trim().length < 10}
-              className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? "Submitting..." : "Submit Report"}
             </button>
