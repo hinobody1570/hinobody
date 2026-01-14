@@ -446,3 +446,42 @@ export const eyeMaskedImagesApi = {
   },
 };
 
+// Votes API endpoints
+export type VoteType = 'UPVOTE' | 'DOWNVOTE';
+
+export interface CreateVoteDto {
+  type: VoteType;
+  postId?: string;
+  commentId?: string;
+}
+
+export interface Vote {
+  id: string;
+  type: VoteType;
+  userId: string;
+  postId?: string;
+  commentId?: string;
+  createdAt: string;
+}
+
+export interface VoteResponse {
+  vote: Vote | null;
+  action: 'created' | 'updated' | 'removed';
+  upvoteCount: number;
+  downvoteCount: number;
+}
+
+export const votesApi = {
+  createOrUpdate: async (createVoteDto: CreateVoteDto): Promise<VoteResponse> => {
+    const response = await api.post<ApiResponse<VoteResponse>>(API_END_POINT.VOTES, createVoteDto);
+    return response.data;
+  },
+  getUserVote: async (postId?: string, commentId?: string): Promise<Vote | null> => {
+    const params = new URLSearchParams();
+    if (postId) params.append('postId', postId);
+    if (commentId) params.append('commentId', commentId);
+    const response = await api.get<ApiResponse<Vote | null>>(`${API_END_POINT.VOTES}/user-vote?${params.toString()}`);
+    return response.data;
+  },
+};
+

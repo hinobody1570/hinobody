@@ -7,6 +7,7 @@ export const API_END_POINT = {
     RESET_PASSWORD: "/auth/reset-password",
     BOARDS: "/boards",
     POSTS: "/posts",
+    VOTES: "/votes",
     S3_UPLOAD: "/s3/upload",
     S3_UPLOAD_BULK: "/s3/upload/bulk",
     EYE_MASKED_IMAGES: "/eye-masked-images",

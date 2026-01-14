@@ -9,7 +9,7 @@ import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 import { CommentsSection } from "../commentSection/CommentSection";
 import { DropdownMenu } from "./DropDownMenu";
 import { menuItems } from "../commentSection/Comment";
-import { boardsApi } from "@/lib/api";
+import { boardsApi, votesApi, VoteType } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 
@@ -18,35 +18,91 @@ export const PostCard = ({ post }: any) => {
   const tToast = useTranslations("toast");
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
-  const [upvotes, setUpvotes] = useState(post.upvotes);
+  const [upvotes, setUpvotes] = useState(post.upvotes || 0);
+  const [downvotes, setDownvotes] = useState(post.downvotes || 0);
   const [showComments, setShowComments] = useState(false);
-  const [voteState, setVoteState] = useState<any>(null); // null, 'up', or 'down'
+  const [voteState, setVoteState] = useState<'up' | 'down' | null>(null); // null, 'up', or 'down'
   const [isMember, setIsMember] = useState<boolean | null>(null); // null = loading, true = member, false = not member
   const [isJoining, setIsJoining] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
 
-  const handleUpvote = () => {
-    if (voteState === "up") {
-      setUpvotes(upvotes - 1);
-      setVoteState(null);
-    } else if (voteState === "down") {
-      setUpvotes(upvotes + 2);
-      setVoteState("up");
-    } else {
-      setUpvotes(upvotes + 1);
-      setVoteState("up");
+  // Fetch user vote status on mount
+  useEffect(() => {
+    const fetchUserVote = async () => {
+      if (!isAuthenticated || !post.id) {
+        setVoteState(null);
+        return;
+      }
+
+      try {
+        const vote = await votesApi.getUserVote(post.id);
+        if (vote) {
+          setVoteState(vote.type === 'UPVOTE' ? 'up' : 'down');
+        } else {
+          setVoteState(null);
+        }
+      } catch (error) {
+        console.error('Error fetching user vote:', error);
+        setVoteState(null);
+      }
+    };
+
+    fetchUserVote();
+  }, [post.id, isAuthenticated]);
+
+  const handleUpvote = async () => {
+    if (!isAuthenticated || !post.id || isVoting) return;
+
+    try {
+      setIsVoting(true);
+      const response = await votesApi.createOrUpdate({
+        type: 'UPVOTE',
+        postId: post.id,
+      });
+
+      // Update vote state
+      if (response.action === 'removed') {
+        setVoteState(null);
+      } else {
+        setVoteState('up');
+      }
+
+      // Update counts based on API response
+      setUpvotes((prev: number) => prev + response.upvoteCount);
+      setDownvotes((prev: number) => prev + response.downvoteCount);
+    } catch (error: any) {
+      console.error('Error voting:', error);
+      showError(error.message || 'Failed to vote. Please try again.');
+    } finally {
+      setIsVoting(false);
     }
   };
 
-  const handleDownvote = () => {
-    if (voteState === "down") {
-      setUpvotes(upvotes + 1);
-      setVoteState(null);
-    } else if (voteState === "up") {
-      setUpvotes(upvotes - 2);
-      setVoteState("down");
-    } else {
-      setUpvotes(upvotes - 1);
-      setVoteState("down");
+  const handleDownvote = async () => {
+    if (!isAuthenticated || !post.id || isVoting) return;
+
+    try {
+      setIsVoting(true);
+      const response = await votesApi.createOrUpdate({
+        type: 'DOWNVOTE',
+        postId: post.id,
+      });
+
+      // Update vote state
+      if (response.action === 'removed') {
+        setVoteState(null);
+      } else {
+        setVoteState('down');
+      }
+
+      // Update counts based on API response
+      setUpvotes((prev: number) => prev + response.upvoteCount);
+      setDownvotes((prev: number) => prev + response.downvoteCount);
+    } catch (error: any) {
+      console.error('Error voting:', error);
+      showError(error.message || 'Failed to vote. Please try again.');
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -164,14 +220,22 @@ export const PostCard = ({ post }: any) => {
         <div className="flex items-center bg-gray-100 rounded-full">
           <button
             onClick={handleUpvote}
-            className={`p-1.5 hover:bg-gray-200 rounded-l-full transition-colors ${voteState === "up" ? "text-orange-500" : "text-gray-600"}`}
+            disabled={!isAuthenticated || isVoting}
+            className={`p-1.5 hover:bg-gray-200 cursor-pointer rounded-l-full transition-colors ${
+              voteState === "up" ? "text-orange-500" : "text-gray-600"
+            } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <HiOutlineArrowUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
           </button>
-          <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">{upvotes}</span>
+          <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">
+            {upvotes - downvotes}
+          </span>
           <button
             onClick={handleDownvote}
-            className={`p-1.5 hover:bg-gray-200 rounded-r-full transition-colors ${voteState === "down" ? "text-blue-500" : "text-gray-600"}`}
+            disabled={!isAuthenticated || isVoting}
+            className={`p-1.5 hover:bg-gray-200 cursor-pointer rounded-r-full transition-colors ${
+              voteState === "down" ? "text-blue-500" : "text-gray-600"
+            } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <HiOutlineArrowDown size={20} fill={voteState === "down" ? "currentColor" : "none"} />
           </button>

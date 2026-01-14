@@ -44,6 +44,7 @@ const transformPost = (post: Post): any => {
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
+    downvotes: post.downvoteCount || 0,
     comments: post.commentCount || 0,
     body: post.body || ""
   };

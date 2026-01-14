@@ -15,6 +15,7 @@ import { UserModule } from './user/user.module';
 import { S3Module } from './s3/s3.module';
 import { EmailModule } from './email/email.module';
 import { EyeMaskedImageModule } from './eye-masked-image/eye-masked-image.module';
+import { VoteModule } from './vote/vote.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EyeMaskedImageModule } from './eye-masked-image/eye-masked-image.module
     ReportModule,
     S3Module,
     EyeMaskedImageModule,
+    VoteModule,
   ],
   controllers: [AppController],
   providers: [AppService],
