@@ -542,3 +542,28 @@ export const commentsApi = {
   },
 };
 
+// Reports API endpoints
+export interface CreateReportDto {
+  reason: string;
+  postId?: string;
+  commentId?: string;
+}
+
+export interface Report {
+  id: string;
+  reason: string;
+  status: string;
+  postId?: string;
+  commentId?: string;
+  reportedById: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const reportsApi = {
+  create: async (createReportDto: CreateReportDto): Promise<Report> => {
+    const response = await api.post<ApiResponse<Report>>(API_END_POINT.REPORTS, createReportDto);
+    return response.data;
+  },
+};
+

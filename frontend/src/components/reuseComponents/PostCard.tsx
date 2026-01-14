@@ -8,10 +8,13 @@ import { GoBell } from "react-icons/go";
 import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 import { CommentsSection } from "../commentSection/CommentSection";
 import { DropdownMenu } from "./DropDownMenu";
-import { menuItems } from "../commentSection/Comment";
-import { boardsApi, votesApi, VoteType } from "@/lib/api";
+import { ReportModal } from "../modals/ReportModal";
+import { boardsApi, votesApi, reportsApi, VoteType } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
+import { FaLayerGroup } from "react-icons/fa";
+import { FiEyeOff } from "react-icons/fi";
+import { BiInfoCircle } from "react-icons/bi";
 
 export const PostCard = ({ post }: any) => {
   const t = useTranslations("feed");
@@ -25,6 +28,8 @@ export const PostCard = ({ post }: any) => {
   const [isMember, setIsMember] = useState<boolean | null>(null); // null = loading, true = member, false = not member
   const [isJoining, setIsJoining] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
 
   // Fetch user vote status on mount
   useEffect(() => {
@@ -157,6 +162,51 @@ export const PostCard = ({ post }: any) => {
     }
   };
 
+  // Handle report submission
+  const handleReportSubmit = async (reason: string) => {
+    if (!isAuthenticated || !post.id || isReporting) return;
+
+    try {
+      setIsReporting(true);
+      await reportsApi.create({
+        reason,
+        postId: post.id,
+      });
+      showSuccess("Report submitted successfully. Thank you for helping keep our community safe.");
+      setShowReportModal(false);
+    } catch (error: any) {
+      console.error('Error submitting report:', error);
+      throw error; // Let the modal handle the error display
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
+  // Post-specific menu items
+  const postMenuItems = [
+    // {
+    //   icon: FiEyeOff,
+    //   label: "Hide",
+    //   onClick: () => console.log("Hide clicked"),
+    // },
+    {
+      icon: FaLayerGroup,
+      label: "Report",
+      onClick: () => {
+        if (isAuthenticated) {
+          setShowReportModal(true);
+        } else {
+          showError("Please login to report this post");
+        }
+      },
+    },
+    // {
+    //   icon: BiInfoCircle,
+    //   label: "About this post",
+    //   onClick: () => console.log("About clicked"),
+    // },
+  ];
+
   return (
     <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
       {/* Post Header */}
@@ -196,7 +246,7 @@ export const PostCard = ({ post }: any) => {
             <FiMoreHorizontal size={20} className="text-gray-600" />
           </button> */}
           <div className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
-            <DropdownMenu items={menuItems} />
+            <DropdownMenu items={postMenuItems} />
           </div>
         </div>
       </div>
@@ -259,6 +309,15 @@ export const PostCard = ({ post }: any) => {
         </button>
       </div>
       {showComments && <CommentsSection postId={post.id} postAuthorId={post.authorId} />}
+      
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        onSubmit={handleReportSubmit}
+        title="Report Post"
+        isLoading={isReporting}
+      />
     </article>
   );
 };
