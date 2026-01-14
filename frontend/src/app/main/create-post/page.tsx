@@ -47,10 +47,10 @@ const CreatePost = () => {
   };
 
   const tabs = [
-    { id: "text", label: t("tabs.text") },
-    { id: "images", label: t("tabs.images") },
-    { id: "link", label: t("tabs.link") },
-    { id: "poll", label: t("tabs.poll"), disabled: true },
+    { id: "text", label: t("tabs.text"), disabled: false },
+    // { id: "images", label: t("tabs.images") },
+    // { id: "link", label: t("tabs.link") },
+    // { id: "poll", label: t("tabs.poll"), disabled: true },
   ];
 
   const handlePost = async () => {
