@@ -1,77 +1,85 @@
-import { useState } from 'react';
+"use client";
+
+import { useState, useEffect } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import Comment from './Comment';
+import { commentsApi, Comment as CommentType } from '@/lib/api';
+import DP from '../../../public/assets/images/avatar_default_4.png';
+
+// Helper function to format timestamp
+const formatTimestamp = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} sec. ago`;
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} ${minutes === 1 ? 'min' : 'mins'}. ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} ${hours === 1 ? 'hr' : 'hrs'}. ago`;
+  } else if (diffInSeconds < 604800) {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+  } else {
+    const weeks = Math.floor(diffInSeconds / 604800);
+    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+  }
+};
+
+// Transform API comment to Comment component format
+const transformComment = (comment: CommentType, postAuthorId?: string): any => {
+  return {
+    id: comment.id,
+    username: comment.author?.nickname || 'Anonymous',
+    avatar: DP, // Default avatar
+    badge: comment.authorId === postAuthorId ? 'OP' : undefined,
+    timestamp: formatTimestamp(comment.createdAt),
+    text: comment.body,
+    upvotes: comment.upvoteCount || 0,
+    edited: comment.updatedAt !== comment.createdAt,
+    editedTime: comment.updatedAt !== comment.createdAt ? formatTimestamp(comment.updatedAt) : undefined,
+    replies: comment.replies ? comment.replies.map((reply) => transformComment(reply, postAuthorId)) : [],
+  };
+};
+
+interface CommentsSectionProps {
+  postId: string;
+  postAuthorId?: string;
+}
 
 // Main Comments Section Component
-export const CommentsSection = () => {
+export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
   const [sortBy, setSortBy] = useState('Best');
+  const [comments, setComments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const dummyComments = [
-    {
-      id: 1,
-      username: 'AutoModerator',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=automod',
-      badge: 'MOD',
-      timestamp: '1d ago',
-      text: '',
-      upvotes: 0,
-      stickied: true,
-      replies: []
-    },
-    {
-      id: 2,
-      username: 'SoggyVolume1556',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=soggy',
-      badge: 'OP',
-      timestamp: '1d ago',
-      text: '"The war will end, and leaders will shake hands. That old woman will keep waiting for her martyred son. And those children will keep waiting for their hero father. I don\'t know who sold our homeland, but I saw who paid the price." This quote is so true it\'s ironic',
-      upvotes: 369,
-      awards: 2,
-      highlighted: true,
-      replies: [
-        {
-          id: 3,
-          username: 'GootuSnotborn',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=gootu',
-          timestamp: '21h ago',
-          edited: true,
-          editedTime: '20h ago',
-          text: 'This is by Mahmoud Darwish the Palestinian poet.\n\nEdit: spelling',
-          upvotes: 54,
-          replies: [
-            {
-              id: 4,
-              username: 'SoggyVolume1556',
-              avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=soggy',
-              badge: 'OP',
-              timestamp: '21h ago',
-              text: 'Yes it isss',
-              upvotes: 13,
-              replies: []
-            }
-          ]
-        },
-        {
-          id: 5,
-          username: 'Attila___',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=attila',
-          timestamp: '1d ago',
-          text: 'So true 😢',
-          upvotes: 14,
-          replies: []
-        }
-      ]
-    },
-    {
-      id: 6,
-      username: 'eight_BUCKS',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=eight',
-      timestamp: '1d ago',
-      text: 'Handshakes are back?',
-      upvotes: 36,
-      replies: []
-    }
-  ];
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!postId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await commentsApi.getByPost(postId, 1, 50);
+        const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId));
+        setComments(transformedComments);
+      } catch (err: any) {
+        console.error('Error fetching comments:', err);
+        setError(err.message || 'Failed to load comments');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, [postId, postAuthorId]);
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -108,12 +116,34 @@ export const CommentsSection = () => {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-500">Loading comments...</div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <p className="text-red-600">{error}</p>
+        </div>
+      )}
+
       {/* Comments List */}
-      <div className="space-y-4">
-        {dummyComments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
-        ))}
-      </div>
+      {!loading && !error && comments.length === 0 && (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-500">No comments yet. Be the first to comment!</div>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <Comment key={comment.id} comment={comment} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

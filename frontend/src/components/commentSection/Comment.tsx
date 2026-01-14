@@ -6,6 +6,7 @@ import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
 import { DropdownMenu } from "../reuseComponents/DropDownMenu";
 import { FaLayerGroup } from "react-icons/fa";
+import AVATAR from "./../../../public/assets/images/avatar_default_4.png";
 
 interface commentType {
   comment: any;
@@ -79,7 +80,11 @@ const Comment = ({ comment, level = 0 }: commentType) => {
         <div className="flex-1">
           {/* Comment Header */}
           <div className="flex items-center gap-2 mb-2">
-            <img src={comment.avatar} alt={comment.username} className="w-6 h-6 rounded-full" />
+            <img
+              src={"https://hinobody-uploads.s3.ap-northeast-2.amazonaws.com/uploads/contractor/1768388540764-dwcgwro84bh.png"}
+              alt={comment.username}
+              className="w-6 h-6 rounded-full"
+            />
             <span className="font-semibold text-sm text-gray-900">{comment.username}</span>
             {comment.badge && (
               <span
@@ -106,14 +111,14 @@ const Comment = ({ comment, level = 0 }: commentType) => {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={handleUpvote}
-                    className={`p-1 hover:bg-gray-100 rounded transition-colors ${voteState === "up" ? "text-orange-500" : "text-gray-500"}`}
+                    className={`p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors ${voteState === "up" ? "text-orange-500" : "text-gray-500"}`}
                   >
                     <HiOutlineArrowUp size={18} fill={voteState === "up" ? "currentColor" : "none"} />
                   </button>
                   <span className="text-xs font-bold text-gray-700 min-w-[30px] text-center">{upvotes}</span>
                   <button
                     onClick={handleDownvote}
-                    className={`p-1 hover:bg-gray-100 rounded transition-colors ${voteState === "down" ? "text-blue-500" : "text-gray-500"}`}
+                    className={`p-1 hover:bg-gray-100 rounded cursor-pointer transition-colors ${voteState === "down" ? "text-blue-500" : "text-gray-500"}`}
                   >
                     <HiOutlineArrowDown size={18} fill={voteState === "down" ? "currentColor" : "none"} />
                   </button>

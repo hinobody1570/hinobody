@@ -485,3 +485,60 @@ export const votesApi = {
   },
 };
 
+// Comments API endpoints
+export interface Comment {
+  id: string;
+  body: string;
+  originalLanguage: Language;
+  postId: string;
+  authorId: string;
+  parentId?: string | null;
+  isActive: boolean;
+  isDeleted: boolean;
+  upvoteCount: number;
+  downvoteCount: number;
+  createdAt: string;
+  updatedAt: string;
+  author?: {
+    id: string;
+    nickname: string;
+  };
+  replies?: Comment[];
+  _count?: {
+    votes: number;
+    replies: number;
+  };
+}
+
+export interface CommentsResponse {
+  data: Comment[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateCommentDto {
+  body: string;
+  originalLanguage: Language;
+  postId: string;
+  parentId?: string;
+}
+
+export const commentsApi = {
+  getByPost: async (postId: string, page: number = 1, limit: number = 20): Promise<CommentsResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/post/${postId}?${params.toString()}`);
+    return response.data;
+  },
+  create: async (createCommentDto: CreateCommentDto): Promise<Comment> => {
+    const response = await api.post<ApiResponse<Comment>>(API_END_POINT.COMMENTS, createCommentDto);
+    return response.data;
+  },
+};
+

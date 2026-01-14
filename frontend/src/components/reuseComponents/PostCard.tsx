@@ -243,7 +243,7 @@ export const PostCard = ({ post }: any) => {
 
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
         >
           <FiMessageSquare size={20} className="text-gray-600" />
           <span className="text-sm font-semibold text-gray-800">{post.comments}</span>
@@ -258,7 +258,7 @@ export const PostCard = ({ post }: any) => {
           <span className="text-sm font-semibold text-gray-800">{t("share")}</span>
         </button>
       </div>
-      {showComments && <CommentsSection />}
+      {showComments && <CommentsSection postId={post.id} postAuthorId={post.authorId} />}
     </article>
   );
 };
