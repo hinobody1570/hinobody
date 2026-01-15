@@ -7,6 +7,7 @@ interface Column<T> {
   key: keyof T | string;
   header: string;
   render?: (value: any, row: T) => React.ReactNode;
+  actions?: (row: T) => React.ReactNode;
 }
 
 interface DataTableProps<T> {
@@ -104,6 +105,11 @@ export function DataTable<T extends Record<string, any>>({
                   {column.header}
                 </th>
               ))}
+              {columns.some(col => col.actions) && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                  {t("actions")}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -121,12 +127,23 @@ export function DataTable<T extends Record<string, any>>({
                       {renderCell(column, row)}
                     </td>
                   ))}
+                  {columns.some(col => col.actions) && (
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex items-center gap-2">
+                        {columns
+                          .filter(col => col.actions)
+                          .map((column, idx) => (
+                            <div key={idx}>{column.actions?.(row)}</div>
+                          ))}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={columns.length}
+                  colSpan={columns.length + (columns.some(col => col.actions) ? 1 : 0)}
                   className="px-6 py-12 text-center text-gray-500"
                 >
                   {t("noData")}

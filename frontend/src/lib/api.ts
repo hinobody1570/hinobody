@@ -583,6 +583,7 @@ export const reportsApi = {
 export interface UpdateUserDto {
   nickname?: string;
   language?: string;
+  isActive?: boolean;
 }
 
 export interface UsersResponse {
@@ -615,6 +616,17 @@ export const usersApi = {
     const response = await api.patch<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`, updateUserDto);
     return response.data;
   },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.USERS}/${id}`);
+  },
+  block: async (id: string): Promise<User> => {
+    const response = await api.patch<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`, { isActive: false });
+    return response.data;
+  },
+  unblock: async (id: string): Promise<User> => {
+    const response = await api.patch<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`, { isActive: true });
+    return response.data;
+  },
 };
 
 // User interface
@@ -625,6 +637,7 @@ export interface User {
   language: string;
   role: string;
   isActive: boolean;
+  emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
 }

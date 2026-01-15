@@ -5,12 +5,31 @@ import { useTranslations } from "next-intl";
 import { DataTable } from "@/components/admin/DataTable";
 import { usersApi, User } from "@/lib/api";
 import { formatTimestamp } from "@/utils/helperFunction";
+import { useToast } from "@/contexts/ToastContext";
+import { FaBan, FaCheck, FaTrash } from "react-icons/fa";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+
+type ActionType = "block" | "unblock" | "delete" | null;
 
 export default function AdminUsersPage() {
   const t = useTranslations("admin");
+  const tToast = useTranslations("toast");
+  const { showSuccess, showError } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [confirmationModal, setConfirmationModal] = useState<{
+    isOpen: boolean;
+    action: ActionType;
+    userId: string | null;
+    userName: string | null;
+  }>({
+    isOpen: false,
+    action: null,
+    userId: null,
+    userName: null,
+  });
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,6 +48,95 @@ export default function AdminUsersPage() {
 
     fetchUsers();
   }, []);
+
+  const openConfirmationModal = (action: ActionType, userId: string, userName: string) => {
+    setConfirmationModal({
+      isOpen: true,
+      action,
+      userId,
+      userName,
+    });
+  };
+
+  const closeConfirmationModal = () => {
+    if (actionLoading) return; // Prevent closing while action is in progress
+    setConfirmationModal({
+      isOpen: false,
+      action: null,
+      userId: null,
+      userName: null,
+    });
+  };
+
+  const handleConfirm = async () => {
+    if (!confirmationModal.userId || !confirmationModal.action) return;
+
+    const { userId, action } = confirmationModal;
+
+    try {
+      setActionLoading(userId);
+      
+      switch (action) {
+        case "block":
+          await usersApi.block(userId);
+          showSuccess(t("userBlocked"));
+          break;
+        case "unblock":
+          await usersApi.unblock(userId);
+          showSuccess(t("userUnblocked"));
+          break;
+        case "delete":
+          await usersApi.delete(userId);
+          showSuccess(t("userDeleted"));
+          break;
+      }
+
+      // Refresh users list
+      const response = await usersApi.getAll(1, 20);
+      setUsers(response.data);
+      
+      // Close modal
+      closeConfirmationModal();
+    } catch (err: any) {
+      console.error(`Error ${action}ing user:`, err);
+      const errorKey = action === "block" ? "blockError" : action === "unblock" ? "unblockError" : "deleteError";
+      showError(err.message || t(errorKey));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const getModalContent = () => {
+    if (!confirmationModal.action || !confirmationModal.userName) return { title: "", description: "" };
+
+    const userName = confirmationModal.userName;
+    
+    switch (confirmationModal.action) {
+      case "block":
+        return {
+          title: t("blockUser"),
+          description: t("confirmBlockDescription", { name: userName }),
+          confirmText: t("block"),
+          confirmButtonColor: "red" as const,
+        };
+      case "unblock":
+        return {
+          title: t("unblockUser"),
+          description: t("confirmUnblockDescription", { name: userName }),
+          confirmText: t("unblock"),
+          confirmButtonColor: "green" as const,
+        };
+      case "delete":
+        return {
+          title: t("deleteUser"),
+          description: t("confirmDeleteDescription", { name: userName }),
+          confirmText: t("delete"),
+          confirmButtonColor: "red" as const,
+        };
+      default:
+        return { title: "", description: "" };
+    }
+  };
 
   const columns = [
     {
@@ -75,9 +183,59 @@ export default function AdminUsersPage() {
       ),
     },
     {
+      key: "emailVerified",
+      header: t("emailVerified"),
+      render: (value: boolean) => (
+        <span
+          className={`px-2 py-1 text-xs font-semibold rounded-full ${
+            value
+              ? "bg-green-100 text-green-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {value ? t("verified") : t("nonVerified")}
+        </span>
+      ),
+    },
+    {
       key: "createdAt",
       header: t("createdAt"),
       render: (value: string) => formatTimestamp(value),
+    },
+    {
+      key: "actions",
+      header: "",
+      actions: (row: User) => (
+        <div className="flex items-center gap-2">
+          {row.isActive ? (
+            <button
+              onClick={() => openConfirmationModal("block", row.id, row.nickname || row.email)}
+              disabled={actionLoading === row.id}
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              title={t("block")}
+            >
+              <FaBan size={16} />
+            </button>
+          ) : (
+            <button
+              onClick={() => openConfirmationModal("unblock", row.id, row.nickname || row.email)}
+              disabled={actionLoading === row.id}
+              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              title={t("unblock")}
+            >
+              <FaCheck size={16} />
+            </button>
+          )}
+          <button
+            onClick={() => openConfirmationModal("delete", row.id, row.nickname || row.email)}
+            disabled={actionLoading === row.id}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            title={t("delete")}
+          >
+            <FaTrash size={16} />
+          </button>
+        </div>
+      ),
     },
   ];
 
@@ -97,10 +255,23 @@ export default function AdminUsersPage() {
     );
   }
 
+  const modalContent = getModalContent();
+
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{t("users")}</h1>
       <DataTable columns={columns} data={users} />
+      
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={closeConfirmationModal}
+        onConfirm={handleConfirm}
+        title={modalContent.title}
+        description={modalContent.description}
+        confirmText={modalContent.confirmText}
+        confirmButtonColor={modalContent.confirmButtonColor}
+        isLoading={!!actionLoading}
+      />
     </div>
   );
 }

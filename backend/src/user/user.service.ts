@@ -100,6 +100,7 @@ export class UserService {
           language: true,
           role: true,
           isActive: true,
+          emailVerified: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -153,6 +154,7 @@ export class UserService {
           language: true,
           role: true,
           isActive: true,
+          emailVerified: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -201,7 +203,7 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
-    const { nickname, language } = updateUserDto;
+    const { nickname, language, isActive } = updateUserDto;
 
     if (nickname) {
       const existingNickname = await this.prisma.user.findUnique({
@@ -218,6 +220,7 @@ export class UserService {
       data: {
         ...(nickname && { nickname }),
         ...(language && { language }),
+        ...(isActive !== undefined && { isActive }),
       },
       select: {
         id: true,
