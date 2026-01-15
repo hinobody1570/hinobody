@@ -529,11 +529,14 @@ export interface CreateCommentDto {
 }
 
 export const commentsApi = {
-  getByPost: async (postId: string, page: number = 1, limit: number = 20): Promise<CommentsResponse> => {
+  getByPost: async (postId: string, page: number = 1, limit: number = 20, search?: string): Promise<CommentsResponse> => {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
     });
+    if (search) {
+      params.append('search', search);
+    }
     const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/post/${postId}?${params.toString()}`);
     return response.data;
   },

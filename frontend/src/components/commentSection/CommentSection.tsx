@@ -50,6 +50,8 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -62,7 +64,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
     return localeMap[locale] || 'EN';
   };
 
-  const fetchComments = useCallback(async (page: number = 1, append: boolean = false) => {
+  const fetchComments = useCallback(async (page: number = 1, append: boolean = false, search?: string) => {
     if (!postId) {
       setLoading(false);
       return;
@@ -75,7 +77,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
         setLoading(true);
       }
       setError(null);
-      const response = await commentsApi.getByPost(postId, page, 20);
+      const response = await commentsApi.getByPost(postId, page, 20, search);
       const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId, t));
       
       if (append) {
@@ -95,10 +97,25 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
     }
   }, [postId, postAuthorId, t]);
 
-  // Initial load
+  // Handle search with debounce
   useEffect(() => {
-    fetchComments(1, false);
-  }, [fetchComments]);
+    if (!searchQuery.trim()) {
+      // If search is cleared, fetch all comments
+      setIsSearching(false);
+      fetchComments(1, false);
+      return;
+    }
+
+    // Debounce search
+    const searchTimer = setTimeout(() => {
+      setIsSearching(true);
+      fetchComments(1, false, searchQuery.trim());
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(searchTimer);
+    };
+  }, [searchQuery, fetchComments]);
 
   // Load more comments
   const loadMoreComments = useCallback(async () => {
@@ -198,9 +215,20 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
           <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchComments')}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
         </div>
       </div>
 
@@ -221,7 +249,9 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       {/* Comments List */}
       {!loading && !error && comments.length === 0 && (
         <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">{t('noCommentsYet')}</div>
+          <div className="text-gray-500">
+            {isSearching || searchQuery ? t('noCommentsFound') : t('noCommentsYet')}
+          </div>
         </div>
       )}
 
@@ -237,8 +267,8 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
             />
           ))}
           
-          {/* Infinite scroll trigger */}
-          {hasMore && (
+          {/* Infinite scroll trigger - only show when not searching */}
+          {!searchQuery && hasMore && (
             <div ref={setObserverTarget} className="py-4">
               {loadingMore && (
                 <div className="flex items-center justify-center py-4">
@@ -248,8 +278,8 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
             </div>
           )}
           
-          {/* End of comments message */}
-          {!hasMore && comments.length > 0 && (
+          {/* End of comments message - only show when not searching */}
+          {!searchQuery && !hasMore && comments.length > 0 && (
             <div className="flex items-center justify-center py-4">
               <div className="text-gray-500">{t('noMoreComments')}</div>
             </div>

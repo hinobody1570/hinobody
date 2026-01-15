@@ -389,6 +389,7 @@
     "searchComments": "搜索评论",
     "loadingComments": "正在加载评论...",
     "noCommentsYet": "还没有评论。成为第一个评论的人！",
+    "noCommentsFound": "未找到匹配的评论。",
     "loadingMoreComments": "正在加载更多评论...",
     "noMoreComments": "没有更多评论可加载",
     "pleaseLoginToComment": "请登录以评论",
@@ -416,8 +417,19 @@
     "best": "最佳"
   },
   "postCard": {
+    "report": "举报",
+    "reportPost": "举报帖子",
     "reportSubmittedSuccess": "举报已成功提交。感谢您帮助维护社区安全。",
-    "pleaseLoginToReport": "请登录以举报此帖子"
+    "pleaseLoginToReport": "请登录以举报此帖子",
+    "reasonForReporting": "举报原因",
+    "reasonPlaceholder": "请提供举报此内容的详细原因...",
+    "pleaseProvideReason": "请提供举报原因",
+    "reasonMinLength": "原因必须至少10个字符",
+    "minimumCharactersRequired": "至少需要10个字符",
+    "cancel": "取消",
+    "submitting": "提交中...",
+    "submitReport": "提交举报",
+    "failedToSubmitReport": "提交举报失败。请重试。"
   },
   "resetPassword": {
     "invalidToken": "无效或缺失的重置令牌。请请求新的密码重置。"

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
+import { useTranslations } from "next-intl";
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -15,9 +16,10 @@ export const ReportModal = ({
   isOpen,
   onClose,
   onSubmit,
-  title = "Report Post",
+  title,
   isLoading = false,
 }: ReportModalProps) => {
+  const t = useTranslations("postCard");
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
 
@@ -28,12 +30,12 @@ export const ReportModal = ({
     setError("");
 
     if (!reason.trim()) {
-      setError("Please provide a reason for reporting");
+      setError(t("pleaseProvideReason"));
       return;
     }
 
     if (reason.trim().length < 10) {
-      setError("Reason must be at least 10 characters long");
+      setError(t("reasonMinLength"));
       return;
     }
 
@@ -42,7 +44,7 @@ export const ReportModal = ({
       setReason("");
       onClose();
     } catch (err: any) {
-      setError(err.message || "Failed to submit report. Please try again.");
+      setError(err.message || t("failedToSubmitReport"));
     }
   };
 
@@ -57,7 +59,7 @@ export const ReportModal = ({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+          <h2 className="text-xl font-bold text-gray-900">{title || t("reportPost")}</h2>
           <button
             onClick={handleClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
@@ -74,7 +76,7 @@ export const ReportModal = ({
               htmlFor="reason"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Reason for reporting
+              {t("reasonForReporting")}
             </label>
             <textarea
               id="reason"
@@ -83,14 +85,14 @@ export const ReportModal = ({
                 setReason(e.target.value);
                 setError("");
               }}
-              placeholder="Please provide a detailed reason for reporting this content..."
+              placeholder={t("reasonPlaceholder")}
               rows={5}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               disabled={isLoading}
               minLength={10}
             />
             <p className="mt-1 text-xs text-gray-500">
-              Minimum 10 characters required
+              {t("minimumCharactersRequired")}
             </p>
           </div>
 
@@ -108,14 +110,14 @@ export const ReportModal = ({
               disabled={isLoading}
               className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
               disabled={isLoading || !reason.trim() || reason.trim().length < 10}
               className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isLoading ? "Submitting..." : "Submit Report"}
+              {isLoading ? t("submitting") : t("submitReport")}
             </button>
           </div>
         </form>

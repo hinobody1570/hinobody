@@ -389,6 +389,7 @@
     "searchComments": "Search Comments",
     "loadingComments": "Loading comments...",
     "noCommentsYet": "No comments yet. Be the first to comment!",
+    "noCommentsFound": "No comments found matching your search.",
     "loadingMoreComments": "Loading more comments...",
     "noMoreComments": "No more comments to load",
     "pleaseLoginToComment": "Please login to comment",
@@ -416,8 +417,19 @@
     "best": "Best"
   },
   "postCard": {
+    "report": "Report",
+    "reportPost": "Report Post",
     "reportSubmittedSuccess": "Report submitted successfully. Thank you for helping keep our community safe.",
-    "pleaseLoginToReport": "Please login to report this post"
+    "pleaseLoginToReport": "Please login to report this post",
+    "reasonForReporting": "Reason for reporting",
+    "reasonPlaceholder": "Please provide a detailed reason for reporting this content...",
+    "pleaseProvideReason": "Please provide a reason for reporting",
+    "reasonMinLength": "Reason must be at least 10 characters long",
+    "minimumCharactersRequired": "Minimum 10 characters required",
+    "cancel": "Cancel",
+    "submitting": "Submitting...",
+    "submitReport": "Submit Report",
+    "failedToSubmitReport": "Failed to submit report. Please try again."
   },
   "resetPassword": {
     "invalidToken": "Invalid or missing reset token. Please request a new password reset."

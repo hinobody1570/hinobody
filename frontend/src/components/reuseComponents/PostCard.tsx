@@ -316,7 +316,7 @@ export const PostCard = ({ post }: any) => {
         isOpen={showReportModal}
         onClose={() => setShowReportModal(false)}
         onSubmit={handleReportSubmit}
-        title="Report Post"
+        title={tPostCard('reportPost')}
         isLoading={isReporting}
       />
     </article>

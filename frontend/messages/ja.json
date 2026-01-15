@@ -389,6 +389,7 @@
     "searchComments": "コメントを検索",
     "loadingComments": "コメントを読み込み中...",
     "noCommentsYet": "まだコメントがありません。最初のコメントを投稿してください！",
+    "noCommentsFound": "検索に一致するコメントが見つかりませんでした。",
     "loadingMoreComments": "さらにコメントを読み込み中...",
     "noMoreComments": "これ以上読み込むコメントはありません",
     "pleaseLoginToComment": "コメントするにはログインしてください",
@@ -416,8 +417,19 @@
     "best": "ベスト"
   },
   "postCard": {
+    "report": "報告",
+    "reportPost": "投稿を報告",
     "reportSubmittedSuccess": "報告が正常に送信されました。コミュニティを安全に保つためにご協力いただき、ありがとうございます。",
-    "pleaseLoginToReport": "この投稿を報告するにはログインしてください"
+    "pleaseLoginToReport": "この投稿を報告するにはログインしてください",
+    "reasonForReporting": "報告理由",
+    "reasonPlaceholder": "このコンテンツを報告する詳細な理由を提供してください...",
+    "pleaseProvideReason": "報告理由を提供してください",
+    "reasonMinLength": "理由は少なくとも10文字である必要があります",
+    "minimumCharactersRequired": "最低10文字必要",
+    "cancel": "キャンセル",
+    "submitting": "送信中...",
+    "submitReport": "報告を送信",
+    "failedToSubmitReport": "報告の送信に失敗しました。もう一度お試しください。"
   },
   "resetPassword": {
     "invalidToken": "無効または欠落しているリセットトークンです。新しいパスワードリセットをリクエストしてください。"
