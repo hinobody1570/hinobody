@@ -10,6 +10,8 @@ import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { postsApi, Post } from '@/lib/api';
 import { PostCard } from '@/components/reuseComponents/PostCard';
+import { useAuth } from '@/contexts/AuthContext';
+import { FiEdit } from 'react-icons/fi';
 
 const transformPost = (post: Post): any => {
   return {
@@ -32,6 +34,7 @@ const transformPost = (post: Post): any => {
 export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const { user: currentUser } = useAuth();
   const t = useTranslations('userProfile');
   const userId = params?.userId as string;
   
@@ -40,6 +43,12 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    nickname: '',
+  });
+  
+  const isOwnProfile = currentUser?.id === userId;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -48,6 +57,9 @@ export default function UserProfilePage() {
         setError(null);
         const userData = await usersApi.getById(userId);
         setUser(userData);
+        setEditForm({
+          nickname: userData.nickname,
+        });
       } catch (err: any) {
         console.error('Error fetching user:', err);
         setError(err.message || 'Failed to load user profile');
@@ -60,6 +72,32 @@ export default function UserProfilePage() {
       fetchUser();
     }
   }, [userId]);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    if (user) {
+      setEditForm({
+        nickname: user.nickname,
+      });
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!user) return;
+    
+    try {
+      const updatedUser = await usersApi.update(userId, editForm);
+      setUser(updatedUser);
+      setIsEditing(false);
+    } catch (err: any) {
+      console.error('Error updating user:', err);
+      setError(err.message || 'Failed to update profile');
+    }
+  };
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -120,13 +158,49 @@ export default function UserProfilePage() {
               className="w-24 h-24 rounded-full border-2 border-gray-300"
             />
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{user.nickname}</h1>
+              <div className="flex items-center gap-4 mb-2 justify-between">
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={editForm.nickname}
+                    onChange={(e) => setEditForm({ ...editForm, nickname: e.target.value })}
+                    className="text-3xl font-bold text-gray-900 border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:border-blue-500"
+                  />
+                ) : (
+                  <h1 className="text-3xl font-bold text-gray-900">{user.nickname}</h1>
+                )}
+                {isOwnProfile && !isEditing && (
+                  <button
+                    onClick={handleEdit}
+                    className="flex items-center gap-2 px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                  >
+                    <FiEdit size={16} />
+                    <span>{t('edit')}</span>
+                  </button>
+                )}
+              </div>
               <p className="text-gray-600 mb-4">{user.email}</p>
               <div className="flex items-center gap-6 text-sm text-gray-500">
                 <span>{t('memberSince')}: {formatTimestamp(user.createdAt)}</span>
                 <span className="capitalize">{user.role}</span>
                 <span className="uppercase">{user.language}</span>
               </div>
+              {isEditing && (
+                <div className="flex items-center gap-3 mt-4">
+                  <button
+                    onClick={handleSaveEdit}
+                    className="px-2 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
+                  >
+                    {t('save')}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    className="px-2 py-1 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer"
+                  >
+                    {t('cancel')}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

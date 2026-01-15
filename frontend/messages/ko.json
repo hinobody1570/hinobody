@@ -112,7 +112,10 @@
     "memberSince": "가입일",
     "posts": "게시물",
     "noPosts": "아직 게시물이 없습니다",
-    "backToHome": "홈으로 돌아가기"
+    "backToHome": "홈으로 돌아가기",
+    "edit": "프로필 편집",
+    "save": "저장",
+    "cancel": "취소"
   },
   "boardProfile": {
     "category": "카테고리",

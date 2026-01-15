@@ -580,9 +580,18 @@ export const reportsApi = {
 };
 
 // Users API
+export interface UpdateUserDto {
+  nickname?: string;
+  language?: string;
+}
+
 export const usersApi = {
   getById: async (id: string): Promise<User> => {
     const response = await api.get<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`);
+    return response.data;
+  },
+  update: async (id: string, updateUserDto: UpdateUserDto): Promise<User> => {
+    const response = await api.patch<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`, updateUserDto);
     return response.data;
   },
 };

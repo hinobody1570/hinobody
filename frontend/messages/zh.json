@@ -112,7 +112,10 @@
     "memberSince": "注册时间",
     "posts": "帖子",
     "noPosts": "还没有帖子",
-    "backToHome": "返回首页"
+    "backToHome": "返回首页",
+    "edit": "编辑资料",
+    "save": "保存",
+    "cancel": "取消"
   },
   "boardProfile": {
     "category": "分类",

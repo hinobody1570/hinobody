@@ -112,7 +112,10 @@
     "memberSince": "Member since",
     "posts": "Posts",
     "noPosts": "No posts yet",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "edit": "Edit Profile",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "boardProfile": {
     "category": "Category",

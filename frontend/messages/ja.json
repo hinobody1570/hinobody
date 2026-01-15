@@ -112,7 +112,10 @@
     "memberSince": "登録日",
     "posts": "投稿",
     "noPosts": "まだ投稿がありません",
-    "backToHome": "ホームに戻る"
+    "backToHome": "ホームに戻る",
+    "edit": "プロフィール編集",
+    "save": "保存",
+    "cancel": "キャンセル"
   },
   "boardProfile": {
     "category": "カテゴリ",
