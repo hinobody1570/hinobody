@@ -175,7 +175,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="w-full mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
 
       {/* Comment Input */}
       <form onSubmit={handleSubmitComment} className="mb-6">

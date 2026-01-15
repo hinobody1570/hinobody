@@ -218,6 +218,10 @@ export const boardsApi = {
     // The API returns { statusCode, message, error, data: { data: Board[], meta: {...} } }
     return response.data;
   },
+  getById: async (id: string): Promise<Board> => {
+    const response = await api.get<ApiResponse<Board>>(`${API_END_POINT.BOARDS}/${id}`);
+    return response.data;
+  },
   create: async (createBoardDto: CreateBoardDto): Promise<Board> => {
     const response = await api.post<ApiResponse<Board>>(API_END_POINT.BOARDS, createBoardDto);
     // The API returns { statusCode, message, error, data: Board }
@@ -325,6 +329,10 @@ export const postsApi = {
     }
     const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
     // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
+    return response.data;
+  },
+  getById: async (id: string): Promise<Post> => {
+    const response = await api.get<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`);
     return response.data;
   },
 };
@@ -567,6 +575,14 @@ export interface Report {
 export const reportsApi = {
   create: async (createReportDto: CreateReportDto): Promise<Report> => {
     const response = await api.post<ApiResponse<Report>>(API_END_POINT.REPORTS, createReportDto);
+    return response.data;
+  },
+};
+
+// Users API
+export const usersApi = {
+  getById: async (id: string): Promise<User> => {
+    const response = await api.get<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`);
     return response.data;
   },
 };

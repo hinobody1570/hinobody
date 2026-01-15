@@ -108,6 +108,26 @@
     "noBoardsFound": "ボードが見つかりません",
     "noResultsFound": "結果が見つかりません"
   },
+  "userProfile": {
+    "memberSince": "登録日",
+    "posts": "投稿",
+    "noPosts": "まだ投稿がありません",
+    "backToHome": "ホームに戻る"
+  },
+  "boardProfile": {
+    "category": "カテゴリ",
+    "visibility": "公開設定",
+    "created": "作成日",
+    "join": "参加",
+    "joined": "参加済み",
+    "loading": "読み込み中...",
+    "posts": "投稿",
+    "noPosts": "まだ投稿がありません",
+    "backToHome": "ホームに戻る"
+  },
+  "postDetail": {
+    "backToHome": "ホームに戻る"
+  },
   "feed": {
     "best": "ベスト",
     "allBoards": "すべてのボード",

@@ -11,7 +11,7 @@ export const RecentPostCard = ({ post }: any) => {
   
   const handleClick = () => {
     if (post.id) {
-      router.push(`${ROUTE_PATHS.HOME}?post=${post.id}`);
+      router.push(`${ROUTE_PATHS.POST_DETAIL}/${post.id}`);
     }
   };
   

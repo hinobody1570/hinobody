@@ -108,6 +108,26 @@
     "noBoardsFound": "未找到看板",
     "noResultsFound": "未找到结果"
   },
+  "userProfile": {
+    "memberSince": "注册时间",
+    "posts": "帖子",
+    "noPosts": "还没有帖子",
+    "backToHome": "返回首页"
+  },
+  "boardProfile": {
+    "category": "分类",
+    "visibility": "可见性",
+    "created": "创建时间",
+    "join": "加入",
+    "joined": "已加入",
+    "loading": "加载中...",
+    "posts": "帖子",
+    "noPosts": "还没有帖子",
+    "backToHome": "返回首页"
+  },
+  "postDetail": {
+    "backToHome": "返回首页"
+  },
   "feed": {
     "best": "最佳",
     "allBoards": "所有看板",

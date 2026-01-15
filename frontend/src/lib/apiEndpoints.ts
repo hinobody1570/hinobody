@@ -5,6 +5,7 @@ export const API_END_POINT = {
     RESEND_OTP: "/auth/resend-otp",
     FORGOT_PASSWORD: "/auth/forgot-password",
     RESET_PASSWORD: "/auth/reset-password",
+    USERS: "/users",
     BOARDS: "/boards",
     POSTS: "/posts",
     VOTES: "/votes",

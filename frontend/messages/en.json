@@ -108,6 +108,26 @@
     "noBoardsFound": "No boards found",
     "noResultsFound": "No results found"
   },
+  "userProfile": {
+    "memberSince": "Member since",
+    "posts": "Posts",
+    "noPosts": "No posts yet",
+    "backToHome": "Back to Home"
+  },
+  "boardProfile": {
+    "category": "Category",
+    "visibility": "Visibility",
+    "created": "Created",
+    "join": "Join",
+    "joined": "Joined",
+    "loading": "Loading...",
+    "posts": "Posts",
+    "noPosts": "No posts yet",
+    "backToHome": "Back to Home"
+  },
+  "postDetail": {
+    "backToHome": "Back to Home"
+  },
   "feed": {
     "best": "Best",
     "allBoards": "All Boards",

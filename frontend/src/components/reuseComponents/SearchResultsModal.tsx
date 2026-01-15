@@ -34,17 +34,17 @@ export const SearchResultsModal = ({ results, searchQuery, onClose }: SearchResu
   const [activeTab, setActiveTab] = useState<'all' | 'users' | 'posts' | 'boards'>('all');
 
   const handleUserClick = (userId: string) => {
-    router.push(`${ROUTE_PATHS.PROFILE}/${userId}`);
+    router.push(`${ROUTE_PATHS.USER_PROFILE}/${userId}`);
     onClose();
   };
 
   const handlePostClick = (postId: string) => {
-    router.push(`${ROUTE_PATHS.HOME}?post=${postId}`);
+    router.push(`${ROUTE_PATHS.POST_DETAIL}/${postId}`);
     onClose();
   };
 
   const handleBoardClick = (boardId: string) => {
-    router.push(`${ROUTE_PATHS.HOME}?board=${boardId}`);
+    router.push(`${ROUTE_PATHS.BOARD_PROFILE}/${boardId}`);
     onClose();
   };
 
