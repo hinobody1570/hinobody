@@ -61,7 +61,7 @@ export default async function RootLayout({
   const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/assets/images/avatar_default_4.png" />
@@ -70,7 +70,7 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-title" content="HiNobody" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <LanguageProvider initialLocale={locale as any}>
           <LocaleProvider initialLocale={locale} initialMessages={messages}>
             <ToastProvider>

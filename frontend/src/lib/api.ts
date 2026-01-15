@@ -239,6 +239,13 @@ export const boardsApi = {
   leave: async (boardId: string): Promise<void> => {
     await api.delete(`${API_END_POINT.BOARDS}/${boardId}/leave`);
   },
+  update: async (id: string, updateBoardDto: { isActive?: boolean }): Promise<Board> => {
+    const response = await api.patch<ApiResponse<Board>>(`${API_END_POINT.BOARDS}/${id}`, updateBoardDto);
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/${id}`);
+  },
 };
 
 // Posts API endpoints
@@ -335,6 +342,13 @@ export const postsApi = {
   getById: async (id: string): Promise<Post> => {
     const response = await api.get<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`);
     return response.data;
+  },
+  update: async (id: string, updatePostDto: { isActive?: boolean }): Promise<Post> => {
+    const response = await api.patch<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`, updatePostDto);
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.POSTS}/${id}`);
   },
 };
 

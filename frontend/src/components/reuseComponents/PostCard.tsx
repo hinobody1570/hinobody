@@ -22,8 +22,8 @@ export const PostCard = ({ post }: any) => {
   const tPostCard = useTranslations("postCard");
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
-  const [upvotes, setUpvotes] = useState(post.upvotes || 0);
-  const [downvotes, setDownvotes] = useState(post.downvotes || 0);
+  const [upvotes, setUpvotes] = useState(post?.upvotes || 0);
+  const [downvotes, setDownvotes] = useState(post?.downvotes || 0);
   const [showComments, setShowComments] = useState(false);
   const [voteState, setVoteState] = useState<'up' | 'down' | null>(null); // null, 'up', or 'down'
   const [isMember, setIsMember] = useState<boolean | null>(null); // null = loading, true = member, false = not member
@@ -35,13 +35,13 @@ export const PostCard = ({ post }: any) => {
   // Fetch user vote status on mount
   useEffect(() => {
     const fetchUserVote = async () => {
-      if (!isAuthenticated || !post.id) {
+      if (!isAuthenticated || !post?.id) {
         setVoteState(null);
         return;
       }
 
       try {
-        const vote = await votesApi.getUserVote(post.id);
+        const vote = await votesApi.getUserVote(post?.id);
         if (vote) {
           setVoteState(vote.type === 'UPVOTE' ? 'up' : 'down');
         } else {
@@ -54,7 +54,7 @@ export const PostCard = ({ post }: any) => {
     };
 
     fetchUserVote();
-  }, [post.id, isAuthenticated]);
+  }, [post?.id, isAuthenticated]);
 
   const handleUpvote = async () => {
     if (!isAuthenticated || !post.id || isVoting) return;
@@ -115,7 +115,7 @@ export const PostCard = ({ post }: any) => {
   // Check membership status on mount
   useEffect(() => {
     const checkMembership = async () => {
-      if (!isAuthenticated || !post.boardId) {
+      if (!isAuthenticated || !post?.boardId) {
         setIsMember(false);
         return;
       }
@@ -130,7 +130,7 @@ export const PostCard = ({ post }: any) => {
     };
 
     checkMembership();
-  }, [post.boardId, isAuthenticated]);
+  }, [post?.boardId, isAuthenticated]);
 
   // Handle join/leave board
   const handleJoinLeave = async () => {
@@ -213,18 +213,18 @@ export const PostCard = ({ post }: any) => {
       {/* Post Header */}
       <div className="flex items-center justify-between px-3 py-2">
         <div className="flex items-center gap-2">
-          <Image src={post.communityAvatar} alt={post.community} className="w-6 h-6 rounded-full" />
-          <span className="font-bold text-sm hover:underline cursor-pointer">{post.community}</span>
-          {post.verified && (
+          <Image src={post?.communityAvatar} alt={post?.community} className="w-6 h-6 rounded-full" />
+          <span className="font-bold text-sm hover:underline cursor-pointer">{post?.community}</span>
+          {post?.verified && (
             <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
               <span className="text-white text-xs">✓</span>
             </div>
           )}
-          <span className="text-gray-500 text-xs">• {post.timestamp}</span>
-          {post.badge && <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold">{post.badge}</span>}
+          <span className="text-gray-500 text-xs">• {post?.timestamp}</span>
+          {post?.badge && <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold">{post.badge}</span>}
         </div>
         <div className="flex items-center gap-2">
-          {isAuthenticated && post.boardId && (
+          {isAuthenticated && post?.boardId && (
             <button
               onClick={handleJoinLeave}
               disabled={isJoining || isMember === null}
@@ -254,7 +254,7 @@ export const PostCard = ({ post }: any) => {
 
       {/* Post Title */}
       <div className="px-3 pb-2">
-        <h2 className="text-lg font-medium text-gray-900 hover:text-gray-700 cursor-pointer">{post.title}</h2>
+        <h2 className="text-lg font-medium text-gray-900 hover:text-gray-700 cursor-pointer">{post?.title}</h2>
       </div>
 
       {/* Post Image/Content */}
@@ -264,7 +264,7 @@ export const PostCard = ({ post }: any) => {
         </div>
       )} */}
 
-      {post.body && <div className="" dangerouslySetInnerHTML={{ __html: post.body }} />}
+      {post?.body && <div className="" dangerouslySetInnerHTML={{ __html: post?.body }} />}
 
       {/* Post Actions */}
       <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200">
@@ -297,7 +297,7 @@ export const PostCard = ({ post }: any) => {
           className="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
         >
           <FiMessageSquare size={20} className="text-gray-600" />
-          <span className="text-sm font-semibold text-gray-800">{post.comments}</span>
+          <span className="text-sm font-semibold text-gray-800">{post?.comments}</span>
         </button>
 
         {/* <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
@@ -309,7 +309,7 @@ export const PostCard = ({ post }: any) => {
           <span className="text-sm font-semibold text-gray-800">{t("share")}</span>
         </button> */}
       </div>
-      {showComments && <CommentsSection postId={post.id} postAuthorId={post.authorId} />}
+      {showComments && <CommentsSection postId={post?.id} postAuthorId={post?.authorId} />}
       
       {/* Report Modal */}
       <ReportModal
