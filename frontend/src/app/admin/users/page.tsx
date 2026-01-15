@@ -6,7 +6,8 @@ import { DataTable } from "@/components/admin/DataTable";
 import { usersApi, User } from "@/lib/api";
 import { formatTimestamp } from "@/utils/helperFunction";
 import { useToast } from "@/contexts/ToastContext";
-import { FaBan, FaCheck, FaTrash } from "react-icons/fa";
+import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 
 type ActionType = "block" | "unblock" | "delete" | null;
@@ -14,6 +15,7 @@ type ActionType = "block" | "unblock" | "delete" | null;
 export default function AdminUsersPage() {
   const t = useTranslations("admin");
   const tToast = useTranslations("toast");
+  const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -233,6 +235,14 @@ export default function AdminUsersPage() {
             title={t("delete")}
           >
             <FaTrash size={16} />
+          </button>
+          <button
+            onClick={() => router.push(`/admin/users/${row.id}`)}
+            disabled={actionLoading === row.id}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            title={t("viewDetails")}
+          >
+            <FaEye size={16} />
           </button>
         </div>
       ),

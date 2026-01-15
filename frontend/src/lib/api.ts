@@ -166,6 +166,7 @@ export interface Board {
   description: string | null;
   visibilityAccess: BoardVisibility;
   isActive: boolean;
+  creatorId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -343,7 +344,58 @@ export interface S3UploadResponse {
   url: string;
 }
 
+export interface S3File {
+  key: string;
+  url: string;
+  size: number;
+  lastModified: string;
+}
+
 export const s3Api = {
+  getAllFiles: async (prefix?: string): Promise<S3File[]> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const url = `${API_BASE_URL}${API_END_POINT.S3_FILES}${prefix ? `?prefix=${encodeURIComponent(prefix)}` : ''}`;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to get S3 files: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  },
+
+  deleteFile: async (key: string): Promise<void> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const encodedKey = encodeURIComponent(key);
+    const url = `${API_BASE_URL}${API_END_POINT.S3_FILES}/${encodedKey}`;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to delete S3 file: ${response.statusText}`);
+    }
+  },
+
   uploadFile: async (file: File, folder?: string): Promise<S3UploadResponse> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -440,8 +492,11 @@ export const eyeMaskedImagesApi = {
     return response.data;
   },
 
-  getAll: async (): Promise<EyeMaskedImage[]> => {
-    const response = await api.get<ApiResponse<EyeMaskedImage[]>>(API_END_POINT.EYE_MASKED_IMAGES);
+  getAll: async (userId?: string): Promise<EyeMaskedImage[]> => {
+    const url = userId 
+      ? `${API_END_POINT.EYE_MASKED_IMAGES}/all?userId=${userId}`
+      : `${API_END_POINT.EYE_MASKED_IMAGES}/all`;
+    const response = await api.get<ApiResponse<EyeMaskedImage[]>>(url);
     return response.data;
   },
 

@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   Delete,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
@@ -51,9 +52,9 @@ export class EyeMaskedImageController {
   @Get('all')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get all eye-masked images from all users (admin)' })
-  findAllImages() {
-    return this.eyeMaskedImageService.findAll();
+  @ApiOperation({ summary: 'Get all eye-masked images from all users (admin) or filter by userId' })
+  findAllImages(@Query('userId') userId?: string) {
+    return this.eyeMaskedImageService.findAll(userId);
   }
 
   @Get(':id')
