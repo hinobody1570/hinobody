@@ -9,6 +9,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { ROUTE_PATHS } from "@/routes/paths";
 
 type ActionType = "block" | "unblock" | "delete" | null;
 
@@ -237,7 +238,7 @@ export default function AdminUsersPage() {
             <FaTrash size={16} />
           </button>
           <button
-            onClick={() => router.push(`/admin/users/${row.id}`)}
+            onClick={() => router.push(`${ROUTE_PATHS.ADMIN_USER_DETAIL}/${row.id}`)}
             disabled={actionLoading === row.id}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             title={t("viewDetails")}

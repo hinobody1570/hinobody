@@ -243,7 +243,14 @@
     "postPreview": "게시물 미리보기",
     "boardPosts": "보드 게시물",
     "originalLanguage": "원본 언어",
-    "updatedAt": "업데이트 시간"
+    "updatedAt": "업데이트 시간",
+    "eyeMasking": "눈 마스킹",
+    "url": "URL",
+    "size": "크기",
+    "deleteEyeMaskedImage": "눈 마스킹 이미지 삭제",
+    "confirmDeleteEyeMaskedImageDescription": "이 눈 마스킹 이미지를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "eyeMaskedImageDeleted": "눈 마스킹 이미지가 성공적으로 삭제되었습니다",
+    "deleteEyeMaskedImageError": "눈 마스킹 이미지 삭제 실패"
   },
   "feed": {
     "best": "베스트",

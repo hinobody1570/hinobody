@@ -16,6 +16,9 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { QueryBoardsDto } from './dto/query-boards.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Boards')
 @Controller('boards')
@@ -48,14 +51,16 @@ export class BoardController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   update(@Param('id') id: string, @Body() updateBoardDto: UpdateBoardDto) {
     return this.boardService.update(id, updateBoardDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
   remove(@Param('id') id: string) {
     return this.boardService.remove(id);

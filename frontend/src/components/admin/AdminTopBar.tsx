@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ROUTE_PATHS } from "@/routes/paths";
 import { Logo } from "@/components/reuseComponents/Logo";
 import ProfileDropdown from "@/components/profileDropDown/ProfileDropdown";
+import LanguageSwitcher from "../LanguageSwitcher";
 
 export function AdminTopBar() {
   const { user } = useAuth();
@@ -15,10 +16,7 @@ export function AdminTopBar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowProfileDropdown(false);
       }
     };
@@ -35,27 +33,22 @@ export function AdminTopBar() {
       <Logo text="HiNobody Admin" onClick={() => router.push(ROUTE_PATHS.ADMIN_USERS)} />
 
       {/* Profile Section */}
-      <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-          className="flex items-center gap-3 cursor-pointer"
-        >
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center">
-            <span className="text-white text-lg font-bold">
-              {user?.nickname?.[0]?.toUpperCase() || "A"}
-            </span>
-          </div>
-          <div className="text-left">
-            <p className="text-sm font-medium text-gray-900">
-              {user?.nickname || "Admin"}
-            </p>
-            <p className="text-xs text-gray-500">Administrator</p>
-          </div>
-        </button>
+      <div className="flex items-center gap-12">
+        <LanguageSwitcher />
+        <div className="relative" ref={dropdownRef}>
+          <button onClick={() => setShowProfileDropdown(!showProfileDropdown)} className="flex items-center gap-3 cursor-pointer">
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-lg font-bold">{user?.nickname?.[0]?.toUpperCase() || "A"}</span>
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-medium text-gray-900">{user?.nickname || "Admin"}</p>
+              <p className="text-xs text-gray-500">Administrator</p>
+            </div>
+          </button>
 
-        {showProfileDropdown && <ProfileDropdown />}
+          {showProfileDropdown && <ProfileDropdown />}
+        </div>
       </div>
     </div>
   );
 }
-

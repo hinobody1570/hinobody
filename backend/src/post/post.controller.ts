@@ -94,8 +94,9 @@ export class PostController {
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
     @GetUser('id') userId: string,
+    @GetUser('role') role: string,
   ) {
-    return this.postService.update(id, updatePostDto, userId);
+    return this.postService.update(id, updatePostDto, userId, role === 'ADMIN');
   }
 
   @Delete(':id')

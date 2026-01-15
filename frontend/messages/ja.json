@@ -243,7 +243,14 @@
     "postPreview": "投稿プレビュー",
     "boardPosts": "ボードの投稿",
     "originalLanguage": "元の言語",
-    "updatedAt": "更新日時"
+    "updatedAt": "更新日時",
+    "eyeMasking": "目マスキング",
+    "url": "URL",
+    "size": "サイズ",
+    "deleteEyeMaskedImage": "目マスキング画像を削除",
+    "confirmDeleteEyeMaskedImageDescription": "この目マスキング画像を削除してもよろしいですか？この操作は取り消せません。",
+    "eyeMaskedImageDeleted": "目マスキング画像が正常に削除されました",
+    "deleteEyeMaskedImageError": "目マスキング画像の削除に失敗しました"
   },
   "feed": {
     "best": "ベスト",

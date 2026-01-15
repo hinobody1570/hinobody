@@ -69,8 +69,12 @@ export class EyeMaskedImageController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete eye-masked image by ID' })
-  remove(@Param('id') id: string, @GetUser('id') userId: string) {
-    return this.eyeMaskedImageService.remove(id, userId);
+  remove(
+    @Param('id') id: string,
+    @GetUser('id') userId: string,
+    @GetUser('role') role: string,
+  ) {
+    return this.eyeMaskedImageService.remove(id, userId, role === 'ADMIN');
   }
 }
 

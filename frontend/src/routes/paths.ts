@@ -29,5 +29,6 @@ export const ROUTE_PATHS = {
     ADMIN_USERS: "/admin/users",
     ADMIN_USER_DETAIL: "/admin/users",
     ADMIN_POSTS: "/admin/posts",
-    ADMIN_BOARDS: "/admin/boards"
+    ADMIN_BOARDS: "/admin/boards",
+    ADMIN_EYE_MASKING: "/admin/eye-masking"
 }

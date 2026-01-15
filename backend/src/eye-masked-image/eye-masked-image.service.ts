@@ -38,7 +38,7 @@ export class EyeMaskedImageService {
     return images;
   }
 
-  async findAll(userId?: string): Promise<EyeMaskedImage[]> {
+  async findAll(userId?: string): Promise<any[]> {
     const where = userId ? { userId } : {};
     
     return this.prisma.eyeMaskedImage.findMany({
@@ -84,8 +84,8 @@ export class EyeMaskedImageService {
     return image;
   }
 
-  async remove(id: string, userId: string): Promise<void> {
-    // Verify the image belongs to the user
+  async remove(id: string, userId: string, isAdmin: boolean = false): Promise<void> {
+    // Verify the image belongs to the user or user is admin
     const image = await this.prisma.eyeMaskedImage.findUnique({
       where: { id },
     });
@@ -94,7 +94,7 @@ export class EyeMaskedImageService {
       throw new Error(`EyeMaskedImage with ID ${id} not found`);
     }
 
-    if (image.userId !== userId) {
+    if (image.userId !== userId && !isAdmin) {
       throw new Error('You do not have permission to delete this image');
     }
 

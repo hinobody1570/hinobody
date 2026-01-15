@@ -9,6 +9,7 @@ import { PostCard } from "@/components/reuseComponents/PostCard";
 import AdminDetailHeader from "@/components/admin/AdminDetailHeader";
 import Image from "next/image";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
+import { ROUTE_PATHS } from "@/routes/paths";
 
 const transformPost = (post: Post): any => {
   return {
@@ -92,7 +93,7 @@ export default function AdminBoardDetailPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-600">{error || t("boardNotFound")}</p>
           <button
-            onClick={() => router.push("/admin/boards")}
+            onClick={() => router.push(ROUTE_PATHS.ADMIN_BOARDS)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
           >
             {t("backToBoards")}
@@ -101,10 +102,10 @@ export default function AdminBoardDetailPage() {
       </div>
     );
   }
-  console.log("posts,,,,12",posts)
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminDetailHeader onClick={() => router.push("/admin/boards")} title={t("boardDetails")} />
+      <AdminDetailHeader onClick={() => router.push(ROUTE_PATHS.ADMIN_BOARDS)} title={t("boardDetails")} />
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Board Detail */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">

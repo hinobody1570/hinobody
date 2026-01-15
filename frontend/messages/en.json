@@ -243,7 +243,14 @@
     "postPreview": "Post Preview",
     "boardPosts": "Board Posts",
     "originalLanguage": "Original Language",
-    "updatedAt": "Updated At"
+    "updatedAt": "Updated At",
+    "eyeMasking": "Eye Masking",
+    "url": "URL",
+    "size": "Size",
+    "deleteEyeMaskedImage": "Delete Eye Masked Image",
+    "confirmDeleteEyeMaskedImageDescription": "Are you sure you want to delete this eye masked image? This action cannot be undone.",
+    "eyeMaskedImageDeleted": "Eye masked image deleted successfully",
+    "deleteEyeMaskedImageError": "Failed to delete eye masked image"
   },
   "feed": {
     "best": "Best",

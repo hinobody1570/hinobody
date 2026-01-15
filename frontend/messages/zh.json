@@ -243,7 +243,14 @@
     "postPreview": "帖子预览",
     "boardPosts": "看板帖子",
     "originalLanguage": "原始语言",
-    "updatedAt": "更新时间"
+    "updatedAt": "更新时间",
+    "eyeMasking": "眼部遮罩",
+    "url": "URL",
+    "size": "大小",
+    "deleteEyeMaskedImage": "删除眼部遮罩图片",
+    "confirmDeleteEyeMaskedImageDescription": "您确定要删除此眼部遮罩图片吗？此操作无法撤销。",
+    "eyeMaskedImageDeleted": "眼部遮罩图片删除成功",
+    "deleteEyeMaskedImageError": "删除眼部遮罩图片失败"
   },
   "feed": {
     "best": "最佳",

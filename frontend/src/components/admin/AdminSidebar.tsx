@@ -7,7 +7,8 @@ import {
   FaUsers, 
   FaFileAlt, 
   FaLayerGroup,
-  FaHome
+  FaHome,
+  FaEye
 } from "react-icons/fa";
 
 interface SidebarItem {
@@ -36,6 +37,11 @@ export function AdminSidebar() {
       icon: FaLayerGroup,
       label: t("boards"),
       path: ROUTE_PATHS.ADMIN_BOARDS,
+    },
+    {
+      icon: FaEye,
+      label: t("eyeMasking"),
+      path: ROUTE_PATHS.ADMIN_EYE_MASKING,
     },
   ];
 

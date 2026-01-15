@@ -9,6 +9,7 @@ import { PostCard } from "@/components/reuseComponents/PostCard";
 import AdminDetailHeader from "@/components/admin/AdminDetailHeader";
 import Image from "next/image";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
+import { ROUTE_PATHS } from "@/routes/paths";
 
 const transformPost = (post: Post): any => {
   return {
@@ -71,7 +72,7 @@ export default function AdminPostDetailPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-600">{error || t("postNotFound")}</p>
           <button
-            onClick={() => router.push("/admin/posts")}
+            onClick={() => router.push(ROUTE_PATHS.ADMIN_POSTS)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
           >
             {t("backToPosts")}
@@ -85,7 +86,7 @@ export default function AdminPostDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminDetailHeader onClick={() => router.push("/admin/posts")} title={t("postDetails")} />
+      <AdminDetailHeader onClick={() => router.push(ROUTE_PATHS.ADMIN_POSTS)} title={t("postDetails")} />
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Post Detail */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">

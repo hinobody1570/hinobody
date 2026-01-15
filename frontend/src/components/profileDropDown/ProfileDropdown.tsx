@@ -16,7 +16,7 @@ import { ROUTE_PATHS } from "@/routes/paths";
 
 export default function ProfileDropdown() {
   const [darkMode, setDarkMode] = useState(false);
-  const { logout, user} = useAuth();
+  const { logout, user } = useAuth();
   const router = useRouter();
   const t = useTranslations("profileDropdown");
 
@@ -125,6 +125,15 @@ export default function ProfileDropdown() {
         </button>
       </div> */}
 
+      {user?.role == "ADMIN" && (
+        <button
+          onClick={() => router.push(ROUTE_PATHS.ADMIN_USERS)}
+          className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3"
+        >
+          <GoTrophy className="w-5 h-5 text-gray-700" />
+          <span className="text-sm font-medium text-gray-900">Admin Pannel</span>
+        </button>
+      )}
       {/* Log Out */}
       <button onClick={() => logout()} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
         <MdLogout className="w-5 h-5 text-gray-700" />

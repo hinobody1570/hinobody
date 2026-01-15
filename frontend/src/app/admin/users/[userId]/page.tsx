@@ -10,6 +10,7 @@ import { FaArrowLeft, FaUser, FaEnvelope, FaShieldAlt, FaGlobe, FaCheckCircle, F
 import Image from "next/image";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import AdminDetailHeader from "@/components/admin/AdminDetailHeader";
+import { ROUTE_PATHS } from "@/routes/paths";
 
 const transformPost = (post: Post): any => {
   return {
@@ -176,7 +177,7 @@ export default function AdminUserDetailPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-600">{error || t("userNotFound")}</p>
           <button
-            onClick={() => router.push("/admin/users")}
+            onClick={() => router.push(ROUTE_PATHS.ADMIN_USERS)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
           >
             {t("backToUsers")}
@@ -189,18 +190,7 @@ export default function AdminUserDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      {/* <div className="bg-white border-b border-gray-200">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <button
-            onClick={() => router.push("/admin/users")}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 cursor-pointer"
-          >
-            <FaArrowLeft size={22} />
-            <h1 className="text-2xl font-bold text-gray-900">{t("userDetails")}</h1>
-          </button>
-        </div>
-      </div> */}
-      <AdminDetailHeader onClick={() => router.push("/admin/users")} title={t("userDetails")} />
+      <AdminDetailHeader onClick={() => router.push(ROUTE_PATHS.ADMIN_USERS)} title={t("userDetails")} />
       <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">

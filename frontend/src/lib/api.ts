@@ -486,6 +486,11 @@ export interface EyeMaskedImage {
   width?: number;
   height?: number;
   createdAt: string;
+  user?: {
+    id: string;
+    nickname: string;
+    email: string;
+  };
 }
 
 export interface CreateEyeMaskedImageDto {

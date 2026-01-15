@@ -9,6 +9,7 @@ import { formatTimestamp } from "@/utils/helperFunction";
 import { useToast } from "@/contexts/ToastContext";
 import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import { ROUTE_PATHS } from "@/routes/paths";
 
 type ActionType = "delete" | "activate" | "deactivate" | null;
 
@@ -218,7 +219,7 @@ export default function AdminBoardsPage() {
             <FaTrash size={16} />
           </button>
           <button
-            onClick={() => router.push(`/admin/boards/${row.id}`)}
+            onClick={() => router.push(`${ROUTE_PATHS.ADMIN_BOARDS}/${row.id}`)}
             disabled={actionLoading === row.id}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             title={t("viewDetails")}
