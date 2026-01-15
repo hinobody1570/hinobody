@@ -585,7 +585,28 @@ export interface UpdateUserDto {
   language?: string;
 }
 
+export interface UsersResponse {
+  data: User[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export const usersApi = {
+  getAll: async (page: number = 1, limit: number = 20, search?: string): Promise<UsersResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) {
+      params.append('search', search);
+    }
+    const response = await api.get<ApiResponse<UsersResponse>>(`${API_END_POINT.USERS}?${params.toString()}`);
+    return response.data;
+  },
   getById: async (id: string): Promise<User> => {
     const response = await api.get<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`);
     return response.data;

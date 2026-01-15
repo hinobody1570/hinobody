@@ -40,12 +40,12 @@ export const routesConfig: RouteConfig[] = [
     path: ROUTE_PATHS.DUMMY_EXAMPLE,
     access: ROUTE_ACCESS.PUBLIC,
   },
-  
+
   // Public Routes that redirect if authenticated
   {
     path: ROUTE_PATHS.DEFAULT,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.HOME,
+    // redirectTo: ROUTE_PATHS.HOME,
   },
   {
     path: ROUTE_PATHS.REGISTER,
@@ -93,6 +93,22 @@ export const routesConfig: RouteConfig[] = [
     access: ROUTE_ACCESS.PRIVATE,
     redirectTo: ROUTE_PATHS.DEFAULT,
   },
+  // Admin Routes
+  {
+    path: ROUTE_PATHS.ADMIN_BOARDS,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.DEFAULT,
+  },
+  {
+    path: ROUTE_PATHS.ADMIN_POSTS,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.DEFAULT,
+  },
+  {
+    path: ROUTE_PATHS.ADMIN_USERS,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.DEFAULT,
+  },
 ];
 
 /**
@@ -104,7 +120,7 @@ export function getRouteConfig(path: string): RouteConfig | undefined {
   // Normalize path (remove trailing slashes, etc.)
   const normalizedPath = path
     .replace(/\/$/, '') || '/'; // Remove trailing slash, default to '/'
-  
+
   return routesConfig.find(route => route.path === normalizedPath);
 }
 

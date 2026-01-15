@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslations } from 'next-intl';
 import { getRouteConfig } from './routes.config';
+import { ROUTE_PATHS } from './paths';
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ interface RouteGuardProps {
  * No need to wrap individual pages - this handles everything!
  */
 export default function RouteGuard({ children }: RouteGuardProps) {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations?.('common');
@@ -46,14 +47,19 @@ export default function RouteGuard({ children }: RouteGuardProps) {
     // Handle public routes that redirect if authenticated (e.g., login/register)
     if (routeConfig.access === 'public-redirect-if-auth') {
       if (isAuthenticated) {
-        const redirectTo = routeConfig.redirectTo || '/dashboard';
+        // Redirect admin users to admin panel
+        if (user?.role === 'ADMIN') {
+          router.push(ROUTE_PATHS.ADMIN_USERS);
+          return;
+        }
+        const redirectTo = routeConfig.redirectTo || ROUTE_PATHS.HOME;
         router.push(redirectTo);
         return;
       }
     }
 
     // Public routes - no action needed, allow access
-  }, [isAuthenticated, loading, router, pathname]);
+  }, [isAuthenticated, loading, router, pathname, user]);
 
   // Show loading state while checking authentication
   if (loading) {
