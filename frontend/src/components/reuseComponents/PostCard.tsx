@@ -19,6 +19,7 @@ import { BiInfoCircle } from "react-icons/bi";
 export const PostCard = ({ post }: any) => {
   const t = useTranslations("feed");
   const tToast = useTranslations("toast");
+  const tPostCard = useTranslations("postCard");
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const [upvotes, setUpvotes] = useState(post.upvotes || 0);
@@ -172,7 +173,7 @@ export const PostCard = ({ post }: any) => {
         reason,
         postId: post.id,
       });
-      showSuccess("Report submitted successfully. Thank you for helping keep our community safe.");
+      showSuccess(tPostCard('reportSubmittedSuccess'));
       setShowReportModal(false);
     } catch (error: any) {
       console.error('Error submitting report:', error);
@@ -191,12 +192,12 @@ export const PostCard = ({ post }: any) => {
     // },
     {
       icon: FaLayerGroup,
-      label: "Report",
+      label: tPostCard('report'),
       onClick: () => {
         if (isAuthenticated) {
           setShowReportModal(true);
         } else {
-          showError("Please login to report this post");
+          showError(tPostCard('pleaseLoginToReport'));
         }
       },
     },

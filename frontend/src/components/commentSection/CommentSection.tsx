@@ -1,42 +1,22 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import Comment from './Comment';
 import { commentsApi, Comment as CommentType, Language } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslations } from 'next-intl';
 import DP from '../../../public/assets/images/avatar_default_4.png';
+import { formatTimestamp } from '@/utils/helperFunction';
 
-// Helper function to format timestamp
-const formatTimestamp = (dateString: string): string => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) {
-    return `${diffInSeconds} sec. ago`;
-  } else if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60);
-    return `${minutes} ${minutes === 1 ? 'min' : 'mins'}. ago`;
-  } else if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600);
-    return `${hours} ${hours === 1 ? 'hr' : 'hrs'}. ago`;
-  } else if (diffInSeconds < 604800) {
-    const days = Math.floor(diffInSeconds / 86400);
-    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
-  } else {
-    const weeks = Math.floor(diffInSeconds / 604800);
-    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
-  }
-};
 
 // Transform API comment to Comment component format
-const transformComment = (comment: CommentType, postAuthorId?: string): any => {
+const transformComment = (comment: CommentType, postAuthorId?: string, t?: any): any => {
   return {
     id: comment.id,
-    username: comment.author?.nickname || 'Anonymous',
+    username: comment.author?.nickname || (t ? t('anonymous') : 'Anonymous'),
     avatar: DP, // Default avatar
     badge: comment.authorId === postAuthorId ? 'OP' : undefined,
     timestamp: formatTimestamp(comment.createdAt),
@@ -45,7 +25,7 @@ const transformComment = (comment: CommentType, postAuthorId?: string): any => {
     downvotes: comment.downvoteCount || 0,
     edited: comment.updatedAt !== comment.createdAt,
     editedTime: comment.updatedAt !== comment.createdAt ? formatTimestamp(comment.updatedAt) : undefined,
-    replies: comment.replies ? comment.replies.map((reply) => transformComment(reply, postAuthorId)) : [],
+    replies: comment.replies ? comment.replies.map((reply) => transformComment(reply, postAuthorId, t)) : [],
   };
 };
 
@@ -59,12 +39,17 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
-  const [sortBy, setSortBy] = useState('Best');
+  const t = useTranslations('comments');
+  const [sortBy, setSortBy] = useState(t('best'));
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -77,39 +62,79 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
     return localeMap[locale] || 'EN';
   };
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async (page: number = 1, append: boolean = false) => {
     if (!postId) {
       setLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
-      const response = await commentsApi.getByPost(postId, 1, 50);
-      const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId));
-      setComments(transformedComments);
+      const response = await commentsApi.getByPost(postId, page, 20);
+      const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId, t));
+      
+      if (append) {
+        setComments((prev) => [...prev, ...transformedComments]);
+      } else {
+        setComments(transformedComments);
+      }
+      
+      setCurrentPage(page);
+      setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
       console.error('Error fetching comments:', err);
-      setError(err.message || 'Failed to load comments');
+      setError(err.message || t('failedToLoadComments'));
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  };
+  }, [postId, postAuthorId, t]);
 
+  // Initial load
   useEffect(() => {
-    fetchComments();
-  }, [postId, postAuthorId]);
+    fetchComments(1, false);
+  }, [fetchComments]);
+
+  // Load more comments
+  const loadMoreComments = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    await fetchComments(currentPage + 1, true);
+  }, [currentPage, loadingMore, hasMore, fetchComments]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!observerTarget || !hasMore || loadingMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreComments();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(observerTarget);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [observerTarget, hasMore, loadingMore, loading, loadMoreComments]);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showError('Please login to comment');
+      showError(t('pleaseLoginToComment'));
       return;
     }
 
     if (!newComment.trim()) {
-      showError('Please enter a comment');
+      showError(t('pleaseEnterComment'));
       return;
     }
 
@@ -121,12 +146,12 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
         postId: postId,
       });
       setNewComment('');
-      showSuccess('Comment added successfully!');
-      // Refresh comments
-      await fetchComments();
+      showSuccess(t('commentAddedSuccess'));
+      // Refresh comments from page 1
+      await fetchComments(1, false);
     } catch (err: any) {
       console.error('Error creating comment:', err);
-      showError(err.message || 'Failed to add comment. Please try again.');
+      showError(err.message || t('commentAddError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -142,7 +167,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
             type="text"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder={isAuthenticated ? "Join the conversation" : "Login to comment"}
+            placeholder={isAuthenticated ? t('joinConversation') : t('loginToComment')}
             disabled={!isAuthenticated || isSubmitting}
             className="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
@@ -151,7 +176,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
             disabled={!isAuthenticated || isSubmitting || !newComment.trim()}
             className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Posting...' : 'Post'}
+            {isSubmitting ? t('posting') : t('post')}
           </button>
         </div>
       </form>
@@ -159,10 +184,10 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       {/* Sort and Search */}
       <div className="flex items-center gap-4 mb-6">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Sort by:</span>
+          <span className="text-sm text-gray-600">{t('sortBy')}</span>
           <button
             className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors cursor-pointer"
-            onClick={() => setSortBy('Best')}
+            onClick={() => setSortBy(t('best'))}
           >
             {sortBy}
             <BiChevronDown size={16} />
@@ -173,7 +198,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
           <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search Comments"
+            placeholder={t('searchComments')}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
           />
         </div>
@@ -182,7 +207,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">Loading comments...</div>
+          <div className="text-gray-500">{t('loadingComments')}</div>
         </div>
       )}
 
@@ -196,7 +221,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       {/* Comments List */}
       {!loading && !error && comments.length === 0 && (
         <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">No comments yet. Be the first to comment!</div>
+          <div className="text-gray-500">{t('noCommentsYet')}</div>
         </div>
       )}
 
@@ -208,9 +233,27 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
               comment={comment}
               postId={postId}
               postAuthorId={postAuthorId}
-              onReplyAdded={fetchComments}
+              onReplyAdded={() => fetchComments(1, false)}
             />
           ))}
+          
+          {/* Infinite scroll trigger */}
+          {hasMore && (
+            <div ref={setObserverTarget} className="py-4">
+              {loadingMore && (
+                <div className="flex items-center justify-center py-4">
+                  <div className="text-gray-500">{t('loadingMoreComments')}</div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* End of comments message */}
+          {!hasMore && comments.length > 0 && (
+            <div className="flex items-center justify-center py-4">
+              <div className="text-gray-500">{t('noMoreComments')}</div>
+            </div>
+          )}
         </div>
       )}
     </div>

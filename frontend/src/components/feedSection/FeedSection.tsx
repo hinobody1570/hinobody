@@ -1,36 +1,15 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CiCalendar } from "react-icons/ci";
 import { IoChevronDown } from "react-icons/io5";
 import { PostCard } from "../reuseComponents/PostCard";
 import { RecentPostCard } from "../reuseComponents/RecentPostCard";
 import { postsApi, Post } from "@/lib/api";
 import DP from "./../../../public/assets/images/avatar_default_4.png";
+import { formatTimestamp } from "@/utils/helperFunction";
 
-// Helper function to format timestamp
-const formatTimestamp = (dateString: string): string => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) {
-    return `${diffInSeconds} sec. ago`;
-  } else if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60);
-    return `${minutes} ${minutes === 1 ? 'min' : 'mins'}. ago`;
-  } else if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600);
-    return `${hours} ${hours === 1 ? 'hr' : 'hrs'}. ago`;
-  } else if (diffInSeconds < 604800) {
-    const days = Math.floor(diffInSeconds / 86400);
-    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
-  } else {
-    const weeks = Math.floor(diffInSeconds / 604800);
-    return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
-  }
-};
 
 // Transform API post to PostCard format
 const transformPost = (post: Post): any => {
@@ -85,8 +64,13 @@ export const RedditFeed = () => {
   const t = useTranslations('feed');
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
 
+  // Initial load
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -98,6 +82,8 @@ export const RedditFeed = () => {
         });
         const transformedPosts = response.data.map(transformPost);
         setPosts(transformedPosts);
+        setCurrentPage(1);
+        setHasMore(response.meta.page < response.meta.totalPages);
       } catch (err: any) {
         console.error('Error fetching posts:', err);
         setError(err.message || 'Failed to load posts');
@@ -108,6 +94,49 @@ export const RedditFeed = () => {
 
     fetchPosts();
   }, []);
+
+  // Load more posts
+  const loadMorePosts = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+
+    try {
+      setLoadingMore(true);
+      const nextPage = currentPage + 1;
+      const response = await postsApi.getAll({
+        page: nextPage,
+        limit: 20,
+      });
+      const transformedPosts = response.data.map(transformPost);
+      setPosts((prev) => [...prev, ...transformedPosts]);
+      setCurrentPage(nextPage);
+      setHasMore(response.meta.page < response.meta.totalPages);
+    } catch (err: any) {
+      console.error('Error fetching more posts:', err);
+      setError(err.message || 'Failed to load more posts');
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [currentPage, loadingMore, hasMore]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!observerTarget || !hasMore || loadingMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMorePosts();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(observerTarget);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [observerTarget, hasMore, loadingMore, loading, loadMorePosts]);
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -152,9 +181,31 @@ export const RedditFeed = () => {
               </div>
             )}
 
-            {!loading && !error && posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
+            {!loading && !error && (
+              <>
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+                
+                {/* Infinite scroll trigger */}
+                {hasMore && (
+                  <div ref={setObserverTarget} className="py-4">
+                    {loadingMore && (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="text-gray-500">Loading more posts...</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* End of feed message */}
+                {!hasMore && posts.length > 0 && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-gray-500">No more posts to load</div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Sidebar - Recent Posts */}

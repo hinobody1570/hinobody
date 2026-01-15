@@ -12,6 +12,7 @@ import { commentsApi, Language, votesApi } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import AVATAR from "./../../../public/assets/images/avatar_default_4.png";
 
@@ -23,25 +24,25 @@ interface commentType {
   onReplyAdded?: () => void;
 }
 
-export const menuItems = [
+const getMenuItems = (t: any) => [
   {
     icon: FiEyeOff,
-    label: "Hide",
+    label: t("hide"),
     onClick: () => console.log("Hide clicked"),
   },
   {
     icon: FaLayerGroup,
-    label: "Report",
+    label: t("report"),
     onClick: () => console.log("Report clicked"),
   },
   {
     icon: BiInfoCircle,
-    label: "About this ad",
+    label: t("aboutThisAd"),
     onClick: () => console.log("About clicked"),
   },
   {
     icon: BiGlobe,
-    label: "Tired of ads?",
+    label: t("tiredOfAds"),
     onClick: () => console.log("Ads clicked"),
   },
 ];
@@ -50,6 +51,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
+  const t = useTranslations('comments');
   const [upvotes, setUpvotes] = useState(comment.upvotes || 0);
   const [downvotes, setDownvotes] = useState(comment.downvotes || 0);
   const [voteState, setVoteState] = useState<'up' | 'down' | null>(null);
@@ -73,12 +75,12 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const handleSubmitReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showError('Please login to reply');
+      showError(t('pleaseLoginToReply'));
       return;
     }
 
     if (!replyText.trim() || !postId) {
-      showError('Please enter a reply');
+      showError(t('pleaseEnterReply'));
       return;
     }
 
@@ -92,14 +94,14 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
       });
       setReplyText('');
       setShowReplyComment(false);
-      showSuccess('Reply added successfully!');
+      showSuccess(t('replyAddedSuccess'));
       // Refresh comments
       if (onReplyAdded) {
         onReplyAdded();
       }
     } catch (err: any) {
       console.error('Error creating reply:', err);
-      showError(err.message || 'Failed to add reply. Please try again.');
+      showError(err.message || t('replyAddError'));
     } finally {
       setIsSubmittingReply(false);
     }
@@ -151,7 +153,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
       setDownvotes((prev: number) => prev + response.downvoteCount);
     } catch (error: any) {
       console.error('Error voting:', error);
-      showError(error.message || 'Failed to vote. Please try again.');
+      showError(error.message || t('voteError'));
     } finally {
       setIsVoting(false);
     }
@@ -179,7 +181,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
       setDownvotes((prev: number) => prev + response.downvoteCount);
     } catch (error: any) {
       console.error('Error voting:', error);
-      showError(error.message || 'Failed to vote. Please try again.');
+      showError(error.message || t('voteError'));
     } finally {
       setIsVoting(false);
     }
@@ -214,7 +216,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
             )}
             <span className="text-xs text-gray-500">• {comment.timestamp}</span>
             {comment.stickied && <PiNavigationArrow size={14} className="text-green-600" />}
-            {comment.edited && <span className="text-xs text-gray-500">• Edited {comment.editedTime}</span>}
+            {comment.edited && <span className="text-xs text-gray-500">• {t('edited')} {comment.editedTime}</span>}
           </div>
 
           {/* Comment Content */}
@@ -255,19 +257,19 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                   className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer"
                 >
                   <BiMessageSquare size={16} />
-                  <span>Reply</span>
+                  <span>{t('reply')}</span>
                 </button>
 
                 {/* Award Button */}
                 <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
                   <BiAward size={16} />
-                  <span>Award</span>
+                  <span>{t('award')}</span>
                 </button>
 
                 {/* Share Button */}
                 <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
                   <CiShare2 size={16} />
-                  <span>Share</span>
+                  <span>{t('share')}</span>
                 </button>
 
                 {/* Awards Display */}
@@ -280,7 +282,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
 
                 {/* More Options */}
                 <button className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
-                  <DropdownMenu items={menuItems} />
+                  <DropdownMenu items={getMenuItems(t)} />
                 </button>
               </div>
             </>
@@ -293,7 +295,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
             type="text"
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
-            placeholder={isAuthenticated ? "Enter reply" : "Login to reply"}
+            placeholder={isAuthenticated ? t('enterReply') : t('loginToReply')}
             disabled={!isAuthenticated || isSubmittingReply}
             className="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
@@ -302,7 +304,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
             disabled={!isAuthenticated || isSubmittingReply || !replyText.trim()}
             className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmittingReply ? '...' : 'Reply'}
+            {isSubmittingReply ? '...' : t('reply')}
           </button>
           <button
             type="button"
@@ -312,7 +314,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
             }}
             className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           >
-            Cancel
+            {t('cancel')}
           </button>
         </form>
       )}
