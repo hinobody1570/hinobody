@@ -30,35 +30,18 @@ const transformPost = (post: Post): any => {
   };
 };
 
-const recentPosts = [
-  {
-    id: 1,
-    community: "r/FarmMergeValley",
-    avatar: DP,
-    timestamp: "5d ago",
-    title: "Don't miss your daily reward! 🎁",
-    upvotes: 731,
-    comments: "1.7K",
-  },
-  {
-    id: 2,
-    community: "r/gaming",
-    avatar: DP,
-    timestamp: "2d ago",
-    title: "Best indie games of 2024",
-    upvotes: 1243,
-    comments: "2.3K",
-  },
-  {
-    id: 3,
-    community: "r/photography",
-    avatar: DP,
-    timestamp: "1d ago",
-    title: "Tips for beginners in landscape photography",
-    upvotes: 456,
-    comments: "892",
-  },
-];
+// Transform API post to RecentPostCard format
+const transformRecentPost = (post: Post): any => {
+  return {
+    id: post.id,
+    community: post.board?.name ? `r/${post.board.name}` : "r/community",
+    avatar: DP, // Default avatar
+    timestamp: formatTimestamp(post.createdAt),
+    title: post.title,
+    upvotes: post.upvoteCount || 0,
+    comments: post.commentCount || 0,
+  };
+};
 
 export const RedditFeed = () => {
   const t = useTranslations('feed');
@@ -74,6 +57,9 @@ export const RedditFeed = () => {
   const [selectedBoardName, setSelectedBoardName] = useState<string>(t('best'));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [showRecentPosts, setShowRecentPosts] = useState(true);
+  const [loadingRecentPosts, setLoadingRecentPosts] = useState(true);
 
   // Fetch boards on mount
   useEffect(() => {
@@ -88,6 +74,34 @@ export const RedditFeed = () => {
 
     fetchBoards();
   }, []);
+
+  // Fetch recent posts (last 4)
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        setLoadingRecentPosts(true);
+        const response = await postsApi.getAll({
+          page: 1,
+          limit: 4,
+        });
+        const transformedRecentPosts = response.data.map(transformRecentPost);
+        setRecentPosts(transformedRecentPosts);
+      } catch (err: any) {
+        console.error('Error fetching recent posts:', err);
+      } finally {
+        setLoadingRecentPosts(false);
+      }
+    };
+
+    if (showRecentPosts) {
+      fetchRecentPosts();
+    }
+  }, [showRecentPosts]);
+
+  // Handle clear recent posts
+  const handleClearRecentPosts = () => {
+    setShowRecentPosts(false);
+  };
 
   // Fetch posts with board filter
   const fetchPosts = useCallback(async (page: number = 1, boardId?: string | null, append: boolean = false) => {
@@ -281,39 +295,56 @@ export const RedditFeed = () => {
           </div>
 
           {/* Sidebar - Recent Posts */}
-          <div className="lg:col-span-1">
-            <div className="bg-white border border-gray-300 rounded-lg p-4 sticky top-8 z-0">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-gray-600 uppercase">{t('recentPosts')}</h3>
-                <button className="text-sm text-blue-600 hover:underline font-semibold cursor-pointer">{t('clear')}</button>
-              </div>
-
-              <div className="space-y-2">
-                {recentPosts.map((post) => (
-                  <RecentPostCard key={post.id} post={post} />
-                ))}
-              </div>
-
-              {/* Footer Links */}
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3">
-                  <a href="#" className="hover:underline">
-                    {t('redditRules')}
-                  </a>
-                  <a href="#" className="hover:underline">
-                    {t('privacyPolicy')}
-                  </a>
-                  <a href="#" className="hover:underline">
-                    {t('userAgreement')}
-                  </a>
-                  <a href="#" className="hover:underline">
-                    {t('accessibility')}
-                  </a>
+          {showRecentPosts && (
+            <div className="lg:col-span-1">
+              <div className="bg-white border border-gray-300 rounded-lg p-4 sticky top-8 z-0">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-gray-600 uppercase">{t('recentPosts')}</h3>
+                  <button 
+                    onClick={handleClearRecentPosts}
+                    className="text-sm text-blue-600 hover:underline font-semibold cursor-pointer"
+                  >
+                    {t('clear')}
+                  </button>
                 </div>
-                <p className="text-xs text-gray-500">{t('redditCopyright')}</p>
+
+                {loadingRecentPosts ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-gray-500 text-sm">Loading...</div>
+                  </div>
+                ) : recentPosts.length > 0 ? (
+                  <div className="space-y-2">
+                    {recentPosts.map((post) => (
+                      <RecentPostCard key={post.id} post={post} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-gray-500 text-sm">No recent posts</div>
+                  </div>
+                )}
+
+                {/* Footer Links */}
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3">
+                    <a href="#" className="hover:underline">
+                      {t('redditRules')}
+                    </a>
+                    <a href="#" className="hover:underline">
+                      {t('privacyPolicy')}
+                    </a>
+                    <a href="#" className="hover:underline">
+                      {t('userAgreement')}
+                    </a>
+                    <a href="#" className="hover:underline">
+                      {t('accessibility')}
+                    </a>
+                  </div>
+                  <p className="text-xs text-gray-500">{t('redditCopyright')}</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -2,12 +2,24 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { ROUTE_PATHS } from "@/routes/paths";
 
 export const RecentPostCard = ({ post }: any) => {
   const t = useTranslations('feed');
+  const router = useRouter();
+  
+  const handleClick = () => {
+    if (post.id) {
+      router.push(`${ROUTE_PATHS.HOME}?post=${post.id}`);
+    }
+  };
   
   return (
-    <div className="mb-4 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors" >
+    <div 
+      onClick={handleClick}
+      className="mb-4 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors" 
+    >
       <div className="flex items-start gap-2 mb-2">
         <Image src={post.avatar} alt={post.community} className="w-5 h-5 rounded-full" />
         <div className="flex-1">
