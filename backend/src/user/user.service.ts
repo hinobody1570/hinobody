@@ -123,61 +123,43 @@ export class UserService {
     const { page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
 
-    const conditions: string[] = [];
-    const params: any[] = [];
-    const countParams: any[] = [];
-    let paramIndex = 1;
+    // Use simple Prisma search instead of FTS to avoid requiring search_vector column
+    const where: Prisma.UserWhereInput = {
+      OR: [
+        {
+          nickname: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          email: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    };
 
-    const searchParamIndex = paramIndex;
-    params.push(search);
-    countParams.push(search);
-    paramIndex++;
-
-    const whereClause = conditions.length > 0 ? conditions.join(' AND ') : '1=1';
-    const ftsCondition = `"search_vector" @@ plainto_tsquery('english', $${searchParamIndex})`;
-    const fullWhereClause = `${whereClause} AND ${ftsCondition}`;
-
-    const usersQuery = `
-      SELECT 
-        u.id,
-        u.email,
-        u.nickname,
-        u."language",
-        u.role,
-        u."isActive",
-        u."createdAt",
-        u."updatedAt"
-      FROM "users" u
-      WHERE ${fullWhereClause}
-      ORDER BY ts_rank(u."search_vector", plainto_tsquery('english', $${searchParamIndex})) DESC, u."createdAt" DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
-
-    params.push(limit, skip);
-
-    const countQuery = `
-      SELECT COUNT(*)::int as total
-      FROM "users" u
-      WHERE ${fullWhereClause}
-    `;
-
-    const [usersResult, countResult] = await Promise.all([
-      this.prisma.$queryRawUnsafe(usersQuery, ...params),
-      this.prisma.$queryRawUnsafe(countQuery, ...countParams),
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          language: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
     ]);
-
-    const users = (usersResult as any[]).map((row: any) => ({
-      id: row.id,
-      email: row.email,
-      nickname: row.nickname,
-      language: row.language,
-      role: row.role,
-      isActive: row.isActive,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }));
-
-    const total = (countResult as any[])[0]?.total || 0;
 
     return {
       data: users,

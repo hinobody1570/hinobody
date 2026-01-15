@@ -87,62 +87,34 @@ export class BoardService {
     const { page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
 
-    const conditions: string[] = ['"isActive" = true'];
-    const params: any[] = [];
-    const countParams: any[] = [];
-    let paramIndex = 1;
+    // Use simple Prisma search instead of FTS to avoid requiring search_vector column
+    const where: Prisma.BoardWhereInput = {
+      isActive: true,
+      OR: [
+        {
+          name: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          description: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      ],
+    };
 
-    const searchParamIndex = paramIndex;
-    params.push(search);
-    countParams.push(search);
-    paramIndex++;
-
-    const whereClause = conditions.join(' AND ');
-    const ftsCondition = `"search_vector" @@ plainto_tsquery('english', $${searchParamIndex})`;
-    const fullWhereClause = `${whereClause} AND ${ftsCondition}`;
-
-    const boardsQuery = `
-      SELECT 
-        b.id,
-        b.name,
-        b.category,
-        b.description,
-        b."visibilityAccess",
-        b."isActive",
-        b."createdAt",
-        b."updatedAt",
-        ts_rank(b."search_vector", plainto_tsquery('english', $${searchParamIndex})) as rank
-      FROM "boards" b
-      WHERE ${fullWhereClause}
-      ORDER BY rank DESC, b."createdAt" ASC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
-
-    params.push(limit, skip);
-
-    const countQuery = `
-      SELECT COUNT(*)::int as total
-      FROM "boards" b
-      WHERE ${fullWhereClause}
-    `;
-
-    const [boardsResult, countResult] = await Promise.all([
-      this.prisma.$queryRawUnsafe(boardsQuery, ...params),
-      this.prisma.$queryRawUnsafe(countQuery, ...countParams),
+    const [boards, total] = await Promise.all([
+      this.prisma.board.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.board.count({ where }),
     ]);
-
-    const boards = (boardsResult as any[]).map((row: any) => ({
-      id: row.id,
-      name: row.name,
-      category: row.category,
-      description: row.description,
-      visibilityAccess: row.visibilityAccess,
-      isActive: row.isActive,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }));
-
-    const total = (countResult as any[])[0]?.total || 0;
 
     return {
       data: boards,

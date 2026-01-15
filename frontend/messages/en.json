@@ -97,6 +97,17 @@
     "create": "Create",
     "ask": "Ask"
   },
+  "search": {
+    "searchResults": "Search results for",
+    "all": "All",
+    "users": "Users",
+    "posts": "Posts",
+    "boards": "Boards",
+    "noUsersFound": "No users found",
+    "noPostsFound": "No posts found",
+    "noBoardsFound": "No boards found",
+    "noResultsFound": "No results found"
+  },
   "feed": {
     "best": "Best",
     "allBoards": "All Boards",

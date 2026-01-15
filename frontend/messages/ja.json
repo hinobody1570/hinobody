@@ -97,6 +97,17 @@
     "create": "作成",
     "ask": "質問"
   },
+  "search": {
+    "searchResults": "検索結果",
+    "all": "すべて",
+    "users": "ユーザー",
+    "posts": "投稿",
+    "boards": "ボード",
+    "noUsersFound": "ユーザーが見つかりません",
+    "noPostsFound": "投稿が見つかりません",
+    "noBoardsFound": "ボードが見つかりません",
+    "noResultsFound": "結果が見つかりません"
+  },
   "feed": {
     "best": "ベスト",
     "allBoards": "すべてのボード",

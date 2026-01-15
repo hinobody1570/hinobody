@@ -97,6 +97,17 @@
     "create": "创建",
     "ask": "提问"
   },
+  "search": {
+    "searchResults": "搜索结果",
+    "all": "全部",
+    "users": "用户",
+    "posts": "帖子",
+    "boards": "看板",
+    "noUsersFound": "未找到用户",
+    "noPostsFound": "未找到帖子",
+    "noBoardsFound": "未找到看板",
+    "noResultsFound": "未找到结果"
+  },
   "feed": {
     "best": "最佳",
     "allBoards": "所有看板",

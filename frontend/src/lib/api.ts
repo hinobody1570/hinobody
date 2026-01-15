@@ -571,3 +571,50 @@ export const reportsApi = {
   },
 };
 
+// User interface
+export interface User {
+  id: string;
+  email: string;
+  nickname: string;
+  language: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Search API
+export interface SearchParams {
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SearchResponse {
+  users: {
+    data: User[];
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  };
+  posts: PostsResponse;
+  boards: BoardsResponse;
+}
+
+export const searchApi = {
+  search: async (params: SearchParams = {}): Promise<SearchResponse> => {
+    const { q, page = 1, limit = 10 } = params;
+    const queryParams = new URLSearchParams();
+    if (q) {
+      queryParams.append('q', q);
+    }
+    queryParams.append('page', page.toString());
+    queryParams.append('limit', limit.toString());
+    const response = await api.get<ApiResponse<SearchResponse>>(`/search?${queryParams.toString()}`);
+    return response.data;
+  },
+};
+
