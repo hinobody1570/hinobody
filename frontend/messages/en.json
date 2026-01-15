@@ -99,6 +99,7 @@
   },
   "feed": {
     "best": "Best",
+    "allBoards": "All Boards",
     "recentPosts": "Recent Posts",
     "clear": "Clear",
     "redditRules": "Reddit Rules",

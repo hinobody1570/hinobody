@@ -99,6 +99,7 @@
   },
   "feed": {
     "best": "ベスト",
+    "allBoards": "すべてのボード",
     "recentPosts": "最近の投稿",
     "clear": "クリア",
     "redditRules": "Redditルール",

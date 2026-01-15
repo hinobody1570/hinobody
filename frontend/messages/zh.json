@@ -99,6 +99,7 @@
   },
   "feed": {
     "best": "最佳",
+    "allBoards": "所有看板",
     "recentPosts": "最近帖子",
     "clear": "清除",
     "redditRules": "Reddit 规则",

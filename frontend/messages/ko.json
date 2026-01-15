@@ -99,6 +99,7 @@
   },
   "feed": {
     "best": "베스트",
+    "allBoards": "모든 보드",
     "recentPosts": "최근 게시물",
     "clear": "지우기",
     "redditRules": "Reddit 규칙",
