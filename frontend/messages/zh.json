@@ -411,6 +411,7 @@
     "voteError": "投票失败。请重试。",
     "hide": "隐藏",
     "report": "举报",
+    "pleaseLoginToReport": "请登录以举报此评论",
     "aboutThisAd": "关于此广告",
     "tiredOfAds": "厌倦了广告？",
     "anonymous": "匿名",
@@ -419,6 +420,7 @@
   "postCard": {
     "report": "举报",
     "reportPost": "举报帖子",
+    "reportComment": "举报评论",
     "reportSubmittedSuccess": "举报已成功提交。感谢您帮助维护社区安全。",
     "pleaseLoginToReport": "请登录以举报此帖子",
     "reasonForReporting": "举报原因",

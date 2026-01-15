@@ -411,6 +411,7 @@
     "voteError": "投票に失敗しました。もう一度お試しください。",
     "hide": "非表示",
     "report": "報告",
+    "pleaseLoginToReport": "このコメントを報告するにはログインしてください",
     "aboutThisAd": "この広告について",
     "tiredOfAds": "広告にうんざりしていませんか？",
     "anonymous": "匿名",
@@ -419,6 +420,7 @@
   "postCard": {
     "report": "報告",
     "reportPost": "投稿を報告",
+    "reportComment": "コメントを報告",
     "reportSubmittedSuccess": "報告が正常に送信されました。コミュニティを安全に保つためにご協力いただき、ありがとうございます。",
     "pleaseLoginToReport": "この投稿を報告するにはログインしてください",
     "reasonForReporting": "報告理由",

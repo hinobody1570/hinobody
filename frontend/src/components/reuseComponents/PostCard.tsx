@@ -300,14 +300,14 @@ export const PostCard = ({ post }: any) => {
           <span className="text-sm font-semibold text-gray-800">{post.comments}</span>
         </button>
 
-        <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
+        {/* <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
           <GoBell size={20} className="text-gray-600" />
-        </button>
+        </button> */}
 
-        <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
+        {/* <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
           <FiShare2 size={20} className="text-gray-600" />
           <span className="text-sm font-semibold text-gray-800">{t("share")}</span>
-        </button>
+        </button> */}
       </div>
       {showComments && <CommentsSection postId={post.id} postAuthorId={post.authorId} />}
       

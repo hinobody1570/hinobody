@@ -411,6 +411,7 @@
     "voteError": "Failed to vote. Please try again.",
     "hide": "Hide",
     "report": "Report",
+    "pleaseLoginToReport": "Please login to report this comment",
     "aboutThisAd": "About this ad",
     "tiredOfAds": "Tired of ads?",
     "anonymous": "Anonymous",
@@ -419,6 +420,7 @@
   "postCard": {
     "report": "Report",
     "reportPost": "Report Post",
+    "reportComment": "Report Comment",
     "reportSubmittedSuccess": "Report submitted successfully. Thank you for helping keep our community safe.",
     "pleaseLoginToReport": "Please login to report this post",
     "reasonForReporting": "Reason for reporting",

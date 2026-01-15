@@ -8,12 +8,13 @@ import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
 import { DropdownMenu } from "../reuseComponents/DropDownMenu";
 import { FaLayerGroup } from "react-icons/fa";
-import { commentsApi, Language, votesApi } from "@/lib/api";
+import { commentsApi, Language, votesApi, reportsApi } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
+import { ReportModal } from "../modals/ReportModal";
 import AVATAR from "./../../../public/assets/images/avatar_default_4.png";
 
 interface commentType {
@@ -24,27 +25,33 @@ interface commentType {
   onReplyAdded?: () => void;
 }
 
-const getMenuItems = (t: any) => [
-  {
-    icon: FiEyeOff,
-    label: t("hide"),
-    onClick: () => console.log("Hide clicked"),
-  },
+const getMenuItems = (t: any, onReportClick: () => void, isAuthenticated: boolean, showError: (message: string) => void) => [
+  // {
+  //   icon: FiEyeOff,
+  //   label: t("hide"),
+  //   onClick: () => console.log("Hide clicked"),
+  // },
   {
     icon: FaLayerGroup,
     label: t("report"),
-    onClick: () => console.log("Report clicked"),
+    onClick: () => {
+      if (isAuthenticated) {
+        onReportClick();
+      } else {
+        showError(t("pleaseLoginToReport"));
+      }
+    },
   },
-  {
-    icon: BiInfoCircle,
-    label: t("aboutThisAd"),
-    onClick: () => console.log("About clicked"),
-  },
-  {
-    icon: BiGlobe,
-    label: t("tiredOfAds"),
-    onClick: () => console.log("Ads clicked"),
-  },
+  // {
+  //   icon: BiInfoCircle,
+  //   label: t("aboutThisAd"),
+  //   onClick: () => console.log("About clicked"),
+  // },
+  // {
+  //   icon: BiGlobe,
+  //   label: t("tiredOfAds"),
+  //   onClick: () => console.log("Ads clicked"),
+  // },
 ];
 
 const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: commentType) => {
@@ -52,6 +59,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
   const t = useTranslations('comments');
+  const tPostCard = useTranslations('postCard');
   const [upvotes, setUpvotes] = useState(comment.upvotes || 0);
   const [downvotes, setDownvotes] = useState(comment.downvotes || 0);
   const [voteState, setVoteState] = useState<'up' | 'down' | null>(null);
@@ -60,6 +68,8 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const [replyText, setReplyText] = useState('');
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -186,6 +196,27 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
       setIsVoting(false);
     }
   };
+
+  // Handle report submission
+  const handleReportSubmit = async (reason: string) => {
+    if (!isAuthenticated || !comment.id || isReporting) return;
+
+    try {
+      setIsReporting(true);
+      await reportsApi.create({
+        reason,
+        commentId: comment.id,
+      });
+      showSuccess(tPostCard('reportSubmittedSuccess'));
+      setShowReportModal(false);
+    } catch (error: any) {
+      console.error('Error submitting report:', error);
+      throw error; // Let the modal handle the error display
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
   return (
     <div className={`${level > 0 ? "ml-8 border-l-2 border-gray-200 pl-4" : ""}`}>
       <div className="flex gap-3 mb-4">
@@ -282,7 +313,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
 
                 {/* More Options */}
                 <button className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
-                  <DropdownMenu items={getMenuItems(t)} />
+                  <DropdownMenu items={getMenuItems(t, () => setShowReportModal(true), isAuthenticated, showError)} />
                 </button>
               </div>
             </>
@@ -334,6 +365,15 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
           ))}
         </div>
       )}
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        onSubmit={handleReportSubmit}
+        title={tPostCard('reportComment')}
+        isLoading={isReporting}
+      />
     </div>
   );
 };

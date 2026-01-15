@@ -411,6 +411,7 @@
     "voteError": "투표에 실패했습니다. 다시 시도해주세요.",
     "hide": "숨기기",
     "report": "신고",
+    "pleaseLoginToReport": "이 댓글을 신고하려면 로그인하세요",
     "aboutThisAd": "이 광고에 대해",
     "tiredOfAds": "광고가 지치셨나요?",
     "anonymous": "익명",
@@ -419,6 +420,7 @@
   "postCard": {
     "report": "신고",
     "reportPost": "게시물 신고",
+    "reportComment": "댓글 신고",
     "reportSubmittedSuccess": "신고가 성공적으로 제출되었습니다. 커뮤니티를 안전하게 유지하는 데 도움을 주셔서 감사합니다.",
     "pleaseLoginToReport": "이 게시물을 신고하려면 로그인하세요",
     "reasonForReporting": "신고 사유",
