@@ -11,6 +11,7 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResendOtpDto } from './dto/resend-otp.dto';
+import { AuthProvider } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -158,6 +159,67 @@ export class AuthService {
 
     return {
       message: 'Password reset successfully',
+    };
+  }
+
+  async googleLogin(user: any) {
+    if (!user) {
+      throw new UnauthorizedException('No user from Google');
+    }
+
+    const dbUser = await this.userService.findOrCreateOAuthUser(
+      AuthProvider.GOOGLE,
+      user.providerId,
+      user.email,
+      user.firstName,
+      user.lastName,
+      user.picture,
+    );
+
+    return this.generateTokenResponse(dbUser);
+  }
+
+  async appleLogin(idToken: string) {
+    if (!idToken) {
+      throw new BadRequestException('ID token is required');
+    }
+
+    // For Apple, we'll validate the token in the controller
+    // and pass the decoded user info here
+    // This method will be called after token validation
+    return { idToken }; // Placeholder, will be updated
+  }
+
+  async appleLoginWithUser(userData: any) {
+    const dbUser = await this.userService.findOrCreateOAuthUser(
+      AuthProvider.APPLE,
+      userData.providerId,
+      userData.email,
+      userData.firstName,
+      userData.lastName,
+    );
+
+    return this.generateTokenResponse(dbUser);
+  }
+
+  private generateTokenResponse(user: any) {
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        language: user.language,
+        role: user.role,
+        avatar: user.avatar,
+        provider: user.provider,
+      },
     };
   }
 }

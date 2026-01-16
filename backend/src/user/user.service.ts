@@ -12,6 +12,9 @@ import * as bcrypt from 'bcrypt';
 import { User, Language, Prisma } from '@prisma/client';
 import * as crypto from 'crypto';
 
+type AuthProvider = 'LOCAL' | 'GOOGLE' | 'APPLE';
+type SafeUser = Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken' | 'otpExpiry' | 'passwordResetExpiry'>;
+
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
@@ -396,6 +399,140 @@ export class UserService {
         passwordResetToken: null,
         passwordResetExpiry: null,
       },
+    });
+  }
+
+  async findOrCreateOAuthUser(
+    provider: AuthProvider,
+    providerId: string,
+    email: string,
+    firstName?: string,
+    lastName?: string,
+    avatar?: string,
+  ): Promise<SafeUser> {
+    // Try to find user by provider and providerId
+    let user = await this.prisma.user.findFirst({
+      where: {
+        provider,
+        providerId,
+      } as any,
+    });
+
+    if (user) {
+      // Update avatar if provided
+      if (avatar && (user as any).avatar !== avatar) {
+        // @ts-expect-error - Prisma client types may be cached. Restart TS server if errors persist. Fields exist in database.
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { avatar } as any,
+          select: {
+            id: true,
+            email: true,
+            nickname: true,
+            language: true,
+            role: true,
+            isActive: true,
+            emailVerified: true,
+            provider: true,
+            providerId: true,
+            avatar: true,
+            createdAt: true,
+            updatedAt: true,
+          } as any,
+        });
+        return user;
+      }
+      // Return user without sensitive fields
+      const { passwordHash, emailVerificationOTP, passwordResetToken, ...safeUser } = user;
+      return safeUser as any;
+    }
+
+    // Try to find user by email (account linking)
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      // Link OAuth provider to existing account
+      const updatedUser = await this.prisma.user.update({
+        where: { id: existingUser.id },
+        data: {
+          provider,
+          providerId,
+          ...(avatar && { avatar }),
+          emailVerified: true, // OAuth emails are pre-verified
+          isActive: true,
+        } as any,
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          language: true,
+          role: true,
+          isActive: true,
+          emailVerified: true,
+          provider: true,
+          providerId: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        } as any,
+      });
+      return updatedUser as unknown as SafeUser;
+    }
+
+    // Create new user
+    const nickname = this.generateUniqueNickname(
+      firstName || lastName || email.split('@')[0],
+    );
+
+    const newUser = await this.prisma.user.create({
+      data: {
+        email,
+        nickname,
+        provider,
+        providerId,
+        passwordHash: null, // OAuth users don't have passwords
+        language: Language.EN,
+        emailVerified: true, // OAuth emails are pre-verified
+        isActive: true,
+        ...(avatar && { avatar }),
+      } as any,
+      select: {
+        id: true,
+        email: true,
+        nickname: true,
+        language: true,
+        role: true,
+        isActive: true,
+        emailVerified: true,
+        provider: true,
+        providerId: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+      } as any,
+    });
+
+    return newUser as unknown as SafeUser;
+  }
+
+  private generateUniqueNickname(base: string): string {
+    // Remove special characters and spaces
+    const cleanBase = base.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    const timestamp = Date.now().toString().slice(-6);
+    return `${cleanBase}_${timestamp}`;
+  }
+
+  async findByProvider(
+    provider: AuthProvider,
+    providerId: string,
+  ): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        provider,
+        providerId,
+      } as any,
     });
   }
 }
