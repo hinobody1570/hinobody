@@ -6,6 +6,7 @@ export interface User {
   nickname: string;
   language?: string;
   role?: string;
+  avatar?: string;
 }
 
 export interface AuthState {
