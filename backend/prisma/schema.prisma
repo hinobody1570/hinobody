@@ -20,6 +20,7 @@ model User {
   otpExpiry            DateTime?
   passwordResetToken   String?
   passwordResetExpiry  DateTime?
+  avatar               String?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   blockedBy            Block[]       @relation("Blocked")

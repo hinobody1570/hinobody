@@ -42,4 +42,12 @@ export class UpdateUserDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @ApiPropertyOptional({
+    example: 'https://example.com/avatar.jpg',
+    description: 'Avatar URL (profile picture)',
+  })
+  @IsString()
+  @IsOptional()
+  avatar?: string;
 }

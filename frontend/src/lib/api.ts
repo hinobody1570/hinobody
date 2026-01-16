@@ -658,6 +658,7 @@ export interface UpdateUserDto {
   nickname?: string;
   language?: string;
   isActive?: boolean;
+  avatar?: string;
 }
 
 export interface UsersResponse {
@@ -712,6 +713,7 @@ export interface User {
   role: string;
   isActive: boolean;
   emailVerified: boolean;
+  avatar?: string;
   createdAt: string;
   updatedAt: string;
 }

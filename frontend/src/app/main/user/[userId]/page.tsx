@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage } from '@/lib/api';
+import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage, s3Api } from '@/lib/api';
 import { ROUTE_PATHS } from '@/routes/paths';
 import Image from 'next/image';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { PostCard } from '@/components/reuseComponents/PostCard';
 import { useAuth } from '@/contexts/AuthContext';
-import { FiEdit } from 'react-icons/fi';
+import { FiEdit, FiCamera } from 'react-icons/fi';
 import { FaImages } from 'react-icons/fa';
 
 const transformPost = (post: Post): any => {
@@ -46,6 +46,7 @@ export default function UserProfilePage() {
   const [loadingImages, setLoadingImages] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [editForm, setEditForm] = useState({
     nickname: '',
   });
@@ -98,6 +99,42 @@ export default function UserProfilePage() {
     } catch (err: any) {
       console.error('Error updating user:', err);
       setError(err.message || 'Failed to update profile');
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploadingAvatar(true);
+      setError(null);
+
+      // Upload to S3
+      const uploadResponse = await s3Api.uploadFile(file, 'avatars');
+      
+      // Update user profile with avatar URL
+      const updatedUser = await usersApi.update(userId, { avatar: uploadResponse.url });
+      setUser(updatedUser);
+    } catch (err: any) {
+      console.error('Error uploading avatar:', err);
+      setError(err.message || 'Failed to upload avatar');
+    } finally {
+      setIsUploadingAvatar(false);
+      // Reset file input
+      e.target.value = '';
     }
   };
 
@@ -173,11 +210,34 @@ export default function UserProfilePage() {
         {/* User Header */}
         <div className="bg-white border border-gray-300 rounded-lg p-6 mb-6">
           <div className="flex items-start gap-6">
-            <Image
-              src={DP}
-              alt={user.nickname}
-              className="w-24 h-24 rounded-full border-2 border-gray-300"
-            />
+            <div className="relative">
+              {isUploadingAvatar ? (
+                <div className="w-24 h-24 rounded-full border-2 border-gray-300 bg-gray-100 flex items-center justify-center">
+                  <div className="text-gray-400 text-sm">Uploading...</div>
+                </div>
+              ) : (
+                <Image
+                  src={user.avatar || DP}
+                  alt={user.nickname}
+                  className="w-24 h-24 rounded-full border-2 border-gray-300 object-cover"
+                  width={96}
+                  height={96}
+                  unoptimized={!!user.avatar}
+                />
+              )}
+              {isOwnProfile && !isUploadingAvatar && (
+                <label className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 cursor-pointer hover:bg-blue-700 transition-colors shadow-lg">
+                  <FiCamera size={16} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    disabled={isUploadingAvatar}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
             <div className="flex-1">
               <div className="flex items-center gap-4 mb-2 justify-between">
                 {isEditing ? (
