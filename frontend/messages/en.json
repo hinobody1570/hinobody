@@ -115,7 +115,10 @@
     "backToHome": "Back to Home",
     "edit": "Edit Profile",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "eyeMaskingImages": "Eye Masking Images",
+    "noEyeMaskingImages": "No eye masking images uploaded yet",
+    "loading": "Loading..."
   },
   "boardProfile": {
     "category": "Category",

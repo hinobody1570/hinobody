@@ -15,16 +15,6 @@ export default function AdminLayout({
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push(ROUTE_PATHS.LOGIN);
-      } else if (user.role !== "ADMIN") {
-        router.push(ROUTE_PATHS.HOME);
-      }
-    }
-  }, [user, loading, router]);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

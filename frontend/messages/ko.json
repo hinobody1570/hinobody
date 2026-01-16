@@ -115,7 +115,10 @@
     "backToHome": "홈으로 돌아가기",
     "edit": "프로필 편집",
     "save": "저장",
-    "cancel": "취소"
+    "cancel": "취소",
+    "eyeMaskingImages": "눈 마스킹 이미지",
+    "noEyeMaskingImages": "아직 업로드된 눈 마스킹 이미지가 없습니다",
+    "loading": "로딩 중..."
   },
   "boardProfile": {
     "category": "카테고리",

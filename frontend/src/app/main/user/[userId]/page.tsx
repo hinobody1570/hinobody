@@ -3,15 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { usersApi, User } from '@/lib/api';
+import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage } from '@/lib/api';
 import { ROUTE_PATHS } from '@/routes/paths';
 import Image from 'next/image';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { formatTimestamp } from '@/utils/helperFunction';
-import { postsApi, Post } from '@/lib/api';
 import { PostCard } from '@/components/reuseComponents/PostCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { FiEdit } from 'react-icons/fi';
+import { FaImages } from 'react-icons/fa';
 
 const transformPost = (post: Post): any => {
   return {
@@ -40,8 +40,10 @@ export default function UserProfilePage() {
   
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
+  const [eyeMaskedImages, setEyeMaskedImages] = useState<EyeMaskedImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [loadingImages, setLoadingImages] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -121,6 +123,25 @@ export default function UserProfilePage() {
       fetchUserPosts();
     }
   }, [userId]);
+
+  useEffect(() => {
+    const fetchEyeMaskedImages = async () => {
+      // Only fetch if it's the user's own profile
+      if (!isOwnProfile || !userId) return;
+      
+      try {
+        setLoadingImages(true);
+        const images = await eyeMaskedImagesApi.getAll(userId);
+        setEyeMaskedImages(images);
+      } catch (err: any) {
+        console.error('Error fetching eye masked images:', err);
+      } finally {
+        setLoadingImages(false);
+      }
+    };
+
+    fetchEyeMaskedImages();
+  }, [userId, isOwnProfile]);
 
   if (loading) {
     return (
@@ -204,6 +225,46 @@ export default function UserProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Eye Masking Images Section - Only show on own profile */}
+        {isOwnProfile && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <FaImages size={24} />
+              <span>{t('eyeMaskingImages')} ({eyeMaskedImages.length})</span>
+            </h2>
+            
+            {loadingImages ? (
+              <div className="bg-white border border-gray-300 rounded-lg p-8 text-center">
+                <div className="text-gray-500">{t('loading')}</div>
+              </div>
+            ) : eyeMaskedImages.length > 0 ? (
+              <div className="bg-white border border-gray-300 rounded-lg p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {eyeMaskedImages.map((image) => (
+                    <div
+                      key={image.id}
+                      className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer group"
+                      onClick={() => window.open(image.url, "_blank")}
+                    >
+                      <Image
+                        src={image.url}
+                        alt="Eye masked image"
+                        fill
+                        className="object-contain h-8 group-hover:scale-105 transition-transform"
+                        unoptimized
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white border border-gray-300 rounded-lg p-8 text-center">
+                <p className="text-gray-500">{t('noEyeMaskingImages')}</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* User Posts */}
         <div>

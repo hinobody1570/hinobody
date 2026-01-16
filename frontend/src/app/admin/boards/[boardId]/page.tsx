@@ -40,7 +40,7 @@ export default function AdminBoardDetailPage() {
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  console.log("posts",posts)
+
   useEffect(() => {
     if (!boardId) return;
 

@@ -115,7 +115,10 @@
     "backToHome": "返回首页",
     "edit": "编辑资料",
     "save": "保存",
-    "cancel": "取消"
+    "cancel": "取消",
+    "eyeMaskingImages": "眼部遮罩图片",
+    "noEyeMaskingImages": "还没有上传眼部遮罩图片",
+    "loading": "加载中..."
   },
   "boardProfile": {
     "category": "分类",

@@ -6,7 +6,7 @@ import FormLabel from "@/components/reuseComponents/FormLabel";
 import PasswordInput from "@/components/reuseComponents/PasswordInput";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BsEnvelope } from "react-icons/bs";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/contexts/AuthContext";

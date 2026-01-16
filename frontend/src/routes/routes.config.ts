@@ -45,7 +45,7 @@ export const routesConfig: RouteConfig[] = [
   {
     path: ROUTE_PATHS.DEFAULT,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    // redirectTo: ROUTE_PATHS.HOME,
+    redirectTo: ROUTE_PATHS.HOME,
   },
   {
     path: ROUTE_PATHS.REGISTER,
