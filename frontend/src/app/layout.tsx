@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   title: 'HiNobody - Eye Detection & Masking Tool',
   description: 'Progressive Web App for eye detection and masking using AI',
    icons: {
-    icon: '/assets/images/avatar_default_4.png',
-    apple: '/assets/images/avatar_default_4.png',
+    icon: '/assets/images/logo/logo-icon.png',
+    apple: '/assets/images/logo/logo-icon.png',
   },
   manifest: '/manifest.json',
   appleWebApp: {
@@ -64,7 +64,7 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/assets/images/avatar_default_4.png" />
+        <link rel="apple-touch-icon" href="/assets/images/logo/logo-icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="HiNobody" />

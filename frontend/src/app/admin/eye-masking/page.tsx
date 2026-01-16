@@ -96,12 +96,12 @@ export default function AdminEyeMaskingPage() {
       key: "image",
       header: t("image"),
       render: (_: any, row: EyeMaskedImage) => (
-        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 cursor-pointer" onClick={() => window.open(row.url, "_blank")}>
+        <div className="relative w-32 h-12 rounded-lg overflow-hidden border border-gray-200 cursor-pointer" onClick={() => window.open(row.url, "_blank")}>
           <Image
             src={row.url}
             alt="Eye masked image"
             fill
-            className="object-cover"
+            className="object-containt"
             unoptimized
           />
         </div>

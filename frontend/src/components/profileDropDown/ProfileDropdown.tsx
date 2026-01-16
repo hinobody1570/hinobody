@@ -90,7 +90,7 @@ export default function ProfileDropdown() {
       <button onClick={handleViewProfile} className="w-full px-4 py-3 hover:bg-gray-50 transition flex items-center gap-3 cursor-pointer">
         <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center flex-shrink-0">
           {/* <span className="text-white text-lg font-bold">R</span> */}
-          <Image width={50} height={50} src={user?.avatar ?? AvatarImage} alt="avatar" className="h-8 w-8" />
+          <Image width={50} height={50} src={user?.avatar ?? AvatarImage} alt="avatar" className="rounded-full h-8 w-8" />
         </div>
         <div className="text-left">
           <p className="text-sm font-medium text-gray-900">{t("viewProfile")}</p>
