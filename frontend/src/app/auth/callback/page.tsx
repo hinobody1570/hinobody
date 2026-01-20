@@ -16,8 +16,8 @@ export default function AuthCallback() {
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    const userParam = searchParams.get("user");
+    const token = searchParams?.get("token");
+    const userParam = searchParams?.get("user");
 
     if (token && userParam) {
       try {

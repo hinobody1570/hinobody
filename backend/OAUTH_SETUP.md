@@ -16,7 +16,9 @@ GOOGLE_CALLBACK_URL=http://localhost:3001/auth/google/callback
 APPLE_CLIENT_ID=your-apple-client-id
 APPLE_TEAM_ID=your-apple-team-id
 APPLE_KEY_ID=your-apple-key-id
-APPLE_KEY_FILE_PATH=./path/to/AuthKey_XXXXXXXXXX.p8
+APPLE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----
+YOUR_PRIVATE_KEY_CONTENT_HERE
+-----END PRIVATE KEY-----
 
 # Frontend URL (for OAuth redirects)
 FRONTEND_URL=http://localhost:3000
@@ -46,7 +48,11 @@ FRONTEND_URL=http://localhost:3000
 8. Configure the Service ID:
    - Add your callback URL: `http://localhost:3001/auth/apple/callback`
    - Add your domain
-9. Add the credentials to your `.env` file
+9. Add the credentials to your `.env` file:
+   - Copy the entire private key content from the `.p8` file (including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----` lines)
+   - Add it as `APPLE_PRIVATE_KEY` in your `.env` file. You can either:
+     * Use a single line with `\n` for line breaks: `APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nKEY_CONTENT\n-----END PRIVATE KEY-----"`
+     * Or paste the key directly (some .env parsers support multi-line values in quotes)
 
 ## Frontend Environment Variables
 

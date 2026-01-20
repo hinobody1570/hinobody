@@ -185,12 +185,26 @@ export class AuthController {
     }
 
     const callbackURL = process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
-    const redirectURI = encodeURIComponent(callbackURL);
+    
+    // Debug logging (remove in production or use proper logger)
+    console.log('Apple OAuth Debug:', {
+      clientID,
+      callbackURL,
+      teamID: process.env.APPLE_TEAM_ID ? 'Set' : 'Missing',
+      keyID: process.env.APPLE_KEY_ID ? 'Set' : 'Missing',
+      privateKey: process.env.APPLE_PRIVATE_KEY ? 'Set' : 'Missing',
+    });
+    
+    // Ensure callback URL doesn't have trailing slash and matches exactly
+    const normalizedCallbackURL = callbackURL.replace(/\/$/, '');
+    const redirectURI = encodeURIComponent(normalizedCallbackURL);
     const state = Math.random().toString(36).substring(7); // Generate state for CSRF protection
     
-    // Store state in session or return it to client
-    // For now, we'll include it in the redirect
-    const appleAuthURL = `https://appleid.apple.com/auth/authorize?client_id=${clientID}&redirect_uri=${redirectURI}&response_type=code&scope=email%20name&state=${state}&response_mode=form_post`;
+    // Build Apple authorization URL
+    // Note: For localhost, Apple requires exact match in Service ID configuration
+    const appleAuthURL = `https://appleid.apple.com/auth/authorize?client_id=${encodeURIComponent(clientID)}&redirect_uri=${redirectURI}&response_type=code&scope=email%20name&state=${state}&response_mode=form_post`;
+    
+    console.log('Redirecting to Apple:', appleAuthURL);
     
     res.redirect(appleAuthURL);
   }
@@ -254,17 +268,25 @@ export class AuthController {
     const clientID = process.env.APPLE_CLIENT_ID;
     const teamID = process.env.APPLE_TEAM_ID;
     const keyID = process.env.APPLE_KEY_ID;
-    const keyFilePath = process.env.APPLE_KEY_FILE_PATH;
+    let privateKey = process.env.APPLE_PRIVATE_KEY || '';
     const callbackURL = process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
 
-    if (!clientID || !teamID || !keyID || !keyFilePath) {
+    if (!clientID || !teamID || !keyID || !privateKey) {
       throw new Error('Apple OAuth credentials not fully configured');
     }
 
-    // Read the private key file
-    const fs = require('fs');
-    const path = require('path');
-    const privateKey = fs.readFileSync(path.resolve(keyFilePath), 'utf8');
+    // Normalize private key newlines for Windows compatibility
+    if (privateKey.includes('\\n')) {
+      privateKey = privateKey.replace(/\\n/g, '\n');
+    }
+    
+    // Ensure proper formatting if key is on single line
+    if (privateKey && !privateKey.includes('\n') && privateKey.includes('-----')) {
+      privateKey = privateKey
+        .replace(/-----BEGIN PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----\n')
+        .replace(/-----END PRIVATE KEY-----/g, '\n-----END PRIVATE KEY-----')
+        .replace(/\n+/g, '\n');
+    }
 
     // Create client secret (JWT)
     const jwt = require('jsonwebtoken');
@@ -276,7 +298,7 @@ export class AuthController {
         aud: 'https://appleid.apple.com',
         sub: clientID,
       },
-      privateKey,
+      privateKey.trim(),
       {
         algorithm: 'ES256',
         keyid: keyID,
@@ -304,5 +326,54 @@ export class AuthController {
     }
 
     return response.json();
+  }
+
+  @Get('apple/debug')
+  @ApiOperation({ summary: 'Debug Apple OAuth configuration (development only)' })
+  @ApiResponse({ status: 200, description: 'Returns configuration status' })
+  async appleDebug() {
+    const clientID = process.env.APPLE_CLIENT_ID;
+    const teamID = process.env.APPLE_TEAM_ID;
+    const keyID = process.env.APPLE_KEY_ID;
+    const privateKey = process.env.APPLE_PRIVATE_KEY;
+    const callbackURL = process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
+
+    const config = {
+      clientID: clientID ? (clientID.length > 0 ? '✓ Set' : '✗ Empty') : '✗ Missing',
+      teamID: teamID ? '✓ Set' : '✗ Missing',
+      keyID: keyID ? '✓ Set' : '✗ Missing',
+      privateKey: privateKey ? (privateKey.length > 0 ? '✓ Set' : '✗ Empty') : '✗ Missing',
+      callbackURL,
+      privateKeyLength: privateKey ? privateKey.length : 0,
+      privateKeyStartsWith: privateKey ? privateKey.substring(0, 30) + '...' : 'N/A',
+      privateKeyEndsWith: privateKey && privateKey.length > 30 ? '...' + privateKey.substring(privateKey.length - 30) : 'N/A',
+      hasNewlines: privateKey ? privateKey.includes('\n') : false,
+      hasEscapedNewlines: privateKey ? privateKey.includes('\\n') : false,
+    };
+
+    // Don't expose full private key in response
+    const safeConfig = {
+      ...config,
+      privateKey: privateKey ? '✓ Present (hidden for security)' : '✗ Missing',
+    };
+
+    return {
+      message: 'Apple OAuth Configuration Status',
+      config: safeConfig,
+      allConfigured: !!(clientID && teamID && keyID && privateKey),
+      troubleshooting: {
+        invalidClientError: [
+          '1. Verify your Service ID exists in Apple Developer Portal',
+          '2. Ensure "Sign in with Apple" is enabled for the Service ID',
+          `3. Check that the callback URL "${callbackURL}" is added to your Service ID\'s Return URLs`,
+          '4. Verify you\'re using a Service ID (not App ID) for web authentication',
+          '5. Wait a few minutes after making changes in Apple Developer Portal (changes can take time to propagate)',
+        ],
+        callbackUrlMismatch: [
+          `Make sure "${callbackURL}" exactly matches (including http:// and no trailing slash)`,
+          'what you configured in Apple Developer Portal > Service ID > Return URLs',
+        ],
+      },
+    };
   }
 }
