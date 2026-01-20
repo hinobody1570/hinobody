@@ -17,6 +17,7 @@ import { useToast } from "@/contexts/ToastContext";
 const ResetPassword = () => {
   const t = useTranslations("auth.resetPasswordPage");
   const tToast = useTranslations("toast");
+  const tReset = useTranslations("resetPassword");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showSuccess, showError } = useToast();
@@ -34,7 +35,7 @@ const ResetPassword = () => {
       setResetToken(token);
     } else {
       // If no token, show error toast
-      showError("Invalid or missing reset token. Please request a new password reset.");
+      showError(tReset('invalidToken'));
     }
   }, [searchParams, showError]);
 
@@ -68,7 +69,7 @@ const ResetPassword = () => {
 
   const handlePasswordReset = async () => {
     if (!resetToken) {
-      showError("Invalid or missing reset token. Please request a new password reset.");
+      showError(tReset('invalidToken'));
       return;
     }
 

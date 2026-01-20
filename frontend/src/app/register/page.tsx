@@ -95,8 +95,13 @@ export default function SignupForm() {
 
       // Success - show toast and redirect
       showSuccess(tToast("registerSuccess"));
+      
+      // Store email for verification page
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pending_verification_email", formData.email!);
+      }
+      
       setIsSubmitted(true);
-
       
     } catch (error: any) {
       // Handle API errors
@@ -120,8 +125,8 @@ export default function SignupForm() {
       <ConfirmationMessage 
         message={tAuth("registrationSuccessful")} 
         title={t("accountCreatedTitle")} 
-        buttonTitle="Login"
-        onClick={()=> router.push(ROUTE_PATHS.DEFAULT)}
+        buttonTitle="Verify Email"
+        onClick={()=> router.push(`${ROUTE_PATHS.VERIFY_EMAIL}?email=${encodeURIComponent(formData.email!)}`)}
       />
     );
   }

@@ -5,6 +5,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { s3Api } from "@/lib/api";
 import { useToast } from "@/contexts/ToastContext";
+import { useTranslations } from "next-intl";
 
 interface QuillEditorProps {
   value?: string;
@@ -15,6 +16,7 @@ const RichTextEditor = ({ value = "", onChange }: QuillEditorProps) => {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const quillRef = useRef<Quill | null>(null);
   const { showError, showSuccess } = useToast();
+  const t = useTranslations('richTextEditor');
 
   useEffect(() => {
     if (!editorRef.current || quillRef.current) return;
@@ -38,7 +40,7 @@ const RichTextEditor = ({ value = "", onChange }: QuillEditorProps) => {
 
     quillRef.current = new Quill(editorRef.current, {
       theme: "snow",
-      placeholder: "Write something...",
+      placeholder: t('placeholder'),
       modules: {
         toolbar: {
           container: toolbarOptions,
@@ -56,41 +58,43 @@ const RichTextEditor = ({ value = "", onChange }: QuillEditorProps) => {
 
                 // Validate file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
-                  showError("Image size must be less than 5MB");
+                  showError(t('imageSizeError'));
                   return;
                 }
 
                 // Validate file type
                 if (!file.type.startsWith("image/")) {
-                  showError("Please select a valid image file");
+                  showError(t('invalidImageError'));
                   return;
                 }
 
                 try {
                   // Show loading indicator
                   const range = quillRef.current!.getSelection(true);
-                  quillRef.current!.insertText(range.index, "Uploading image...", "user");
-                  quillRef.current!.setSelection(range.index + 20);
+                  const uploadingText = t('uploadingImage');
+                  quillRef.current!.insertText(range.index, uploadingText, "user");
+                  quillRef.current!.setSelection(range.index + uploadingText.length);
 
                   // Upload to S3
                   const uploadResult = await s3Api.uploadFile(file, "uploads/contractor");
 
                   // Remove loading text
-                  quillRef.current!.deleteText(range.index, 20);
+                  quillRef.current!.deleteText(range.index, uploadingText.length);
 
                   // Insert image into editor
                   const index = range.index;
                   quillRef.current!.insertEmbed(index, "image", uploadResult.url);
                   quillRef.current!.setSelection(index + 1);
 
-                  showSuccess("Image uploaded successfully!");
+                  showSuccess(t('imageUploadSuccess'));
                 } catch (error: any) {
                   // Remove loading text
                   const currentRange = quillRef.current!.getSelection();
                   if (currentRange) {
-                    quillRef.current!.deleteText(currentRange.index - 20, 20);
+                    const uploadingText = t('uploadingImage');
+                    quillRef.current!.deleteText(currentRange.index - uploadingText.length, uploadingText.length);
                   }
-                  showError(error?.message || "Failed to upload image. Please try again.");
+                  showError(error?.message || t('imageUploadError'));
                 }
               };
             },
@@ -103,7 +107,7 @@ const RichTextEditor = ({ value = "", onChange }: QuillEditorProps) => {
       const html = editorRef.current!.querySelector(".ql-editor")?.innerHTML || "";
       onChange?.(html);
     });
-  }, [onChange, showError, showSuccess]);
+  }, [onChange, showError, showSuccess, t]);
 
   useEffect(() => {
     if (quillRef.current && value !== quillRef.current.root.innerHTML) {

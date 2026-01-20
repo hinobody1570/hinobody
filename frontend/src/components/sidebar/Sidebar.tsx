@@ -31,34 +31,34 @@ const RedditSidebar = () => {
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
-    { icon: CgArrowTopRightO, label: t("popular"), navigate: "" },
-    { icon: PiCirclesThree, label: t("explore"), navigate: "" },
-    { icon: BiBarChartSquare, label: t("all"), navigate: "" },
+    // { icon: CgArrowTopRightO, label: t("popular"), navigate: "" },
+    // { icon: PiCirclesThree, label: t("explore"), navigate: "" },
+    // { icon: BiBarChartSquare, label: t("all"), navigate: "" },
     { icon: FaPlus, label: t("startCommunity"), navigate: "" },
   ];
 
-  const GAMES_MENU = [
-    { icon: IoHomeOutline, label: t("farmMergeValley"), navigate: "" },
-    { icon: CgArrowTopRightO, label: t("quizPlanet"), navigate: "" },
-    { icon: PiCirclesThree, label: t("swordSupper"), navigate: "" },
-    { icon: BiBarChartSquare, label: t("discoverMoreGames"), navigate: "" },
-  ];
+  // const GAMES_MENU = [
+  //   { icon: IoHomeOutline, label: t("farmMergeValley"), navigate: "" },
+  //   { icon: CgArrowTopRightO, label: t("quizPlanet"), navigate: "" },
+  //   { icon: PiCirclesThree, label: t("swordSupper"), navigate: "" },
+  //   { icon: BiBarChartSquare, label: t("discoverMoreGames"), navigate: "" },
+  // ];
 
-  const RESOURCES_MENU = [
-    { icon: LuSmilePlus, label: t("aboutReddit"), navigate: "" },
-    { icon: MdCampaign, label: t("advertise"), navigate: "" },
-    { icon: IoLogoCodepen, label: t("developerPlatform"), navigate: "" },
-    {
-      icon: PiClockCountdownLight,
-      label: t("redditPro"),
-      badge: t("beta"),
-      navigate: "",
-    },
-    { icon: IoIosHelpCircleOutline, label: t("help"), navigate: "" },
-    { icon: VscBook, label: t("blog"), navigate: "" },
-    { icon: IoBagRemoveSharp, label: t("careers"), navigate: "" },
-    { icon: TbMicrophone2, label: t("press"), navigate: "" },
-  ];
+  // const RESOURCES_MENU = [
+  //   { icon: LuSmilePlus, label: t("aboutReddit"), navigate: "" },
+  //   { icon: MdCampaign, label: t("advertise"), navigate: "" },
+  //   { icon: IoLogoCodepen, label: t("developerPlatform"), navigate: "" },
+  //   {
+  //     icon: PiClockCountdownLight,
+  //     label: t("redditPro"),
+  //     badge: t("beta"),
+  //     navigate: "",
+  //   },
+  //   { icon: IoIosHelpCircleOutline, label: t("help"), navigate: "" },
+  //   { icon: VscBook, label: t("blog"), navigate: "" },
+  //   { icon: IoBagRemoveSharp, label: t("careers"), navigate: "" },
+  //   { icon: TbMicrophone2, label: t("press"), navigate: "" },
+  // ];
 
   return (
     <div className="flex">
@@ -75,7 +75,6 @@ const RedditSidebar = () => {
                 {...item}
                 onClick={() => {
                   if (item.label === t("startCommunity")) {
-                    console.log("true............")
                     setIsCommunityPopupOpen(true);
                   } else {
                     router.push(item?.navigate);
@@ -86,37 +85,37 @@ const RedditSidebar = () => {
           </nav>
 
           {/* Games Section */}
-          <CollapsibleSection title={t("gamesOnReddit")}>
+          {/* <CollapsibleSection title={t("gamesOnReddit")}>
             <nav className="flex flex-col gap-2 mt-4">
               {GAMES_MENU.map((item, index) => (
                 <MenuItem key={index} {...item} />
               ))}
             </nav>
-          </CollapsibleSection>
+          </CollapsibleSection> */}
 
           {/* Custom Feeds */}
-          <CollapsibleSection title={t("customFeeds")}>
+          {/* <CollapsibleSection title={t("customFeeds")}>
             <MenuItem icon={FaPlus} label={t("createCustomFeed")} />
-          </CollapsibleSection>
+          </CollapsibleSection> */}
 
           {/* Communities */}
-          <CollapsibleSection title={t("communities")} defaultOpen>
+          {/* <CollapsibleSection title={t("communities")} defaultOpen>
             <MenuItem icon={IoMdSettings} label={t("manageCommunities")} />
-          </CollapsibleSection>
+          </CollapsibleSection> */}
 
           {/* Resources */}
-          <CollapsibleSection title={t("resources")} defaultOpen>
+          {/* <CollapsibleSection title={t("resources")} defaultOpen>
             <nav className="flex flex-col gap-2 mt-4">
               {RESOURCES_MENU.map((item, index) => (
                 <MenuItem key={index} {...item} />
               ))}
             </nav>
-          </CollapsibleSection>
+          </CollapsibleSection> */}
 
           {/* Bottom */}
-          <div className="border-t border-gray-200 pt-2">
+          {/* <div className="border-t border-gray-200 pt-2">
             <MenuItem icon={FaRegUserCircle} label={t("communities")} />
-          </div>
+          </div> */}
         </div>
       </aside>
 

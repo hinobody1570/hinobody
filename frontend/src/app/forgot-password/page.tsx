@@ -137,7 +137,7 @@ export default function ForgotPassword() {
 
           <button
             onClick={() => console.log("Open email app")}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition mb-3"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition mb-3 cursor-pointer"
           >
             {t("openEmailApp")}
           </button>
@@ -146,7 +146,7 @@ export default function ForgotPassword() {
             <p className="text-sm text-gray-600 mb-2">{t("didntReceiveEmail")}</p>
             <button 
               onClick={handleEmailSubmit} 
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
               disabled={isLoading}
             >
               {isLoading ? t("sending") : t("resendEmail")}

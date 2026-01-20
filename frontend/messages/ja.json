@@ -17,8 +17,19 @@
     "forgotPasswordError": "リセットメールの送信に失敗しました。もう一度お試しください。",
     "resetPasswordSuccess": "パスワードリセット成功！新しいパスワードでログインできるようになりました。",
     "resetPasswordError": "パスワードリセットに失敗しました。もう一度お試しください。",
+    "emailVerified": "メールアドレスが正常に確認されました！",
+    "verificationFailed": "確認コードが無効です。もう一度お試しください。",
+    "otpResent": "確認コードが正常に再送信されました！",
+    "resendFailed": "コードの再送信に失敗しました。もう一度お試しください。",
     "postSuccess": "投稿が正常に作成されました！",
-    "postError": "投稿の作成に失敗しました。もう一度お試しください。"
+    "postError": "投稿の作成に失敗しました。もう一度お試しください。",
+    "communityCreatedSuccess": "コミュニティが正常に作成されました！",
+    "communityCreatedError": "コミュニティの作成に失敗しました。もう一度お試しください。",
+    "joinedBoard": "ボードに正常に参加しました！",
+    "leftBoard": "ボードから正常に退出しました",
+    "joinRequestPending": "参加リクエストが送信されました！ボード作成者がリクエストを確認します。",
+    "draftSaved": "下書きが正常に保存されました！",
+    "draftError": "下書きの保存に失敗しました。もう一度お試しください。"
   },
   "eyeMasking": {
     "title": "目の検出とマスキングツール",
@@ -86,8 +97,43 @@
     "create": "作成",
     "ask": "質問"
   },
+  "search": {
+    "searchResults": "検索結果",
+    "all": "すべて",
+    "users": "ユーザー",
+    "posts": "投稿",
+    "boards": "ボード",
+    "noUsersFound": "ユーザーが見つかりません",
+    "noPostsFound": "投稿が見つかりません",
+    "noBoardsFound": "ボードが見つかりません",
+    "noResultsFound": "結果が見つかりません"
+  },
+  "userProfile": {
+    "memberSince": "登録日",
+    "posts": "投稿",
+    "noPosts": "まだ投稿がありません",
+    "backToHome": "ホームに戻る",
+    "edit": "プロフィール編集",
+    "save": "保存",
+    "cancel": "キャンセル"
+  },
+  "boardProfile": {
+    "category": "カテゴリ",
+    "visibility": "公開設定",
+    "created": "作成日",
+    "join": "参加",
+    "joined": "参加済み",
+    "loading": "読み込み中...",
+    "posts": "投稿",
+    "noPosts": "まだ投稿がありません",
+    "backToHome": "ホームに戻る"
+  },
+  "postDetail": {
+    "backToHome": "ホームに戻る"
+  },
   "feed": {
     "best": "ベスト",
+    "allBoards": "すべてのボード",
     "recentPosts": "最近の投稿",
     "clear": "クリア",
     "redditRules": "Redditルール",
@@ -96,6 +142,7 @@
     "accessibility": "アクセシビリティ",
     "redditCopyright": "Reddit, Inc. © 2025. 全著作権所有。",
     "join": "参加",
+    "joined": "参加済み",
     "share": "共有",
     "upvotes": "アップ投票",
     "comments": "コメント"
@@ -211,6 +258,21 @@
       "passwordMinLength8": "パスワードは少なくとも8文字である必要があります",
       "confirmPasswordRequired": "パスワードを確認してください",
       "passwordsDoNotMatch": "パスワードが一致しません"
+    },
+    "verifyEmailPage": {
+      "back": "戻る",
+      "verifyYourEmail": "メールアドレスを確認",
+      "codeSentTo": "6桁のコードを次のアドレスに送信しました",
+      "enterVerificationCode": "確認コードを入力",
+      "verifyEmail": "メールアドレスを確認",
+      "verifying": "確認中...",
+      "didntReceiveCode": "コードが届いていませんか？",
+      "resendCode": "コードを再送信",
+      "resendCodeIn": "再送信",
+      "codeRequired": "6桁のコードをすべて入力してください",
+      "emailNotFound": "メールアドレスが見つかりません。再度登録してください。",
+      "emailVerifiedTitle": "メールアドレスが確認されました！",
+      "emailVerifiedMessage": "メールアドレスが正常に確認されました。アカウントにアクセスできるようになりました。"
     }
   },
   "dashboard": {
@@ -348,7 +410,87 @@
     "characters": "文字",
     "titleRequired": "タイトルは必須です",
     "bodyRequired": "本文内容は必須です",
-    "communityRequired": "コミュニティを選択してください"
+    "communityRequired": "コミュニティを選択してください",
+    "draftEmpty": "下書きには少なくともタイトルまたは本文が必要です",
+    "untitledDraft": "タイトルなしの下書き",
+    "saving": "保存中..."
+  },
+  "comments": {
+    "joinConversation": "会話に参加する",
+    "loginToComment": "コメントするにはログインしてください",
+    "posting": "投稿中...",
+    "post": "投稿",
+    "sortBy": "並び替え:",
+    "searchComments": "コメントを検索",
+    "loadingComments": "コメントを読み込み中...",
+    "noCommentsYet": "まだコメントがありません。最初のコメントを投稿してください！",
+    "noCommentsFound": "検索に一致するコメントが見つかりませんでした。",
+    "loadingMoreComments": "さらにコメントを読み込み中...",
+    "noMoreComments": "これ以上読み込むコメントはありません",
+    "pleaseLoginToComment": "コメントするにはログインしてください",
+    "pleaseEnterComment": "コメントを入力してください",
+    "commentAddedSuccess": "コメントが正常に追加されました！",
+    "commentAddError": "コメントの追加に失敗しました。もう一度お試しください。",
+    "failedToLoadComments": "コメントの読み込みに失敗しました",
+    "reply": "返信",
+    "award": "賞",
+    "share": "共有",
+    "edited": "編集済み",
+    "enterReply": "返信を入力",
+    "loginToReply": "返信するにはログインしてください",
+    "cancel": "キャンセル",
+    "pleaseLoginToReply": "返信するにはログインしてください",
+    "pleaseEnterReply": "返信を入力してください",
+    "replyAddedSuccess": "返信が正常に追加されました！",
+    "replyAddError": "返信の追加に失敗しました。もう一度お試しください。",
+    "voteError": "投票に失敗しました。もう一度お試しください。",
+    "hide": "非表示",
+    "report": "報告",
+    "pleaseLoginToReport": "このコメントを報告するにはログインしてください",
+    "aboutThisAd": "この広告について",
+    "tiredOfAds": "広告にうんざりしていませんか？",
+    "anonymous": "匿名",
+    "best": "ベスト"
+  },
+  "postCard": {
+    "report": "報告",
+    "reportPost": "投稿を報告",
+    "reportComment": "コメントを報告",
+    "reportSubmittedSuccess": "報告が正常に送信されました。コミュニティを安全に保つためにご協力いただき、ありがとうございます。",
+    "pleaseLoginToReport": "この投稿を報告するにはログインしてください",
+    "reasonForReporting": "報告理由",
+    "reasonPlaceholder": "このコンテンツを報告する詳細な理由を提供してください...",
+    "pleaseProvideReason": "報告理由を提供してください",
+    "reasonMinLength": "理由は少なくとも10文字である必要があります",
+    "minimumCharactersRequired": "最低10文字必要",
+    "cancel": "キャンセル",
+    "submitting": "送信中...",
+    "submitReport": "報告を送信",
+    "failedToSubmitReport": "報告の送信に失敗しました。もう一度お試しください。"
+  },
+  "resetPassword": {
+    "invalidToken": "無効または欠落しているリセットトークンです。新しいパスワードリセットをリクエストしてください。"
+  },
+  "joinBoard": {
+    "title": "投稿するにはボードに参加してください",
+    "tryingToPost": "次のボードに投稿しようとしています",
+    "publicMessage": "投稿する前にこのボードに参加する必要があります。「参加」をクリックしてメンバーになりましょう。",
+    "privateMessage": "投稿する前にこのボードに参加する必要があります。リクエストはボード作成者に承認のために送信されます。",
+    "defaultMessage": "投稿する前にこのボードに参加する必要があります。",
+    "joinedSuccess": "ボードに正常に参加しました！これで投稿できます。",
+    "joinRequestSubmitted": "参加リクエストが送信されました！ボード作成者がリクエストを確認します。",
+    "joinError": "ボードへの参加に失敗しました。もう一度お試しください。",
+    "cancel": "キャンセル",
+    "join": "参加",
+    "joining": "参加中..."
+  },
+  "richTextEditor": {
+    "placeholder": "何か書いてください...",
+    "uploadingImage": "画像をアップロード中...",
+    "imageSizeError": "画像サイズは5MB未満である必要があります",
+    "invalidImageError": "有効な画像ファイルを選択してください",
+    "imageUploadSuccess": "画像が正常にアップロードされました！",
+    "imageUploadError": "画像のアップロードに失敗しました。もう一度お試しください。"
   },
   "profileDropdown": {
     "viewProfile": "プロフィールを表示",

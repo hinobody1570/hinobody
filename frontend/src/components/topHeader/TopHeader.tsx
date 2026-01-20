@@ -25,11 +25,11 @@ export const RedditHeader = () => {
   const [profileDropdown, setProfileDropDown] = useState(false);
 
   const headerActions = [
-    { icon: BsBadgeAd, onClick: () => console.log("Ads") },
-    { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
+    // { icon: BsBadgeAd, onClick: () => console.log("Ads") },
+    // { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
     { icon: VscDiffAdded, label: t("create"), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
-    { icon: BsBell, onClick: () => console.log("Notifications") },
-    { icon: LuCamera, onClick: ()=> router.push(ROUTE_PATHS.EYE_MASKING)} 
+    // { icon: BsBell, onClick: () => console.log("Notifications") },
+    { icon: LuCamera, label: "Eye mask", onClick: ()=> router.push(ROUTE_PATHS.EYE_MASKING)} 
   ];
 
   useEffect(() => {

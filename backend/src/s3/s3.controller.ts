@@ -6,12 +6,13 @@ import {
   Param,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
   Query,
   UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -118,6 +119,63 @@ export class S3Controller {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getAllFiles(@Query() listFilesDto: ListFilesDto) {
     return this.s3Service.getAllFiles(listFilesDto.prefix);
+  }
+
+  @Post('upload/bulk')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor('files', 10)) // Allow up to 10 files
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Upload multiple files to S3' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'Files to upload (multiple files allowed)',
+        },
+        folder: {
+          type: 'string',
+          description: 'Optional folder path in S3 bucket',
+          example: 'eye-masked-images',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Files uploaded successfully',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          key: { type: 'string', example: 'eye-masked-images/1234567890-abc123.jpg' },
+          url: {
+            type: 'string',
+            example:
+              'https://bucket.s3.region.amazonaws.com/eye-masked-images/1234567890-abc123.jpg',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - No files provided or invalid files',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async uploadFiles(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Query() uploadFileDto: UploadFileDto,
+  ) {
+    return this.s3Service.uploadFiles(files, uploadFileDto.folder || 'uploads/contractor');
   }
 
   @Delete('files/:key')

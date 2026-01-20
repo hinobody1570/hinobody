@@ -17,10 +17,19 @@
     "forgotPasswordError": "发送重置电子邮件失败。请重试。",
     "resetPasswordSuccess": "密码重置成功！您现在可以使用新密码登录。",
     "resetPasswordError": "重置密码失败。请重试。",
+    "emailVerified": "电子邮件验证成功！",
+    "verificationFailed": "验证代码无效。请重试。",
+    "otpResent": "验证代码已成功重新发送！",
+    "resendFailed": "重新发送代码失败。请重试。",
     "postSuccess": "帖子创建成功！",
     "postError": "创建帖子失败。请重试。",
     "communityCreatedSuccess": "社区创建成功！",
-    "communityCreatedError": "创建社区失败。请重试。"
+    "communityCreatedError": "创建社区失败。请重试。",
+    "joinedBoard": "成功加入板块！",
+    "leftBoard": "成功离开板块",
+    "joinRequestPending": "已提交加入请求！板块创建者将审核您的请求。",
+    "draftSaved": "草稿保存成功！",
+    "draftError": "保存草稿失败。请重试。"
   },
   "eyeMasking": {
     "title": "眼睛检测和遮罩工具",
@@ -88,8 +97,43 @@
     "create": "创建",
     "ask": "提问"
   },
+  "search": {
+    "searchResults": "搜索结果",
+    "all": "全部",
+    "users": "用户",
+    "posts": "帖子",
+    "boards": "看板",
+    "noUsersFound": "未找到用户",
+    "noPostsFound": "未找到帖子",
+    "noBoardsFound": "未找到看板",
+    "noResultsFound": "未找到结果"
+  },
+  "userProfile": {
+    "memberSince": "注册时间",
+    "posts": "帖子",
+    "noPosts": "还没有帖子",
+    "backToHome": "返回首页",
+    "edit": "编辑资料",
+    "save": "保存",
+    "cancel": "取消"
+  },
+  "boardProfile": {
+    "category": "分类",
+    "visibility": "可见性",
+    "created": "创建时间",
+    "join": "加入",
+    "joined": "已加入",
+    "loading": "加载中...",
+    "posts": "帖子",
+    "noPosts": "还没有帖子",
+    "backToHome": "返回首页"
+  },
+  "postDetail": {
+    "backToHome": "返回首页"
+  },
   "feed": {
     "best": "最佳",
+    "allBoards": "所有看板",
     "recentPosts": "最近帖子",
     "clear": "清除",
     "redditRules": "Reddit 规则",
@@ -98,6 +142,7 @@
     "accessibility": "无障碍",
     "redditCopyright": "Reddit, Inc. © 2025. 保留所有权利。",
     "join": "加入",
+    "joined": "已加入",
     "share": "分享",
     "upvotes": "赞",
     "comments": "评论"
@@ -213,6 +258,21 @@
       "passwordMinLength8": "密码必须至少 8 个字符",
       "confirmPasswordRequired": "请确认您的密码",
       "passwordsDoNotMatch": "密码不匹配"
+    },
+    "verifyEmailPage": {
+      "back": "返回",
+      "verifyYourEmail": "验证您的电子邮件",
+      "codeSentTo": "我们已向以下地址发送了 6 位数字代码",
+      "enterVerificationCode": "输入验证代码",
+      "verifyEmail": "验证电子邮件",
+      "verifying": "验证中...",
+      "didntReceiveCode": "没有收到代码？",
+      "resendCode": "重新发送代码",
+      "resendCodeIn": "重新发送代码",
+      "codeRequired": "请输入完整的 6 位数字代码",
+      "emailNotFound": "找不到电子邮件。请重新注册。",
+      "emailVerifiedTitle": "电子邮件已验证！",
+      "emailVerifiedMessage": "您的电子邮件已成功验证。您现在可以访问您的账户。"
     }
   },
   "dashboard": {
@@ -350,7 +410,87 @@
     "characters": "字符",
     "titleRequired": "标题是必填项",
     "bodyRequired": "正文内容是必填项",
-    "communityRequired": "请选择一个社区"
+    "communityRequired": "请选择一个社区",
+    "draftEmpty": "草稿必须至少包含标题或正文",
+    "untitledDraft": "未命名草稿",
+    "saving": "保存中..."
+  },
+  "comments": {
+    "joinConversation": "加入对话",
+    "loginToComment": "登录以评论",
+    "posting": "发布中...",
+    "post": "发布",
+    "sortBy": "排序:",
+    "searchComments": "搜索评论",
+    "loadingComments": "正在加载评论...",
+    "noCommentsYet": "还没有评论。成为第一个评论的人！",
+    "noCommentsFound": "未找到匹配的评论。",
+    "loadingMoreComments": "正在加载更多评论...",
+    "noMoreComments": "没有更多评论可加载",
+    "pleaseLoginToComment": "请登录以评论",
+    "pleaseEnterComment": "请输入评论",
+    "commentAddedSuccess": "评论添加成功！",
+    "commentAddError": "添加评论失败。请重试。",
+    "failedToLoadComments": "加载评论失败",
+    "reply": "回复",
+    "award": "奖励",
+    "share": "分享",
+    "edited": "已编辑",
+    "enterReply": "输入回复",
+    "loginToReply": "登录以回复",
+    "cancel": "取消",
+    "pleaseLoginToReply": "请登录以回复",
+    "pleaseEnterReply": "请输入回复",
+    "replyAddedSuccess": "回复添加成功！",
+    "replyAddError": "添加回复失败。请重试。",
+    "voteError": "投票失败。请重试。",
+    "hide": "隐藏",
+    "report": "举报",
+    "pleaseLoginToReport": "请登录以举报此评论",
+    "aboutThisAd": "关于此广告",
+    "tiredOfAds": "厌倦了广告？",
+    "anonymous": "匿名",
+    "best": "最佳"
+  },
+  "postCard": {
+    "report": "举报",
+    "reportPost": "举报帖子",
+    "reportComment": "举报评论",
+    "reportSubmittedSuccess": "举报已成功提交。感谢您帮助维护社区安全。",
+    "pleaseLoginToReport": "请登录以举报此帖子",
+    "reasonForReporting": "举报原因",
+    "reasonPlaceholder": "请提供举报此内容的详细原因...",
+    "pleaseProvideReason": "请提供举报原因",
+    "reasonMinLength": "原因必须至少10个字符",
+    "minimumCharactersRequired": "至少需要10个字符",
+    "cancel": "取消",
+    "submitting": "提交中...",
+    "submitReport": "提交举报",
+    "failedToSubmitReport": "提交举报失败。请重试。"
+  },
+  "resetPassword": {
+    "invalidToken": "无效或缺失的重置令牌。请请求新的密码重置。"
+  },
+  "joinBoard": {
+    "title": "加入看板以发帖",
+    "tryingToPost": "您正在尝试在以下看板发帖",
+    "publicMessage": "发帖前需要加入此看板。点击'加入'成为会员。",
+    "privateMessage": "发帖前需要加入此看板。您的请求将发送给看板创建者进行审核。",
+    "defaultMessage": "发帖前需要加入此看板。",
+    "joinedSuccess": "成功加入看板！您现在可以发帖了。",
+    "joinRequestSubmitted": "加入请求已提交！看板创建者将审核您的请求。",
+    "joinError": "加入看板失败。请重试。",
+    "cancel": "取消",
+    "join": "加入",
+    "joining": "加入中..."
+  },
+  "richTextEditor": {
+    "placeholder": "写点什么...",
+    "uploadingImage": "正在上传图片...",
+    "imageSizeError": "图片大小必须小于5MB",
+    "invalidImageError": "请选择有效的图片文件",
+    "imageUploadSuccess": "图片上传成功！",
+    "imageUploadError": "图片上传失败。请重试。"
   },
   "profileDropdown": {
     "viewProfile": "查看个人资料",

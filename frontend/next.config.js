@@ -10,6 +10,19 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: [],
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '**',
+      },
+    ],
+    unoptimized: false,
+  },
   // Ensure pages are served fresh in development
   onDemandEntries: {
     // Period (in ms) where the server will keep pages in the buffer

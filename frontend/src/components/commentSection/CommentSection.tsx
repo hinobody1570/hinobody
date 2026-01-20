@@ -1,97 +1,210 @@
-import { useState } from 'react';
+"use client";
+
+import { useState, useEffect, useCallback } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import Comment from './Comment';
+import { commentsApi, Comment as CommentType, Language } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslations } from 'next-intl';
+import DP from '../../../public/assets/images/avatar_default_4.png';
+import { formatTimestamp } from '@/utils/helperFunction';
+
+
+// Transform API comment to Comment component format
+const transformComment = (comment: CommentType, postAuthorId?: string, t?: any): any => {
+  return {
+    id: comment.id,
+    username: comment.author?.nickname || (t ? t('anonymous') : 'Anonymous'),
+    avatar: DP, // Default avatar
+    badge: comment.authorId === postAuthorId ? 'OP' : undefined,
+    timestamp: formatTimestamp(comment.createdAt),
+    text: comment.body,
+    upvotes: comment.upvoteCount || 0,
+    downvotes: comment.downvoteCount || 0,
+    edited: comment.updatedAt !== comment.createdAt,
+    editedTime: comment.updatedAt !== comment.createdAt ? formatTimestamp(comment.updatedAt) : undefined,
+    replies: comment.replies ? comment.replies.map((reply) => transformComment(reply, postAuthorId, t)) : [],
+  };
+};
+
+interface CommentsSectionProps {
+  postId: string;
+  postAuthorId?: string;
+}
 
 // Main Comments Section Component
-export const CommentsSection = () => {
-  const [sortBy, setSortBy] = useState('Best');
+export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
+  const { isAuthenticated } = useAuth();
+  const { showSuccess, showError } = useToast();
+  const { locale } = useLanguage();
+  const t = useTranslations('comments');
+  const [sortBy, setSortBy] = useState(t('best'));
+  const [comments, setComments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
-  const dummyComments = [
-    {
-      id: 1,
-      username: 'AutoModerator',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=automod',
-      badge: 'MOD',
-      timestamp: '1d ago',
-      text: '',
-      upvotes: 0,
-      stickied: true,
-      replies: []
-    },
-    {
-      id: 2,
-      username: 'SoggyVolume1556',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=soggy',
-      badge: 'OP',
-      timestamp: '1d ago',
-      text: '"The war will end, and leaders will shake hands. That old woman will keep waiting for her martyred son. And those children will keep waiting for their hero father. I don\'t know who sold our homeland, but I saw who paid the price." This quote is so true it\'s ironic',
-      upvotes: 369,
-      awards: 2,
-      highlighted: true,
-      replies: [
-        {
-          id: 3,
-          username: 'GootuSnotborn',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=gootu',
-          timestamp: '21h ago',
-          edited: true,
-          editedTime: '20h ago',
-          text: 'This is by Mahmoud Darwish the Palestinian poet.\n\nEdit: spelling',
-          upvotes: 54,
-          replies: [
-            {
-              id: 4,
-              username: 'SoggyVolume1556',
-              avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=soggy',
-              badge: 'OP',
-              timestamp: '21h ago',
-              text: 'Yes it isss',
-              upvotes: 13,
-              replies: []
-            }
-          ]
-        },
-        {
-          id: 5,
-          username: 'Attila___',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=attila',
-          timestamp: '1d ago',
-          text: 'So true 😢',
-          upvotes: 14,
-          replies: []
-        }
-      ]
-    },
-    {
-      id: 6,
-      username: 'eight_BUCKS',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=eight',
-      timestamp: '1d ago',
-      text: 'Handshakes are back?',
-      upvotes: 36,
-      replies: []
+  // Map locale to Language enum
+  const getLanguage = (): Language => {
+    const localeMap: Record<string, Language> = {
+      'en': 'EN',
+      'ko': 'KO',
+      'zh': 'ZH',
+      'ja': 'JA',
+    };
+    return localeMap[locale] || 'EN';
+  };
+
+  const fetchComments = useCallback(async (page: number = 1, append: boolean = false, search?: string) => {
+    if (!postId) {
+      setLoading(false);
+      return;
     }
-  ];
+
+    try {
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+      setError(null);
+      const response = await commentsApi.getByPost(postId, page, 20, search);
+      const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId, t));
+      
+      if (append) {
+        setComments((prev) => [...prev, ...transformedComments]);
+      } else {
+        setComments(transformedComments);
+      }
+      
+      setCurrentPage(page);
+      setHasMore(response.meta.page < response.meta.totalPages);
+    } catch (err: any) {
+      console.error('Error fetching comments:', err);
+      setError(err.message || t('failedToLoadComments'));
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [postId, postAuthorId, t]);
+
+  // Handle search with debounce
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      // If search is cleared, fetch all comments
+      setIsSearching(false);
+      fetchComments(1, false);
+      return;
+    }
+
+    // Debounce search
+    const searchTimer = setTimeout(() => {
+      setIsSearching(true);
+      fetchComments(1, false, searchQuery.trim());
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(searchTimer);
+    };
+  }, [searchQuery, fetchComments]);
+
+  // Load more comments
+  const loadMoreComments = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    await fetchComments(currentPage + 1, true);
+  }, [currentPage, loadingMore, hasMore, fetchComments]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!observerTarget || !hasMore || loadingMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreComments();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(observerTarget);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [observerTarget, hasMore, loadingMore, loading, loadMoreComments]);
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      showError(t('pleaseLoginToComment'));
+      return;
+    }
+
+    if (!newComment.trim()) {
+      showError(t('pleaseEnterComment'));
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await commentsApi.create({
+        body: newComment.trim(),
+        originalLanguage: getLanguage(),
+        postId: postId,
+      });
+      setNewComment('');
+      showSuccess(t('commentAddedSuccess'));
+      // Refresh comments from page 1
+      await fetchComments(1, false);
+    } catch (err: any) {
+      console.error('Error creating comment:', err);
+      showError(err.message || t('commentAddError'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="w-full mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
 
       {/* Comment Input */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Join the conversation"
-          className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-        />
-      </div>
+      <form onSubmit={handleSubmitComment} className="mb-6">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder={isAuthenticated ? t('joinConversation') : t('loginToComment')}
+            disabled={!isAuthenticated || isSubmitting}
+            className="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          />
+          <button
+            type="submit"
+            disabled={!isAuthenticated || isSubmitting || !newComment.trim()}
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? t('posting') : t('post')}
+          </button>
+        </div>
+      </form>
 
       {/* Sort and Search */}
       <div className="flex items-center gap-4 mb-6">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Sort by:</span>
+          <span className="text-sm text-gray-600">{t('sortBy')}</span>
           <button
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors"
-            onClick={() => setSortBy('Best')}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+            onClick={() => setSortBy(t('best'))}
           >
             {sortBy}
             <BiChevronDown size={16} />
@@ -102,18 +215,77 @@ export const CommentsSection = () => {
           <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search Comments"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('searchComments')}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-500">{t('loadingComments')}</div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+          <p className="text-red-600">{error}</p>
+        </div>
+      )}
+
       {/* Comments List */}
-      <div className="space-y-4">
-        {dummyComments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
-        ))}
-      </div>
+      {!loading && !error && comments.length === 0 && (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-500">
+            {isSearching || searchQuery ? t('noCommentsFound') : t('noCommentsYet')}
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <Comment 
+              key={comment.id} 
+              comment={comment}
+              postId={postId}
+              postAuthorId={postAuthorId}
+              onReplyAdded={() => fetchComments(1, false)}
+            />
+          ))}
+          
+          {/* Infinite scroll trigger - only show when not searching */}
+          {!searchQuery && hasMore && (
+            <div ref={setObserverTarget} className="py-4">
+              {loadingMore && (
+                <div className="flex items-center justify-center py-4">
+                  <div className="text-gray-500">{t('loadingMoreComments')}</div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* End of comments message - only show when not searching */}
+          {!searchQuery && !hasMore && comments.length > 0 && (
+            <div className="flex items-center justify-center py-4">
+              <div className="text-gray-500">{t('noMoreComments')}</div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

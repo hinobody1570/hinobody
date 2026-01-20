@@ -17,10 +17,19 @@
     "forgotPasswordError": "Failed to send reset email. Please try again.",
     "resetPasswordSuccess": "Password reset successful! You can now login with your new password.",
     "resetPasswordError": "Failed to reset password. Please try again.",
+    "emailVerified": "Email verified successfully!",
+    "verificationFailed": "Invalid verification code. Please try again.",
+    "otpResent": "Verification code resent successfully!",
+    "resendFailed": "Failed to resend code. Please try again.",
     "postSuccess": "Post created successfully!",
     "postError": "Failed to create post. Please try again.",
     "communityCreatedSuccess": "Community created successfully!",
-    "communityCreatedError": "Failed to create community. Please try again."
+    "communityCreatedError": "Failed to create community. Please try again.",
+    "joinedBoard": "Successfully joined the board!",
+    "leftBoard": "Successfully left the board",
+    "joinRequestPending": "Join request submitted! The board creator will review your request.",
+    "draftSaved": "Draft saved successfully!",
+    "draftError": "Failed to save draft. Please try again."
   },
   "eyeMasking": {
     "title": "Eye Detection & Masking Tool",
@@ -88,8 +97,43 @@
     "create": "Create",
     "ask": "Ask"
   },
+  "search": {
+    "searchResults": "Search results for",
+    "all": "All",
+    "users": "Users",
+    "posts": "Posts",
+    "boards": "Boards",
+    "noUsersFound": "No users found",
+    "noPostsFound": "No posts found",
+    "noBoardsFound": "No boards found",
+    "noResultsFound": "No results found"
+  },
+  "userProfile": {
+    "memberSince": "Member since",
+    "posts": "Posts",
+    "noPosts": "No posts yet",
+    "backToHome": "Back to Home",
+    "edit": "Edit Profile",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "boardProfile": {
+    "category": "Category",
+    "visibility": "Visibility",
+    "created": "Created",
+    "join": "Join",
+    "joined": "Joined",
+    "loading": "Loading...",
+    "posts": "Posts",
+    "noPosts": "No posts yet",
+    "backToHome": "Back to Home"
+  },
+  "postDetail": {
+    "backToHome": "Back to Home"
+  },
   "feed": {
     "best": "Best",
+    "allBoards": "All Boards",
     "recentPosts": "Recent Posts",
     "clear": "Clear",
     "redditRules": "Reddit Rules",
@@ -98,6 +142,7 @@
     "accessibility": "Accessibility",
     "redditCopyright": "Reddit, Inc. © 2025. All rights reserved.",
     "join": "Join",
+    "joined": "Joined",
     "share": "Share",
     "upvotes": "upvotes",
     "comments": "comments"
@@ -140,7 +185,7 @@
     "success": "Success!",
     "loginFailed": "Login failed. Please try again.",
     "registrationFailed": "Registration failed. Please try again.",
-    "registrationSuccessful": "Registration successful! Redirecting to login...",
+    "registrationSuccessful": "Registration successful! Redirecting to verify email...",
     "dontHaveAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
     "emailPlaceholder": "user@example.com",
@@ -217,6 +262,21 @@
       "passwordMinLength8": "Password must be at least 8 characters",
       "confirmPasswordRequired": "Please confirm your password",
       "passwordsDoNotMatch": "Passwords do not match"
+    },
+    "verifyEmailPage": {
+      "back": "Back",
+      "verifyYourEmail": "Verify Your Email",
+      "codeSentTo": "We've sent a 6-digit code to",
+      "enterVerificationCode": "Enter Verification Code",
+      "verifyEmail": "Verify Email",
+      "verifying": "Verifying...",
+      "didntReceiveCode": "Didn't receive the code?",
+      "resendCode": "Resend Code",
+      "resendCodeIn": "Resend code in",
+      "codeRequired": "Please enter the complete 6-digit code",
+      "emailNotFound": "Email not found. Please register again.",
+      "emailVerifiedTitle": "Email Verified!",
+      "emailVerifiedMessage": "Your email has been successfully verified. You can now access your account."
     }
   },
   "dashboard": {
@@ -354,7 +414,87 @@
     "characters": "characters",
     "titleRequired": "Title is required",
     "bodyRequired": "Body content is required",
-    "communityRequired": "Please select a community"
+    "communityRequired": "Please select a community",
+    "draftEmpty": "Draft must have at least a title or body",
+    "untitledDraft": "Untitled Draft",
+    "saving": "Saving..."
+  },
+  "comments": {
+    "joinConversation": "Join the conversation",
+    "loginToComment": "Login to comment",
+    "posting": "Posting...",
+    "post": "Post",
+    "sortBy": "Sort by:",
+    "searchComments": "Search Comments",
+    "loadingComments": "Loading comments...",
+    "noCommentsYet": "No comments yet. Be the first to comment!",
+    "noCommentsFound": "No comments found matching your search.",
+    "loadingMoreComments": "Loading more comments...",
+    "noMoreComments": "No more comments to load",
+    "pleaseLoginToComment": "Please login to comment",
+    "pleaseEnterComment": "Please enter a comment",
+    "commentAddedSuccess": "Comment added successfully!",
+    "commentAddError": "Failed to add comment. Please try again.",
+    "failedToLoadComments": "Failed to load comments",
+    "reply": "Reply",
+    "award": "Award",
+    "share": "Share",
+    "edited": "Edited",
+    "enterReply": "Enter reply",
+    "loginToReply": "Login to reply",
+    "cancel": "Cancel",
+    "pleaseLoginToReply": "Please login to reply",
+    "pleaseEnterReply": "Please enter a reply",
+    "replyAddedSuccess": "Reply added successfully!",
+    "replyAddError": "Failed to add reply. Please try again.",
+    "voteError": "Failed to vote. Please try again.",
+    "hide": "Hide",
+    "report": "Report",
+    "pleaseLoginToReport": "Please login to report this comment",
+    "aboutThisAd": "About this ad",
+    "tiredOfAds": "Tired of ads?",
+    "anonymous": "Anonymous",
+    "best": "Best"
+  },
+  "postCard": {
+    "report": "Report",
+    "reportPost": "Report Post",
+    "reportComment": "Report Comment",
+    "reportSubmittedSuccess": "Report submitted successfully. Thank you for helping keep our community safe.",
+    "pleaseLoginToReport": "Please login to report this post",
+    "reasonForReporting": "Reason for reporting",
+    "reasonPlaceholder": "Please provide a detailed reason for reporting this content...",
+    "pleaseProvideReason": "Please provide a reason for reporting",
+    "reasonMinLength": "Reason must be at least 10 characters long",
+    "minimumCharactersRequired": "Minimum 10 characters required",
+    "cancel": "Cancel",
+    "submitting": "Submitting...",
+    "submitReport": "Submit Report",
+    "failedToSubmitReport": "Failed to submit report. Please try again."
+  },
+  "resetPassword": {
+    "invalidToken": "Invalid or missing reset token. Please request a new password reset."
+  },
+  "joinBoard": {
+    "title": "Join Board to Post",
+    "tryingToPost": "You're trying to post in",
+    "publicMessage": "You need to join this board before posting. Click 'Join' to become a member.",
+    "privateMessage": "You need to join this board before posting. Your request will be sent to the board creator for approval.",
+    "defaultMessage": "You need to join this board before posting.",
+    "joinedSuccess": "Successfully joined the board! You can now post.",
+    "joinRequestSubmitted": "Join request submitted! The board creator will review your request.",
+    "joinError": "Failed to join board. Please try again.",
+    "cancel": "Cancel",
+    "join": "Join",
+    "joining": "Joining..."
+  },
+  "richTextEditor": {
+    "placeholder": "Write something...",
+    "uploadingImage": "Uploading image...",
+    "imageSizeError": "Image size must be less than 5MB",
+    "invalidImageError": "Please select a valid image file",
+    "imageUploadSuccess": "Image uploaded successfully!",
+    "imageUploadError": "Failed to upload image. Please try again."
   },
   "profileDropdown": {
     "viewProfile": "View Profile",

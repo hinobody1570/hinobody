@@ -28,21 +28,27 @@ export class PostService {
       throw new NotFoundException('Board not found');
     }
 
-    // Check if user is an approved member of the board
-    const isMember = await this.boardMemberService.isMember(createPostDto.boardId, userId);
-    if (!isMember) {
-      const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId, userId);
-      
-      if (!membership) {
-        throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
-      } else if (membership.status === 'PENDING') {
-        throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
-      } else if (membership.status === 'REJECTED') {
-        throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+    // If isActive is not provided, default to true (published)
+    // If isActive is false, it's a draft and we skip membership check
+    const isDraft = createPostDto.isActive === false;
+    
+    // Only check membership if posting (not saving as draft)
+    if (!isDraft) {
+      // Check if user is an approved member of the board
+      const isMember = await this.boardMemberService.isMember(createPostDto.boardId, userId);
+      if (!isMember) {
+        const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId, userId);
+        
+        if (!membership) {
+          throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
+        } else if (membership.status === 'PENDING') {
+          throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
+        } else if (membership.status === 'REJECTED') {
+          throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+        }
       }
     }
 
-    // Create post with images and tags
     const post = await this.prisma.post.create({
       data: {
         title: createPostDto.title,
@@ -51,6 +57,7 @@ export class PostService {
         authorId: userId,
         boardId: createPostDto.boardId,
         tags: createPostDto.tags || [],
+        isActive: createPostDto.isActive !== undefined ? createPostDto.isActive : true,
         images: createPostDto.imageIds
           ? {
               connect: createPostDto.imageIds.map((id) => ({ id })),
@@ -139,160 +146,58 @@ export class PostService {
     const { boardId, authorId, page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
 
-    // Build WHERE conditions
-    const conditions: string[] = [
-      '"isActive" = true',
-      '"isDeleted" = false',
-    ];
+    // Use simple Prisma search instead of FTS to avoid requiring search_vector column
+    const where: Prisma.PostWhereInput = {
+      isActive: true,
+      isDeleted: false,
+      ...(boardId && { boardId }),
+      ...(authorId && { authorId }),
+      OR: search
+        ? [
+            {
+              title: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+            {
+              body: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          ]
+        : undefined,
+    };
 
-    const params: any[] = [];
-    const countParams: any[] = [];
-    let paramIndex = 1;
-
-    if (boardId) {
-      conditions.push(`"boardId" = $${paramIndex}`);
-      params.push(boardId);
-      countParams.push(boardId);
-      paramIndex++;
-    }
-
-    if (authorId) {
-      conditions.push(`"authorId" = $${paramIndex}`);
-      params.push(authorId);
-      countParams.push(authorId);
-      paramIndex++;
-    }
-
-    // Add FTS search condition - search parameter will be at current paramIndex
-    const searchParamIndex = paramIndex;
-    params.push(search);
-    countParams.push(search);
-    paramIndex++;
-
-    const whereClause = conditions.join(' AND ');
-    const ftsCondition = `"search_vector" @@ plainto_tsquery('english', $${searchParamIndex})`;
-    const fullWhereClause = `${whereClause} AND ${ftsCondition}`;
-
-    // Build the main query with FTS ranking
-    const postsQuery = `
-      SELECT 
-        p.id,
-        p.title,
-        p.body,
-        p."originalLanguage",
-        p."authorId",
-        p."boardId",
-        p."isActive",
-        p."isDeleted",
-        p."upvoteCount",
-        p."downvoteCount",
-        p."commentCount",
-        p."viewCount",
-        p."createdAt",
-        p."updatedAt",
-        (
-          SELECT json_build_object(
-            'id', u.id,
-            'nickname', u.nickname,
-            'language', u."language"
-          )
-          FROM "users" u
-          WHERE u.id = p."authorId"
-        ) as author,
-        (
-          SELECT json_build_object(
-            'id', b.id,
-            'name', b.name,
-            'slug', b.slug,
-            'description', b.description,
-            'isActive', b."isActive",
-            'createdAt', b."createdAt",
-            'updatedAt', b."updatedAt"
-          )
-          FROM "boards" b
-          WHERE b.id = p."boardId"
-        ) as board,
-        COALESCE(
-          (
-            SELECT json_agg(
-              json_build_object(
-                'id', i.id,
-                'url', i.url,
-                'key', i.key,
-                'postId', i."postId",
-                'userId', i."userId",
-                'size', i.size,
-                'mimeType', i."mimeType",
-                'width', i.width,
-                'height', i.height,
-                'createdAt', i."createdAt"
-              )
-            )
-            FROM (
-              SELECT * FROM "images" 
-              WHERE "postId" = p.id 
-              LIMIT 1
-            ) i
-          ),
-          '[]'::json
-        ) as images,
-        (
-          SELECT COUNT(*)::int
-          FROM "comments" c
-          WHERE c."postId" = p.id
-            AND c."isActive" = true
-            AND c."isDeleted" = false
-        ) as comment_count,
-        (
-          SELECT COUNT(*)::int
-          FROM "votes" v
-          WHERE v."postId" = p.id
-        ) as vote_count
-      FROM "posts" p
-      WHERE ${fullWhereClause}
-      ORDER BY ts_rank(p."search_vector", plainto_tsquery('english', $${searchParamIndex})) DESC, p."createdAt" DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
-
-    params.push(limit, skip);
-
-    // Count query (same WHERE clause, no LIMIT/OFFSET)
-    const countQuery = `
-      SELECT COUNT(*)::int as total
-      FROM "posts" p
-      WHERE ${fullWhereClause}
-    `;
-
-    const [postsResult, countResult] = await Promise.all([
-      this.prisma.$queryRawUnsafe(postsQuery, ...params),
-      this.prisma.$queryRawUnsafe(countQuery, ...countParams),
+    const [posts, total] = await Promise.all([
+      this.prisma.post.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              nickname: true,
+              language: true,
+            },
+          },
+          board: true,
+          images: {
+            take: 1,
+          },
+          _count: {
+            select: {
+              comments: true,
+              votes: true,
+            },
+          },
+        },
+      }),
+      this.prisma.post.count({ where }),
     ]);
-
-    const posts = (postsResult as any[]).map((row: any) => ({
-      id: row.id,
-      title: row.title,
-      body: row.body,
-      originalLanguage: row.originalLanguage,
-      authorId: row.authorId,
-      boardId: row.boardId,
-      isActive: row.isActive,
-      isDeleted: row.isDeleted,
-      upvoteCount: row.upvoteCount,
-      downvoteCount: row.downvoteCount,
-      commentCount: row.commentCount || 0,
-      viewCount: row.viewCount,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      author: row.author,
-      board: row.board,
-      images: Array.isArray(row.images) ? row.images : [],
-      _count: {
-        comments: row.comment_count || 0,
-        votes: row.vote_count || 0,
-      },
-    }));
-
-    const total = (countResult as any[])[0]?.total || 0;
 
     return {
       data: posts,

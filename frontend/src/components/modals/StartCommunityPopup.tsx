@@ -254,7 +254,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
           <button
             type="button"
             onClick={step === 1 ? onClose : handleBack}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
           >
             {step > 1 && <IoChevronBack className="w-4 h-4" />}
             {step === 1 ? t("cancel") : t("back")}
@@ -275,7 +275,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
                 disabled={(step === 1 && !selectedCategory) || (step === 2 && !visibility)}
                 className={`px-6 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
                   (step === 1 && selectedCategory) || (step === 2 && visibility)
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
@@ -288,7 +288,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
                 onClick={handleSubmit}
                 disabled={!name.trim() || isSubmitting}
                 className={`px-6 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  name.trim() && !isSubmitting ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  name.trim() && !isSubmitting ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
                 {isSubmitting ? t("creating") : t("createCommunity")}

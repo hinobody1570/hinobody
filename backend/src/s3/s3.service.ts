@@ -116,6 +116,64 @@ export class S3Service {
   }
 
   /**
+   * Upload multiple files to S3
+   * @param files - Array of files to upload
+   * @param folder - Optional folder path in S3 bucket
+   * @returns Array of objects with key and URL of uploaded files
+   */
+  async uploadFiles(
+    files: Express.Multer.File[],
+    folder?: string,
+  ): Promise<Array<{ key: string; url: string }>> {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No files provided');
+    }
+
+    if (!this.bucketName) {
+      throw new BadRequestException('AWS S3 bucket name is not configured');
+    }
+
+    const uploadPromises = files.map(async (file) => {
+      // Generate unique file name
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const fileExtension = file.originalname.split('.').pop();
+      const fileName = `${timestamp}-${randomString}.${fileExtension}`;
+      const key = folder ? `${folder}/${fileName}` : fileName;
+
+      try {
+        const command = new PutObjectCommand({
+          Bucket: this.bucketName,
+          Key: key,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        });
+
+        await this.s3Client.send(command);
+        this.logger.log(`File uploaded successfully: ${key}`);
+
+        // Generate public URL
+        const url = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${key}`;
+
+        return {
+          key,
+          url,
+        };
+      } catch (error: any) {
+        this.logger.error(
+          `Failed to upload file ${file.originalname} to S3: ${error.message}`,
+          error.stack,
+        );
+        throw new BadRequestException(
+          `Failed to upload file ${file.originalname}: ${error.message || 'Unknown error'}`,
+        );
+      }
+    });
+
+    return Promise.all(uploadPromises);
+  }
+
+  /**
    * Upload a file to S3
    * @param file - The file to upload
    * @param folder - Optional folder path in S3 bucket

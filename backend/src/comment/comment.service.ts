@@ -70,6 +70,82 @@ export class CommentService {
     return comment;
   }
 
+  // Helper function to recursively fetch nested replies
+  private async fetchCommentWithReplies(commentId: string): Promise<any> {
+    const comment = await this.prisma.comment.findUnique({
+      where: { id: commentId },
+      include: {
+        author: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+        _count: {
+          select: {
+            votes: true,
+            replies: true,
+          },
+        },
+      },
+    });
+
+    if (!comment) return null;
+
+    // Fetch direct replies (first level)
+    const directReplies = await this.prisma.comment.findMany({
+      where: {
+        parentId: commentId,
+        isActive: true,
+        isDeleted: false,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+        _count: {
+          select: {
+            votes: true,
+            replies: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+    console.log("reply",directReplies)
+    // Recursively fetch nested replies for each direct reply
+    // This will fetch replies to replies, replies to those replies, etc.
+    // If there are no direct replies, this will be an empty array
+    const repliesWithNested = directReplies.length > 0
+      ? await Promise.all(
+          directReplies.map((reply) => this.fetchCommentWithReplies(reply.id))
+        )
+      : [];
+        console.log("repliesWithNested",repliesWithNested)
+    // Explicitly construct the return object to ensure all properties are included
+    // This ensures nested replies are always included in the response
+    return {
+      id: comment.id,
+      body: comment.body,
+      originalLanguage: comment.originalLanguage,
+      postId: comment.postId,
+      authorId: comment.authorId,
+      parentId: comment.parentId,
+      isActive: comment.isActive,
+      isDeleted: comment.isDeleted,
+      upvoteCount: comment.upvoteCount,
+      downvoteCount: comment.downvoteCount,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      author: comment.author,
+      _count: comment._count,
+      replies: repliesWithNested.filter((r) => r !== null),
+    };
+  }
+
   async findByPost(postId: string, query?: QueryCommentsDto) {
     const { page = 1, limit = 20, search, authorId } = query || {};
     const skip = (page - 1) * limit;
@@ -87,7 +163,7 @@ export class CommentService {
       ...(authorId && { authorId }),
     };
 
-    const [comments, total] = await Promise.all([
+    const [topLevelComments, total] = await Promise.all([
       this.prisma.comment.findMany({
         where,
         skip,
@@ -98,21 +174,6 @@ export class CommentService {
               id: true,
               nickname: true,
             },
-          },
-          replies: {
-            where: {
-              isActive: true,
-              isDeleted: false,
-            },
-            include: {
-              author: {
-                select: {
-                  id: true,
-                  nickname: true,
-                },
-              },
-            },
-            orderBy: { createdAt: 'asc' },
           },
           _count: {
             select: {
@@ -125,9 +186,14 @@ export class CommentService {
       }),
       this.prisma.comment.count({ where }),
     ]);
+    console.log("topLevelComments",topLevelComments)
+    // Fetch nested replies for each top-level comment
+    const commentsWithReplies = await Promise.all(
+      topLevelComments.map((comment) => this.fetchCommentWithReplies(comment.id))
+    );
 
     return {
-      data: comments,
+      data: commentsWithReplies.filter((c) => c !== null),
       meta: {
         total,
         page,
@@ -141,144 +207,50 @@ export class CommentService {
     const { page = 1, limit = 20, search, authorId } = query;
     const skip = (page - 1) * limit;
 
-    const conditions: string[] = [
-      '"postId" = $1',
-      '"isActive" = true',
-      '"isDeleted" = false',
-      '"parentId" IS NULL',
-    ];
+    // Use simple ILIKE search instead of FTS to avoid requiring search_vector column
+    const where: Prisma.CommentWhereInput = {
+      postId,
+      isActive: true,
+      isDeleted: false,
+      parentId: null, // Top-level comments only
+      body: {
+        contains: search,
+        mode: 'insensitive',
+      },
+      ...(authorId && { authorId }),
+    };
 
-    const params: any[] = [postId];
-    const countParams: any[] = [postId];
-    let paramIndex = 2;
-
-    if (authorId) {
-      conditions.push(`"authorId" = $${paramIndex}`);
-      params.push(authorId);
-      countParams.push(authorId);
-      paramIndex++;
-    }
-
-    const searchParamIndex = paramIndex;
-    params.push(search);
-    countParams.push(search);
-    paramIndex++;
-
-    const whereClause = conditions.join(' AND ');
-    const ftsCondition = `"search_vector" @@ plainto_tsquery('english', $${searchParamIndex})`;
-    const fullWhereClause = `${whereClause} AND ${ftsCondition}`;
-
-    const commentsQuery = `
-      SELECT 
-        c.id,
-        c.body,
-        c."originalLanguage",
-        c."postId",
-        c."authorId",
-        c."parentId",
-        c."isActive",
-        c."isDeleted",
-        c."upvoteCount",
-        c."downvoteCount",
-        c."createdAt",
-        c."updatedAt",
-        (
-          SELECT json_build_object(
-            'id', u.id,
-            'nickname', u.nickname
-          )
-          FROM "users" u
-          WHERE u.id = c."authorId"
-        ) as author,
-        (
-          SELECT json_agg(
-            json_build_object(
-              'id', r.id,
-              'body', r.body,
-              'originalLanguage', r."originalLanguage",
-              'postId', r."postId",
-              'authorId', r."authorId",
-              'parentId', r."parentId",
-              'isActive', r."isActive",
-              'isDeleted', r."isDeleted",
-              'upvoteCount', r."upvoteCount",
-              'downvoteCount', r."downvoteCount",
-              'createdAt', r."createdAt",
-              'updatedAt', r."updatedAt",
-              'author', (
-                SELECT json_build_object(
-                  'id', u2.id,
-                  'nickname', u2.nickname
-                )
-                FROM "users" u2
-                WHERE u2.id = r."authorId"
-              )
-            )
-          )
-          FROM (
-            SELECT * FROM "comments" r
-            WHERE r."parentId" = c.id
-              AND r."isActive" = true
-              AND r."isDeleted" = false
-            ORDER BY r."createdAt" ASC
-          ) r
-        ) as replies,
-        (
-          SELECT COUNT(*)::int
-          FROM "comments" r
-          WHERE r."parentId" = c.id
-            AND r."isActive" = true
-            AND r."isDeleted" = false
-        ) as reply_count,
-        (
-          SELECT COUNT(*)::int
-          FROM "votes" v
-          WHERE v."commentId" = c.id
-        ) as vote_count
-      FROM "comments" c
-      WHERE ${fullWhereClause}
-      ORDER BY ts_rank(c."search_vector", plainto_tsquery('english', $${searchParamIndex})) DESC, c."createdAt" ASC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
-
-    params.push(limit, skip);
-
-    const countQuery = `
-      SELECT COUNT(*)::int as total
-      FROM "comments" c
-      WHERE ${fullWhereClause}
-    `;
-
-    const [commentsResult, countResult] = await Promise.all([
-      this.prisma.$queryRawUnsafe(commentsQuery, ...params),
-      this.prisma.$queryRawUnsafe(countQuery, ...countParams),
+    const [topLevelComments, total] = await Promise.all([
+      this.prisma.comment.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          author: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
+          _count: {
+            select: {
+              votes: true,
+              replies: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.comment.count({ where }),
     ]);
 
-    const comments = (commentsResult as any[]).map((row: any) => ({
-      id: row.id,
-      body: row.body,
-      originalLanguage: row.originalLanguage,
-      postId: row.postId,
-      authorId: row.authorId,
-      parentId: row.parentId,
-      isActive: row.isActive,
-      isDeleted: row.isDeleted,
-      upvoteCount: row.upvoteCount,
-      downvoteCount: row.downvoteCount,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      author: row.author,
-      replies: Array.isArray(row.replies) ? row.replies : [],
-      _count: {
-        votes: row.vote_count || 0,
-        replies: row.reply_count || 0,
-      },
-    }));
-
-    const total = (countResult as any[])[0]?.total || 0;
+    // Fetch nested replies for each top-level comment
+    const commentsWithReplies = await Promise.all(
+      topLevelComments.map((comment) => this.fetchCommentWithReplies(comment.id))
+    );
 
     return {
-      data: comments,
+      data: commentsWithReplies.filter((c) => c !== null),
       meta: {
         total,
         page,
