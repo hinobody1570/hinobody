@@ -36,41 +36,10 @@ import { RolesGuard } from './guards/roles.guard';
   providers: [
     AuthService,
     JwtStrategy,
-    {
-      provide: GoogleStrategy,
-      useFactory: (configService: ConfigService) => {
-        const clientID = configService.get<string>('GOOGLE_CLIENT_ID');
-        const clientSecret = configService.get<string>('GOOGLE_CLIENT_SECRET');
-        // Only create GoogleStrategy if credentials are configured
-        if (clientID && clientSecret && clientID !== 'your-google-client-id' && clientSecret !== 'your-google-client-secret') {
-          try {
-            return new GoogleStrategy(configService);
-          } catch (error) {
-            console.warn('Google OAuth strategy creation failed:', error.message);
-            // Return a dummy object that won't be used
-            return { isConfigured: false } as any;
-          }
-        }
-        console.warn('Google OAuth credentials not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env to enable Google login.');
-        // Return a dummy object that won't be used
-        return { isConfigured: false } as any;
-      },
-      inject: [ConfigService],
-    },
-    {
-      provide: AppleStrategy,
-      useFactory: (configService: ConfigService) => {
-        const clientID = configService.get<string>('APPLE_CLIENT_ID');
-        // Only create AppleStrategy if credentials are configured
-        if (clientID && clientID !== 'your-apple-client-id') {
-          return new AppleStrategy(configService);
-        }
-        console.warn('Apple OAuth credentials not configured. Set APPLE_CLIENT_ID in .env to enable Apple login.');
-        // Return a dummy object that won't be used
-        return { isConfigured: false } as any;
-      },
-      inject: [ConfigService],
-    },
+    // Register strategies as normal providers so Nest instantiates them
+    // (Passport registers a strategy when the provider is instantiated).
+    GoogleStrategy,
+    AppleStrategy,
     RolesGuard,
   ],
   exports: [AuthService, RolesGuard],

@@ -135,15 +135,27 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    const result = await this.authService.googleLogin(req.user);
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const token = result.access_token;
-    const user = JSON.stringify(result.user);
+    try {
+      if (!req.user) {
+        throw new Error('No user data received from Google');
+      }
 
-    // Redirect to frontend with token
-    res.redirect(
-      `${frontendUrl}/auth/callback?token=${token}&user=${encodeURIComponent(user)}`,
-    );
+      const result = await this.authService.googleLogin(req.user);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const token = result.access_token;
+      const user = JSON.stringify(result.user);
+
+      // Redirect to frontend with token
+      res.redirect(
+        `${frontendUrl}/auth/callback?token=${token}&user=${encodeURIComponent(user)}`,
+      );
+    } catch (error) {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const errorMessage = error.message || 'Google authentication failed';
+      res.redirect(
+        `${frontendUrl}/auth/callback?error=${encodeURIComponent(errorMessage)}`,
+      );
+    }
   }
 
   @Post('google/mobile')
