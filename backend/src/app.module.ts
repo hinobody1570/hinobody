@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { BlockModule } from './block/block.module';
 import { BoardModule } from './board/board.module';
+import { BoardMemberModule } from './board-member/board-member.module';
 import { CommentModule } from './comment/comment.module';
 import { ImageModule } from './image/image.module';
 import { PostModule } from './post/post.module';
@@ -13,7 +14,6 @@ import { ReportModule } from './report/report.module';
 import { UserModule } from './user/user.module';
 import { S3Module } from './s3/s3.module';
 import { EmailModule } from './email/email.module';
-
 
 @Module({
   imports: [
@@ -27,6 +27,7 @@ import { EmailModule } from './email/email.module';
     AuthModule,
     BlockModule,
     BoardModule,
+    BoardMemberModule,
     CommentModule,
     ImageModule,
     PostModule,
@@ -37,4 +38,3 @@ import { EmailModule } from './email/email.module';
   providers: [AppService],
 })
 export class AppModule {}
-

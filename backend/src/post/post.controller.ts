@@ -9,7 +9,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -36,10 +43,28 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get all posts with pagination and filters' })
-  @ApiQuery({ name: 'boardId', required: false, description: 'Filter by board ID' })
-  @ApiQuery({ name: 'authorId', required: false, description: 'Filter by author ID' })
-  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
-  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
+  @ApiQuery({
+    name: 'boardId',
+    required: false,
+    description: 'Filter by board ID',
+  })
+  @ApiQuery({
+    name: 'authorId',
+    required: false,
+    description: 'Filter by author ID',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Items per page',
+    type: Number,
+  })
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiResponse({ status: 200, description: 'List of posts with pagination' })
   findAll(@Query() query: QueryPostsDto) {
@@ -84,4 +109,3 @@ export class PostController {
     return this.postService.remove(id, userId, role === 'ADMIN');
   }
 }
-

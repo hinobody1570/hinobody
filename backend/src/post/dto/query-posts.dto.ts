@@ -51,5 +51,3 @@ export class QueryPostsDto {
   @IsString()
   search?: string;
 }
-
-

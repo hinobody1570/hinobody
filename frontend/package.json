@@ -3,20 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "cross-env NODE_ENV=development next dev",
+    "dev:fresh": "npm run clean && cross-env NODE_ENV=development next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "powershell -Command \"if (Test-Path .next) { Remove-Item -Recurse -Force .next; Write-Host 'Cache cleared successfully' } else { Write-Host 'No cache to clear' }\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.952.0",
-    "@tensorflow-models/face-landmarks-detection": "^1.0.6",
     "browser-image-compression": "^2.0.2",
+    "face-api.js": "^0.22.2",
     "next": "^16.0.10",
     "next-intl": "^4.6.1",
     "next-pwa": "^5.6.0",
+    "quill": "^2.0.3",
+    "quill-table": "^1.0.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
@@ -24,6 +29,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.23",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.0.10",
     "postcss": "^8.5.6",

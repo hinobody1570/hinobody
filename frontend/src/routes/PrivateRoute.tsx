@@ -1,0 +1,39 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter, usePathname } from '@/i18n/routing';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface PrivateRouteProps {
+  children: React.ReactNode;
+}
+
+export default function PrivateRoute({ children }: PrivateRouteProps) {
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return <>{children}</>;
+}
+

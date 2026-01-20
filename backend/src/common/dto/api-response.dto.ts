@@ -13,4 +13,3 @@ export class ApiResponseDto<T> {
   @ApiProperty({ description: 'Response data' })
   data: T;
 }
-

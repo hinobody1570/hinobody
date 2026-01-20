@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { BlockService } from './block.service';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -12,7 +20,10 @@ export class BlockController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  create(@Body() createBlockDto: CreateBlockDto, @GetUser('id') userId: string) {
+  create(
+    @Body() createBlockDto: CreateBlockDto,
+    @GetUser('id') userId: string,
+  ) {
     return this.blockService.create(createBlockDto, userId);
   }
 
@@ -37,6 +48,3 @@ export class BlockController {
     return this.blockService.remove(blockedId, userId);
   }
 }
-
-
-

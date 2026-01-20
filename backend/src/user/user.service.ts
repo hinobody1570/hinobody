@@ -1,16 +1,26 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { QueryUsersDto } from './dto/query-users.dto';
 import * as bcrypt from 'bcrypt';
-import { User, Language } from '@prisma/client';
+import { User, Language, Prisma } from '@prisma/client';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>> {
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<
+    Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>
+  > {
     const { email, password, nickname, language } = createUserDto;
 
     // Check if email already exists
@@ -67,21 +77,117 @@ export class UserService {
     return user;
   }
 
-  async findAll(): Promise<Omit<User, 'passwordHash'>[]> {
+  async findAll(query: QueryUsersDto) {
+    const { page = 1, limit = 20, search } = query;
+    const skip = (page - 1) * limit;
 
-    const response: any = this.prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        nickname: true,
-        language: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
+    // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
+    if (search) {
+      return this.findAllWithFTS(query);
+    }
+
+    const where: Prisma.UserWhereInput = {};
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+          language: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    });
-    return response
+    };
+  }
+
+  private async findAllWithFTS(query: QueryUsersDto) {
+    const { page = 1, limit = 20, search } = query;
+    const skip = (page - 1) * limit;
+
+    const conditions: string[] = [];
+    const params: any[] = [];
+    const countParams: any[] = [];
+    let paramIndex = 1;
+
+    const searchParamIndex = paramIndex;
+    params.push(search);
+    countParams.push(search);
+    paramIndex++;
+
+    const whereClause = conditions.length > 0 ? conditions.join(' AND ') : '1=1';
+    const ftsCondition = `"search_vector" @@ plainto_tsquery('english', $${searchParamIndex})`;
+    const fullWhereClause = `${whereClause} AND ${ftsCondition}`;
+
+    const usersQuery = `
+      SELECT 
+        u.id,
+        u.email,
+        u.nickname,
+        u."language",
+        u.role,
+        u."isActive",
+        u."createdAt",
+        u."updatedAt"
+      FROM "users" u
+      WHERE ${fullWhereClause}
+      ORDER BY ts_rank(u."search_vector", plainto_tsquery('english', $${searchParamIndex})) DESC, u."createdAt" DESC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `;
+
+    params.push(limit, skip);
+
+    const countQuery = `
+      SELECT COUNT(*)::int as total
+      FROM "users" u
+      WHERE ${fullWhereClause}
+    `;
+
+    const [usersResult, countResult] = await Promise.all([
+      this.prisma.$queryRawUnsafe(usersQuery, ...params),
+      this.prisma.$queryRawUnsafe(countQuery, ...countParams),
+    ]);
+
+    const users = (usersResult as any[]).map((row: any) => ({
+      id: row.id,
+      email: row.email,
+      nickname: row.nickname,
+      language: row.language,
+      role: row.role,
+      isActive: row.isActive,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }));
+
+    const total = (countResult as any[])[0]?.total || 0;
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<Omit<User, 'passwordHash'>> {
@@ -112,10 +218,7 @@ export class UserService {
     });
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<any> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
     const { nickname, language } = updateUserDto;
 
     if (nickname) {
@@ -147,7 +250,6 @@ export class UserService {
     });
   }
 
-
   async remove(id: string): Promise<void> {
     await this.prisma.user.delete({
       where: { id },
@@ -158,7 +260,12 @@ export class UserService {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  async verifyEmail(email: string, otp: string): Promise<Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>> {
+  async verifyEmail(
+    email: string,
+    otp: string,
+  ): Promise<
+    Omit<User, 'passwordHash' | 'emailVerificationOTP' | 'passwordResetToken'>
+  > {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -180,11 +287,13 @@ export class UserService {
     }
 
     if (new Date() > user.otpExpiry) {
-      throw new BadRequestException('OTP has expired. Please request a new one.');
+      throw new BadRequestException(
+        'OTP has expired. Please request a new one.',
+      );
     }
 
     // Verify email and activate account
-    const updatedUser:any = await this.prisma.user.update({
+    const updatedUser: any = await this.prisma.user.update({
       where: { email },
       data: {
         emailVerified: true,
@@ -290,6 +399,3 @@ export class UserService {
     });
   }
 }
-
-
-

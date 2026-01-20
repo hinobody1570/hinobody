@@ -1,8 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ForbiddenException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  ForbiddenException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { QueryUsersDto } from './dto/query-users.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -27,10 +46,13 @@ export class UserController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'List of all users' })
-  findAll() {
-    return this.userService.findAll();
+  @ApiOperation({ summary: 'Get all users with pagination and search' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
+  @ApiQuery({ name: 'search', required: false, description: 'Search term' })
+  @ApiResponse({ status: 200, description: 'List of users with pagination' })
+  findAll(@Query() query: QueryUsersDto) {
+    return this.userService.findAll(query);
   }
 
   @Get(':id')
@@ -78,4 +100,3 @@ export class UserController {
     return this.userService.remove(id);
   }
 }
-

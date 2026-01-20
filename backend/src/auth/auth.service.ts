@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { EmailService } from '../email/email.service';
@@ -19,13 +23,13 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findByEmail(email);
-    
+
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -36,7 +40,9 @@ export class AuthService {
 
     // Check if email is verified
     if (!user.emailVerified) {
-      throw new UnauthorizedException('Please verify your email address before logging in');
+      throw new UnauthorizedException(
+        'Please verify your email address before logging in',
+      );
     }
 
     const { passwordHash, ...result } = user;
@@ -45,9 +51,9 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto.email, loginDto.password);
-    
-    const payload = { 
-      email: user.email, 
+
+    const payload = {
+      email: user.email,
       sub: user.id,
       role: user.role,
     };
@@ -75,7 +81,7 @@ export class AuthService {
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     const { email, otp } = verifyEmailDto;
     const user = await this.userService.verifyEmail(email, otp);
-    
+
     return {
       message: 'Email verified successfully',
       user: {
@@ -91,7 +97,7 @@ export class AuthService {
 
   async resendOtp(resendOtpDto: ResendOtpDto) {
     const { email } = resendOtpDto;
-    
+
     // Check if user exists
     const user = await this.userService.findByEmail(email);
     if (!user) {
@@ -105,10 +111,10 @@ export class AuthService {
 
     // Generate and save new OTP
     await this.userService.resendOTP(email);
-    
+
     // Get updated user to get the new OTP
     const updatedUser = await this.userService.findByEmail(email);
-    
+
     // Send email with new OTP
     if (updatedUser?.emailVerificationOTP) {
       await this.emailService.sendVerificationEmail(
@@ -123,10 +129,10 @@ export class AuthService {
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const { email } = forgotPasswordDto;
-    
+
     // Generate reset token
     const resetToken = await this.userService.generatePasswordResetToken(email);
-    
+
     // If user exists, send reset email
     if (resetToken) {
       const user = await this.userService.findByEmail(email);
@@ -147,14 +153,11 @@ export class AuthService {
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { token, newPassword } = resetPasswordDto;
-    
+
     await this.userService.resetPassword(token, newPassword);
-    
+
     return {
       message: 'Password reset successfully',
     };
   }
 }
-
-
-

@@ -12,7 +12,16 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBearerAuth, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiConsumes,
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { S3Service } from './s3.service';
 import { UploadFileDto } from './dto/upload-file.dto';
 import { ListFilesDto } from './dto/list-files.dto';
@@ -54,17 +63,24 @@ export class S3Controller {
       type: 'object',
       properties: {
         key: { type: 'string', example: 'images/1234567890-abc123.jpg' },
-        url: { type: 'string', example: 'https://bucket.s3.region.amazonaws.com/images/1234567890-abc123.jpg' },
+        url: {
+          type: 'string',
+          example:
+            'https://bucket.s3.region.amazonaws.com/images/1234567890-abc123.jpg',
+        },
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Bad request - No file provided or invalid file' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - No file provided or invalid file',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Query() uploadFileDto: UploadFileDto,
   ) {
-    return this.s3Service.uploadFile(file, uploadFileDto.folder);
+    return this.s3Service.uploadFile(file, "uploads/contractor");
   }
 
   @Get('files')
@@ -87,7 +103,11 @@ export class S3Controller {
         type: 'object',
         properties: {
           key: { type: 'string', example: 'images/1234567890-abc123.jpg' },
-          url: { type: 'string', example: 'https://bucket.s3.region.amazonaws.com/images/1234567890-abc123.jpg' },
+          url: {
+            type: 'string',
+            example:
+              'https://bucket.s3.region.amazonaws.com/images/1234567890-abc123.jpg',
+          },
           size: { type: 'number', example: 102400 },
           lastModified: { type: 'string', format: 'date-time' },
         },
@@ -131,4 +151,3 @@ export class S3Controller {
     return this.s3Service.deleteFile(decodedKey);
   }
 }
-

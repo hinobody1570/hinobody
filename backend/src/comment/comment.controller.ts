@@ -6,14 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { QueryCommentsDto } from './dto/query-comments.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 
 @Controller('comments')
 export class CommentController {
@@ -22,15 +24,23 @@ export class CommentController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  create(@Body() createCommentDto: CreateCommentDto, @GetUser('id') userId: string) {
+  create(
+    @Body() createCommentDto: CreateCommentDto,
+    @GetUser('id') userId: string,
+  ) {
     return this.commentService.create(createCommentDto, userId);
   }
 
   @Get('post/:postId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  findByPost(@Param('postId') postId: string) {
-    return this.commentService.findByPost(postId);
+  @ApiOperation({ summary: 'Get comments by post ID with pagination and search' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
+  @ApiQuery({ name: 'search', required: false, description: 'Search term' })
+  @ApiQuery({ name: 'authorId', required: false, description: 'Filter by author ID' })
+  findByPost(@Param('postId') postId: string, @Query() query: QueryCommentsDto) {
+    return this.commentService.findByPost(postId, { ...query, postId });
   }
 
   @Get(':id')
@@ -62,6 +72,3 @@ export class CommentController {
     return this.commentService.remove(id, userId, role === 'ADMIN');
   }
 }
-
-
-

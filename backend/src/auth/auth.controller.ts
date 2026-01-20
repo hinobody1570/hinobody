@@ -21,15 +21,18 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully registered. Verification email sent.' })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully registered. Verification email sent.',
+  })
   @ApiResponse({ status: 409, description: 'Email or nickname already exists' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
-    
+
     // Get the user with OTP to send email
     const userWithOtp = await this.userService.findByEmail(createUserDto.email);
-    
+
     // Send verification email with OTP
     if (userWithOtp?.emailVerificationOTP) {
       await this.emailService.sendVerificationEmail(
@@ -38,9 +41,10 @@ export class AuthController {
         user.nickname,
       );
     }
-    
+
     return {
-      message: 'Registration successful. Please check your email to verify your account.',
+      message:
+        'Registration successful. Please check your email to verify your account.',
       user: {
         id: user.id,
         email: user.email,
@@ -53,7 +57,10 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200, description: 'User successfully logged in' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials or email not verified' })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid credentials or email not verified',
+  })
   @ApiBody({ type: LoginDto })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
@@ -80,7 +87,10 @@ export class AuthController {
 
   @Post('forgot-password')
   @ApiOperation({ summary: 'Request password reset' })
-  @ApiResponse({ status: 200, description: 'Password reset email sent if email exists' })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset email sent if email exists',
+  })
   @ApiBody({ type: ForgotPasswordDto })
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     return this.authService.forgotPassword(forgotPasswordDto);
@@ -95,4 +105,3 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
 }
-

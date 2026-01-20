@@ -55,6 +55,14 @@ export class CreatePostDto {
   @IsString({ each: true })
   @IsOptional()
   imageIds?: string[];
+
+  @ApiPropertyOptional({
+    example: ['javascript', 'react', 'nextjs'],
+    description: 'Array of tags for the post',
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
 }
-
-

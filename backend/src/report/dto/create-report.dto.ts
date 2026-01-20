@@ -20,7 +20,8 @@ export class CreateReportDto {
 
   @ApiPropertyOptional({
     example: 'post_123456',
-    description: 'ID of the post being reported (required if commentId is not provided)',
+    description:
+      'ID of the post being reported (required if commentId is not provided)',
   })
   @IsString()
   @IsOptional()
@@ -29,12 +30,11 @@ export class CreateReportDto {
 
   @ApiPropertyOptional({
     example: 'comment_654321',
-    description: 'ID of the comment being reported (required if postId is not provided)',
+    description:
+      'ID of the comment being reported (required if postId is not provided)',
   })
   @IsString()
   @IsOptional()
   @ValidateIf((o) => !o.postId)
   commentId?: string;
 }
-
-
