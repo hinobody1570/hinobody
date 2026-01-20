@@ -95,7 +95,8 @@
   "header": {
     "findAnything": "Find anything",
     "create": "Create",
-    "ask": "Ask"
+    "ask": "Ask",
+    "eyeMask": "Eye mask"
   },
   "search": {
     "searchResults": "Search results for",
@@ -139,7 +140,12 @@
     "posts": "Posts",
     "boards": "Boards",
     "backToHome": "Back to Home",
+    "adminPanel": "Admin Panel",
+    "adminPanelTitle": "HiNobody Admin",
+    "admin": "Admin",
+    "administrator": "Administrator",
     "id": "ID",
+    "avatar": "Avatar",
     "nickname": "Nickname",
     "email": "Email",
     "role": "Role",
@@ -242,6 +248,7 @@
     "errorLoadingBoard": "Error loading board",
     "postID": "Post ID",
     "boardID": "Board ID",
+    "image": "Image",
     "images": "Images",
     "postPreview": "Post Preview",
     "boardPosts": "Board Posts",
@@ -634,7 +641,11 @@
     "beta": "BETA",
     "settings": "Settings",
     "darkMode": "Dark Mode",
-    "logOut": "Log Out"
+    "logOut": "Log Out",
+    "login": "Login",
+    "adminPanel": "Admin Panel",
+    "defaultNickname": "User",
+    "userPrefix": "u/"
   },
   "startCommunity": {
     "step1Title": "Choose a category",

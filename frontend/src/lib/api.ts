@@ -34,9 +34,9 @@ class ApiClient {
     const url = `${API_BASE_URL}${endpoint}`;
 
     // Debug: Log the URL being called (remove in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('API Request:', url);
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.log('API Request:', url);
+    // }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

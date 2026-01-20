@@ -95,7 +95,8 @@
   "header": {
     "findAnything": "何でも検索",
     "create": "作成",
-    "ask": "質問"
+    "ask": "質問",
+    "eyeMask": "目マスク"
   },
   "search": {
     "searchResults": "検索結果",
@@ -139,7 +140,12 @@
     "posts": "投稿",
     "boards": "ボード",
     "backToHome": "ホームに戻る",
+    "adminPanel": "管理パネル",
+    "adminPanelTitle": "HiNobody 管理",
+    "admin": "管理者",
+    "administrator": "管理者",
     "id": "ID",
+    "avatar": "アバター",
     "nickname": "ニックネーム",
     "email": "メール",
     "role": "役割",
@@ -242,6 +248,7 @@
     "errorLoadingBoard": "ボードの読み込みエラー",
     "postID": "投稿ID",
     "boardID": "ボードID",
+    "image": "画像",
     "images": "画像",
     "postPreview": "投稿プレビュー",
     "boardPosts": "ボードの投稿",
@@ -630,7 +637,11 @@
     "beta": "ベータ",
     "settings": "設定",
     "darkMode": "ダークモード",
-    "logOut": "ログアウト"
+    "logOut": "ログアウト",
+    "login": "ログイン",
+    "adminPanel": "管理パネル",
+    "defaultNickname": "ユーザー",
+    "userPrefix": "u/"
   },
   "startCommunity": {
     "step1Title": "カテゴリを選択",

@@ -10,6 +10,8 @@ import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { ROUTE_PATHS } from "@/routes/paths";
+import DP from "../../../../public/assets/images/avatar_default_4.png";
+import Image from "next/image";
 
 type ActionType = "block" | "unblock" | "delete" | null;
 
@@ -145,6 +147,15 @@ export default function AdminUsersPage() {
     {
       key: "id",
       header: t("id"),
+    },
+    {
+      key: "avatar",
+      header: t("avatar"),
+      render: (value:string) => (
+        <div>
+          <Image src={value ? value : DP} alt="DP" width={80} height={80} className="rounded-full"/>
+        </div>
+      )
     },
     {
       key: "nickname",

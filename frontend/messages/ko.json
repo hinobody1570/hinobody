@@ -95,7 +95,8 @@
   "header": {
     "findAnything": "무엇이든 찾기",
     "create": "만들기",
-    "ask": "질문하기"
+    "ask": "질문하기",
+    "eyeMask": "눈 마스크"
   },
   "search": {
     "searchResults": "검색 결과",
@@ -139,7 +140,12 @@
     "posts": "게시물",
     "boards": "보드",
     "backToHome": "홈으로 돌아가기",
+    "adminPanel": "관리자 패널",
+    "adminPanelTitle": "HiNobody 관리자",
+    "admin": "관리자",
+    "administrator": "관리자",
     "id": "ID",
+    "avatar": "아바타",
     "nickname": "닉네임",
     "email": "이메일",
     "role": "역할",
@@ -242,6 +248,7 @@
     "errorLoadingBoard": "보드 로드 오류",
     "postID": "게시물 ID",
     "boardID": "보드 ID",
+    "image": "이미지",
     "images": "이미지",
     "postPreview": "게시물 미리보기",
     "boardPosts": "보드 게시물",
@@ -630,7 +637,11 @@
     "beta": "베타",
     "settings": "설정",
     "darkMode": "다크 모드",
-    "logOut": "로그아웃"
+    "logOut": "로그아웃",
+    "login": "로그인",
+    "adminPanel": "관리자 패널",
+    "defaultNickname": "사용자",
+    "userPrefix": "u/"
   },
   "startCommunity": {
     "step1Title": "카테고리 선택",

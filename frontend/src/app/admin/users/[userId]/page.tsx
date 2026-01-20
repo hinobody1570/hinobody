@@ -40,13 +40,10 @@ export default function AdminUserDetailPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [eyeMaskedImages, setEyeMaskedImages] = useState<EyeMaskedImage[]>([]);
-  const [s3Files, setS3Files] = useState<S3File[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [loadingBoards, setLoadingBoards] = useState(true);
   const [loadingImages, setLoadingImages] = useState(true);
-  const [loadingS3Files, setLoadingS3Files] = useState(true);
-  const [deletingS3File, setDeletingS3File] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -126,42 +123,6 @@ export default function AdminUserDetailPage() {
     fetchEyeMaskedImages();
   }, [userId]);
 
-  useEffect(() => {
-    if (!userId) return;
-
-    const fetchS3Files = async () => {
-      try {
-        setLoadingS3Files(true);
-        // Fetch all S3 files, optionally filter by user-specific prefix if needed
-        const files = await s3Api.getAllFiles();
-        setS3Files(files);
-      } catch (err: any) {
-        console.error("Error fetching S3 files:", err);
-      } finally {
-        setLoadingS3Files(false);
-      }
-    };
-
-    fetchS3Files();
-  }, [userId]);
-
-  const handleDeleteS3File = async (key: string) => {
-    if (!confirm(t("confirmDeleteS3File"))) {
-      return;
-    }
-
-    try {
-      setDeletingS3File(key);
-      await s3Api.deleteFile(key);
-      // Remove the file from the list
-      setS3Files((prev) => prev.filter((file) => file.key !== key));
-    } catch (err: any) {
-      console.error("Error deleting S3 file:", err);
-      alert(err.message || t("deleteS3FileError"));
-    } finally {
-      setDeletingS3File(null);
-    }
-  };
 
   if (loading) {
     return (
@@ -194,14 +155,14 @@ export default function AdminUserDetailPage() {
       <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-32"></div>
+          <div className="bg-gradient-to-r from-blue-500 h-32"></div>
           <div className="px-6 pb-6 -mt-16">
             <div className="flex items-end gap-6">
               <div className="relative">
-                <Image src={DP} alt={user.nickname || user.email} width={120} height={120} className="rounded-full border-4 border-white shadow-lg" />
+                <Image src={user.avatar ?  user.avatar : DP} alt={user.nickname || user.email} width={120} height={120} className="rounded-full border-4 border-white shadow-lg" />
               </div>
               <div className="flex-1 pb-4">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">{user.nickname || user.email}</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2 capitalize">{user.nickname || user.email}</h2>
                 <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <FaEnvelope size={14} />
@@ -320,7 +281,7 @@ export default function AdminUserDetailPage() {
           ) : (
             <div className="space-y-4">
               {posts.map((post) => (
-                <PostCard key={post.id} {...post} />
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
           )}
@@ -374,78 +335,13 @@ export default function AdminUserDetailPage() {
                   className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer group"
                   onClick={() => window.open(image.url, "_blank")}
                 >
-                  <Image src={image.url} alt="Eye masked image" fill className="object-cover group-hover:scale-105 transition-transform" />
+                  <Image src={image.url} alt="Eye masked image" height={100} width={400} className="object-containt group-hover:scale-105 transition-transform" />
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* S3 Files Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <FaImages size={20} />
-            <span>{t("s3Files")}</span>
-          </h3>
-          {loadingS3Files ? (
-            <div className="text-center py-8 text-gray-500">{t("loading")}</div>
-          ) : s3Files.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{t("noS3Files")}</div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {s3Files.map((file) => {
-                const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.key);
-                return (
-                  <div
-                    key={file.key}
-                    className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow group"
-                  >
-                    {isImage ? (
-                      <>
-                        <Image
-                          src={file.url}
-                          alt={file.key}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform cursor-pointer"
-                          onClick={() => window.open(file.url, "_blank")}
-                        />
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteS3File(file.key);
-                          }}
-                          disabled={deletingS3File === file.key}
-                          className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg z-10"
-                          title={t("delete")}
-                        >
-                          <FaTrash size={14} />
-                        </button>
-                      </>
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-4">
-                        <FaImage className="text-gray-400 mb-2" size={32} />
-                        <p className="text-xs text-gray-600 text-center truncate w-full px-2">{file.key.split('/').pop()}</p>
-                        <button
-                          onClick={() => handleDeleteS3File(file.key)}
-                          disabled={deletingS3File === file.key}
-                          className="mt-2 bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                          title={t("delete")}
-                        >
-                          {deletingS3File === file.key ? t("deleting") : t("delete")}
-                        </button>
-                      </div>
-                    )}
-                    {deletingS3File === file.key && (
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
-                        <div className="text-white text-sm">{t("deleting")}</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

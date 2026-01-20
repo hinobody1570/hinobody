@@ -2,10 +2,6 @@
 
 import RedditSidebar from "@/components/sidebar/Sidebar";
 import { RedditHeader } from "@/components/topHeader/TopHeader";
-import { useAuth } from "@/contexts/AuthContext";
-import { ROUTE_PATHS } from "@/routes/paths";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -20,14 +16,6 @@ interface MainLayoutProps {
  * - Main Content Area (changes based on route)
  */
 export default function MainLayout({ children }: MainLayoutProps) {
-  const { user } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (user?.role == "ADMIN") {
-      router.push(ROUTE_PATHS.ADMIN_USERS);
-    }
-  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50">

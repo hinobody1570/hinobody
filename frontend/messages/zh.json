@@ -95,7 +95,8 @@
   "header": {
     "findAnything": "查找任何内容",
     "create": "创建",
-    "ask": "提问"
+    "ask": "提问",
+    "eyeMask": "眼部遮罩"
   },
   "search": {
     "searchResults": "搜索结果",
@@ -139,7 +140,12 @@
     "posts": "帖子",
     "boards": "看板",
     "backToHome": "返回首页",
+    "adminPanel": "管理面板",
+    "adminPanelTitle": "HiNobody 管理",
+    "admin": "管理员",
+    "administrator": "管理员",
     "id": "ID",
+    "avatar": "头像",
     "nickname": "昵称",
     "email": "邮箱",
     "role": "角色",
@@ -242,6 +248,7 @@
     "errorLoadingBoard": "加载看板时出错",
     "postID": "帖子ID",
     "boardID": "看板ID",
+    "image": "图片",
     "images": "图片",
     "postPreview": "帖子预览",
     "boardPosts": "看板帖子",
@@ -630,7 +637,11 @@
     "beta": "测试版",
     "settings": "设置",
     "darkMode": "深色模式",
-    "logOut": "登出"
+    "logOut": "登出",
+    "login": "登录",
+    "adminPanel": "管理面板",
+    "defaultNickname": "用户",
+    "userPrefix": "u/"
   },
   "startCommunity": {
     "step1Title": "选择类别",

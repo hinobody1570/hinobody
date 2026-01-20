@@ -53,7 +53,7 @@ export function AdminSidebar() {
     <div className="w-64 bg-blue-700 text-white h-screen fixed left-0 top-0 flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-blue-600">
-        <h1 className="text-2xl font-bold">Admin Panel</h1>
+        <h1 className="text-2xl font-bold">{t("adminPanel")}</h1>
       </div>
 
       {/* Menu Items */}

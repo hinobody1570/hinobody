@@ -6,7 +6,7 @@ import { GoTrophy } from "react-icons/go";
 import { LuDollarSign } from "react-icons/lu";
 import { GiQueenCrown } from "react-icons/gi";
 import { IoMoonOutline } from "react-icons/io5";
-import { MdLogout } from "react-icons/md";
+import { MdLogin, MdLogout } from "react-icons/md";
 import { FaRegClock } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,10 +16,9 @@ import { ROUTE_PATHS } from "@/routes/paths";
 import Image from "next/image";
 import AvatarImage from "../../../public/assets/images/avatar_default_4.png";
 
-
 export default function ProfileDropdown() {
   const [darkMode, setDarkMode] = useState(false);
-  const { logout, user } = useAuth();
+  const { logout, user, isAuthenticated } = useAuth();
   const router = useRouter();
   const t = useTranslations("profileDropdown");
 
@@ -33,7 +32,7 @@ export default function ProfileDropdown() {
     {
       icon: FaRegCircleUser,
       label: t("viewProfile"),
-      subtitle: `u/${user?.nickname || "ResultRight8391"}`,
+      subtitle: `${t("userPrefix")}${user?.nickname || t("defaultNickname")}`,
       onClick: handleViewProfile,
     },
     // {
@@ -135,14 +134,21 @@ export default function ProfileDropdown() {
           className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3"
         >
           <GoTrophy className="w-5 h-5 text-gray-700" />
-          <span className="text-sm font-medium text-gray-900">Admin Pannel</span>
+          <span className="text-sm font-medium text-gray-900">{t("adminPanel")}</span>
         </button>
       )}
       {/* Log Out */}
-      <button onClick={() => logout()} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
-        <MdLogout className="w-5 h-5 text-gray-700" />
-        <span className="text-sm font-medium text-gray-900">{t("logOut")}</span>
-      </button>
+      {isAuthenticated ? (
+        <button onClick={() => logout()} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
+          <MdLogout className="w-5 h-5 text-gray-700" />
+          <span className="text-sm font-medium text-gray-900">{t("logOut")}</span>
+        </button>
+      ) : (
+        <button onClick={() => router.push(ROUTE_PATHS.DEFAULT)} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
+          <MdLogin className="w-5 h-5 text-gray-700" />
+          <span className="text-sm font-medium text-gray-900">{t("login")}</span>
+        </button>
+      )}
 
       <div className="border-t border-gray-200 my-2"></div>
 

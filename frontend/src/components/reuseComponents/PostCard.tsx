@@ -207,7 +207,7 @@ export const PostCard = ({ post }: any) => {
     //   onClick: () => console.log("About clicked"),
     // },
   ];
-
+  console.log("post",post)
   return (
     <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
       {/* Post Header */}
