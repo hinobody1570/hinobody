@@ -154,6 +154,41 @@ export const authApi = {
       newPassword,
     });
   },
+
+  googleLogin: async () => {
+    // Redirect to backend Google OAuth endpoint
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    window.location.href = `${API_BASE_URL}${API_END_POINT.GOOGLE_AUTH}`;
+  },
+
+  googleMobileLogin: async (data: {
+    idToken: string;
+    accessToken: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    picture?: string;
+    providerId: string;
+  }) => {
+    return api.post<ApiResponse<{ access_token: string; user: any }>>(
+      API_END_POINT.GOOGLE_MOBILE,
+      data
+    );
+  },
+
+  appleLogin: async () => {
+    // Redirect to backend Apple OAuth endpoint (server-side flow)
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    window.location.href = `${API_BASE_URL}${API_END_POINT.APPLE_AUTH}`;
+  },
+
+  appleTokenLogin: async (idToken: string) => {
+    // Client-side flow with idToken from Apple JS SDK
+    return api.post<ApiResponse<{ access_token: string; user: any }>>(
+      API_END_POINT.APPLE_TOKEN,
+      { idToken }
+    );
+  },
 };
 
 // Boards API endpoints
