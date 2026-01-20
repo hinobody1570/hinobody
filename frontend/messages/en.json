@@ -332,8 +332,12 @@
       "emailRequired": "Email is required",
       "emailInvalid": "Email is invalid",
       "passwordRequired": "Password is required",
-      "passwordMinLength8": "Password must be at least 8 characters"
+      "passwordMinLength8": "Password must be at least 8 characters",
+      "orContinueWith": "Or continue with",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithApple": "Continue with Apple"
     },
+    "processing": "Processing authentication...",
     "registerPage": {
       "createAccount": "Create Account",
       "joinUsToday": "Join us today and get started",

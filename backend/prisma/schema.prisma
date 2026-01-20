@@ -10,7 +10,7 @@ datasource db {
 model User {
   id                   String        @id @default(cuid())
   email                String        @unique
-  passwordHash         String
+  passwordHash         String?
   nickname             String        @unique
   language             Language      @default(EN)
   role                 UserRole      @default(USER)
@@ -20,6 +20,8 @@ model User {
   otpExpiry            DateTime?
   passwordResetToken   String?
   passwordResetExpiry  DateTime?
+  provider             AuthProvider? @default(LOCAL)
+  providerId           String?
   avatar               String?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
@@ -34,9 +36,11 @@ model User {
   boardMemberships     BoardMember[]
   eyeMaskedImages      EyeMaskedImage[] @relation("EyeMaskedImages")
 
+  @@unique([provider, providerId])
   @@index([email])
   @@index([nickname])
   @@index([passwordResetToken])
+  @@index([provider, providerId])
   @@map("users")
 }
 
@@ -242,6 +246,12 @@ enum BoardMemberStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  APPLE
 }
 
 model BoardMember {
