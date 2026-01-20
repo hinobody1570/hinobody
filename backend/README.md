@@ -51,6 +51,13 @@ RESEND_API_KEY="re_your-resend-api-key"
 VERIFIED_EMAIL_SENDER="your-verified-email@yourdomain.com"
 FRONTEND_URL="http://localhost:3000"
 
+# Apple OAuth (optional)
+APPLE_CLIENT_ID="your-apple-client-id"
+APPLE_TEAM_ID="your-apple-team-id"
+APPLE_KEY_ID="your-apple-key-id"
+APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_CONTENT_HERE\n-----END PRIVATE KEY-----"
+APPLE_CALLBACK_URL="http://localhost:3001/auth/apple/callback"
+
 # App
 NODE_ENV="development"
 PORT=3001
