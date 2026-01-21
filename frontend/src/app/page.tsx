@@ -25,7 +25,7 @@ export default function Home() {
   const t = useTranslations("auth.loginPage");
   const tAuth = useTranslations("auth");
   const tToast = useTranslations("toast");
-  const { login: authLogin, isAuthenticated } = useAuth();
+  const { login: authLogin, isAuthenticated, user } = useAuth();
   const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState<loginFormType>({
@@ -76,13 +76,18 @@ export default function Home() {
 
     try {
       // Call the real API through AuthContext
-      await authLogin(formData.email!, formData.password!);
+      // The login function now returns the user
+      const loggedInUser = await authLogin(formData.email!, formData.password!);
 
-      // Success - show toast and redirect
+      // Success - show toast
       showSuccess(tToast("loginSuccess"));
-      setIsLoading(false)
-      // Redirect to home
-      router.push(ROUTE_PATHS.HOME);
+      setIsLoading(false);
+      // Redirect admin users to admin panel, others to home
+      if (loggedInUser?.role === 'ADMIN') {
+        router.push(ROUTE_PATHS.ADMIN_USERS);
+      } else {
+        router.push(ROUTE_PATHS.HOME);
+      }
     } catch (error: any) {
       // Handle API errors
       setIsLoading(false);

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { useAuth } from '@/contexts/AuthContext';
+import { ROUTE_PATHS } from './paths';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push('/login');
+      router.push(ROUTE_PATHS.DEFAULT);
     }
   }, [isAuthenticated, loading, router]);
 

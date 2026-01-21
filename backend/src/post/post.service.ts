@@ -265,11 +265,12 @@ export class PostService {
     id: string,
     updatePostDto: UpdatePostDto,
     userId: string,
+    isAdmin: boolean = false,
   ): Promise<Post> {
     const post = await this.findOne(id);
 
-    // Check if user is the author
-    if (post.authorId !== userId) {
+    // Check if user is the author or admin
+    if (post.authorId !== userId && !isAdmin) {
       throw new ForbiddenException('You can only update your own posts');
     }
 

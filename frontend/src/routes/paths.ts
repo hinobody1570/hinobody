@@ -22,5 +22,13 @@ export const ROUTE_PATHS = {
     DUMMY_EXAMPLE : "/main/dummy-example",
     CREATE_POST: "/main/create-post",
     HOME: "/main/home",
-    EYE_MASKING: "/main/eye-masking"
+    EYE_MASKING: "/main/eye-masking",
+
+
+    // AdminRoutes
+    ADMIN_USERS: "/admin/users",
+    ADMIN_USER_DETAIL: "/admin/users",
+    ADMIN_POSTS: "/admin/posts",
+    ADMIN_BOARDS: "/admin/boards",
+    ADMIN_EYE_MASKING: "/admin/eye-masking"
 }

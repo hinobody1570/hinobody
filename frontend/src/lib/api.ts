@@ -34,9 +34,9 @@ class ApiClient {
     const url = `${API_BASE_URL}${endpoint}`;
 
     // Debug: Log the URL being called (remove in production)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('API Request:', url);
-    }
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.log('API Request:', url);
+    // }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -201,6 +201,7 @@ export interface Board {
   description: string | null;
   visibilityAccess: BoardVisibility;
   isActive: boolean;
+  creatorId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -272,6 +273,13 @@ export const boardsApi = {
   },
   leave: async (boardId: string): Promise<void> => {
     await api.delete(`${API_END_POINT.BOARDS}/${boardId}/leave`);
+  },
+  update: async (id: string, updateBoardDto: { isActive?: boolean }): Promise<Board> => {
+    const response = await api.patch<ApiResponse<Board>>(`${API_END_POINT.BOARDS}/${id}`, updateBoardDto);
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/${id}`);
   },
 };
 
@@ -370,6 +378,13 @@ export const postsApi = {
     const response = await api.get<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`);
     return response.data;
   },
+  update: async (id: string, updatePostDto: { isActive?: boolean }): Promise<Post> => {
+    const response = await api.patch<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`, updatePostDto);
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.POSTS}/${id}`);
+  },
 };
 
 // S3 Upload API
@@ -378,7 +393,58 @@ export interface S3UploadResponse {
   url: string;
 }
 
+export interface S3File {
+  key: string;
+  url: string;
+  size: number;
+  lastModified: string;
+}
+
 export const s3Api = {
+  getAllFiles: async (prefix?: string): Promise<S3File[]> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const url = `${API_BASE_URL}${API_END_POINT.S3_FILES}${prefix ? `?prefix=${encodeURIComponent(prefix)}` : ''}`;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to get S3 files: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  },
+
+  deleteFile: async (key: string): Promise<void> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const encodedKey = encodeURIComponent(key);
+    const url = `${API_BASE_URL}${API_END_POINT.S3_FILES}/${encodedKey}`;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to delete S3 file: ${response.statusText}`);
+    }
+  },
+
   uploadFile: async (file: File, folder?: string): Promise<S3UploadResponse> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -455,6 +521,11 @@ export interface EyeMaskedImage {
   width?: number;
   height?: number;
   createdAt: string;
+  user?: {
+    id: string;
+    nickname: string;
+    email: string;
+  };
 }
 
 export interface CreateEyeMaskedImageDto {
@@ -475,8 +546,11 @@ export const eyeMaskedImagesApi = {
     return response.data;
   },
 
-  getAll: async (): Promise<EyeMaskedImage[]> => {
-    const response = await api.get<ApiResponse<EyeMaskedImage[]>>(API_END_POINT.EYE_MASKED_IMAGES);
+  getAll: async (userId?: string): Promise<EyeMaskedImage[]> => {
+    const url = userId 
+      ? `${API_END_POINT.EYE_MASKED_IMAGES}/all?userId=${userId}`
+      : `${API_END_POINT.EYE_MASKED_IMAGES}/all`;
+    const response = await api.get<ApiResponse<EyeMaskedImage[]>>(url);
     return response.data;
   },
 
@@ -618,15 +692,49 @@ export const reportsApi = {
 export interface UpdateUserDto {
   nickname?: string;
   language?: string;
+  isActive?: boolean;
+  avatar?: string;
+}
+
+export interface UsersResponse {
+  data: User[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export const usersApi = {
+  getAll: async (page: number = 1, limit: number = 20, search?: string): Promise<UsersResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) {
+      params.append('search', search);
+    }
+    const response = await api.get<ApiResponse<UsersResponse>>(`${API_END_POINT.USERS}?${params.toString()}`);
+    return response.data;
+  },
   getById: async (id: string): Promise<User> => {
     const response = await api.get<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`);
     return response.data;
   },
   update: async (id: string, updateUserDto: UpdateUserDto): Promise<User> => {
     const response = await api.patch<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`, updateUserDto);
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.USERS}/${id}`);
+  },
+  block: async (id: string): Promise<User> => {
+    const response = await api.patch<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`, { isActive: false });
+    return response.data;
+  },
+  unblock: async (id: string): Promise<User> => {
+    const response = await api.patch<ApiResponse<User>>(`${API_END_POINT.USERS}/${id}`, { isActive: true });
     return response.data;
   },
 };
@@ -639,6 +747,8 @@ export interface User {
   language: string;
   role: string;
   isActive: boolean;
+  emailVerified: boolean;
+  avatar?: string;
   createdAt: string;
   updatedAt: string;
 }

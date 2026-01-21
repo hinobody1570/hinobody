@@ -72,6 +72,7 @@ export class UserService {
         role: true,
         isActive: true,
         emailVerified: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -103,6 +104,8 @@ export class UserService {
           language: true,
           role: true,
           isActive: true,
+          emailVerified: true,
+          avatar: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -156,6 +159,8 @@ export class UserService {
           language: true,
           role: true,
           isActive: true,
+          emailVerified: true,
+          avatar: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -185,6 +190,7 @@ export class UserService {
         language: true,
         role: true,
         isActive: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -204,7 +210,7 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<any> {
-    const { nickname, language } = updateUserDto;
+    const { nickname, language, isActive, avatar } = updateUserDto;
 
     if (nickname) {
       const existingNickname = await this.prisma.user.findUnique({
@@ -221,6 +227,8 @@ export class UserService {
       data: {
         ...(nickname && { nickname }),
         ...(language && { language }),
+        ...(isActive !== undefined && { isActive }),
+        ...(avatar !== undefined && { avatar }),
       },
       select: {
         id: true,
@@ -229,6 +237,7 @@ export class UserService {
         language: true,
         role: true,
         isActive: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -294,6 +303,7 @@ export class UserService {
         role: true,
         isActive: true,
         emailVerified: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },

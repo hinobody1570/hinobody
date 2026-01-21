@@ -5,6 +5,7 @@ import {
   Matches,
   IsEnum,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Language } from '@prisma/client';
@@ -33,4 +34,20 @@ export class UpdateUserDto {
   @IsEnum(Language)
   @IsOptional()
   language?: Language;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'User active status',
+  })
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
+
+  @ApiPropertyOptional({
+    example: 'https://example.com/avatar.jpg',
+    description: 'Avatar URL (profile picture)',
+  })
+  @IsString()
+  @IsOptional()
+  avatar?: string;
 }

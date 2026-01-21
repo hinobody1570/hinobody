@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   Delete,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
@@ -51,9 +52,9 @@ export class EyeMaskedImageController {
   @Get('all')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get all eye-masked images from all users (admin)' })
-  findAllImages() {
-    return this.eyeMaskedImageService.findAll();
+  @ApiOperation({ summary: 'Get all eye-masked images from all users (admin) or filter by userId' })
+  findAllImages(@Query('userId') userId?: string) {
+    return this.eyeMaskedImageService.findAll(userId);
   }
 
   @Get(':id')
@@ -68,8 +69,12 @@ export class EyeMaskedImageController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete eye-masked image by ID' })
-  remove(@Param('id') id: string, @GetUser('id') userId: string) {
-    return this.eyeMaskedImageService.remove(id, userId);
+  remove(
+    @Param('id') id: string,
+    @GetUser('id') userId: string,
+    @GetUser('role') role: string,
+  ) {
+    return this.eyeMaskedImageService.remove(id, userId, role === 'ADMIN');
   }
 }
 

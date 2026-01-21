@@ -67,6 +67,7 @@ export class AuthService {
         nickname: user.nickname,
         language: user.language,
         role: user.role,
+        avatar: user.avatar
       },
     };
   }

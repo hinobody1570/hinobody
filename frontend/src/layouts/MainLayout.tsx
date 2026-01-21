@@ -16,6 +16,7 @@ interface MainLayoutProps {
  * - Main Content Area (changes based on route)
  */
 export default function MainLayout({ children }: MainLayoutProps) {
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Fixed Header */}
