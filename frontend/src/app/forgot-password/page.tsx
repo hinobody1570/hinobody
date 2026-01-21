@@ -154,7 +154,7 @@ export default function ForgotPassword() {
           </div>
           <div className="mt-6 text-center">
             <Link
-              href={ROUTE_PATHS.LOGIN}
+              href={ROUTE_PATHS.DEFAULT}
               className="cursor-pointer flex items-center justify-center mx-auto text-gray-600 hover:text-gray-800 transition"
             >
               <GoArrowLeft className="w-4 h-4 mr-2" />

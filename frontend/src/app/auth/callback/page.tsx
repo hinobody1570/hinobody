@@ -29,11 +29,11 @@ export default function AuthCallback() {
       } catch (error) {
         console.error("Error parsing user data:", error);
         showError(tToast("loginError"));
-        router.push(ROUTE_PATHS.LOGIN);
+        router.push(ROUTE_PATHS.DEFAULT);
       }
     } else {
       showError(tToast("loginError"));
-      router.push(ROUTE_PATHS.LOGIN);
+      router.push(ROUTE_PATHS.DEFAULT);
     }
     setIsProcessing(false);
   }, [searchParams, router, showSuccess, showError, tToast]);
