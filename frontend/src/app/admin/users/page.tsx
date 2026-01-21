@@ -55,6 +55,10 @@ export default function AdminUsersPage() {
   }, []);
 
   const openConfirmationModal = (action: ActionType, userId: string, userName: string) => {
+    // Do not allow block/unblock/delete actions for ADMIN users
+    const targetUser = users.find((u) => u.id === userId);
+    if (targetUser?.role?.toUpperCase?.() === "ADMIN") return;
+
     setConfirmationModal({
       isOpen: true,
       action,
@@ -221,10 +225,17 @@ export default function AdminUsersPage() {
       header: "",
       actions: (row: User) => (
         <div className="flex items-center gap-2">
+          {(() => {
+            const isAdminUser = row.role?.toUpperCase?.() === "ADMIN";
+            const isBusy = actionLoading === row.id;
+            const isDisabled = isAdminUser || isBusy;
+
+            return (
+              <>
           {row.isActive ? (
             <button
               onClick={() => openConfirmationModal("block", row.id, row.nickname || row.email)}
-              disabled={actionLoading === row.id}
+              disabled={isDisabled}
               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               title={t("block")}
             >
@@ -233,7 +244,7 @@ export default function AdminUsersPage() {
           ) : (
             <button
               onClick={() => openConfirmationModal("unblock", row.id, row.nickname || row.email)}
-              disabled={actionLoading === row.id}
+              disabled={isDisabled}
               className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               title={t("unblock")}
             >
@@ -242,7 +253,7 @@ export default function AdminUsersPage() {
           )}
           <button
             onClick={() => openConfirmationModal("delete", row.id, row.nickname || row.email)}
-            disabled={actionLoading === row.id}
+            disabled={isDisabled}
             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             title={t("delete")}
           >
@@ -250,12 +261,15 @@ export default function AdminUsersPage() {
           </button>
           <button
             onClick={() => router.push(`${ROUTE_PATHS.ADMIN_USER_DETAIL}/${row.id}`)}
-            disabled={actionLoading === row.id}
+            disabled={isBusy}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             title={t("viewDetails")}
           >
             <FaEye size={16} />
           </button>
+              </>
+            );
+          })()}
         </div>
       ),
     },
