@@ -158,7 +158,10 @@ export class BoardService {
   }
 
   async findByUserId(userId: string) {
-    // Get boards created by user
+    // This method returns boards for the specified userId (from URL parameter)
+    // It works for both viewing your own profile and viewing other users' profiles
+    
+    // Get boards created by the specified user
     const createdBoards = await this.prisma.board.findMany({
       where: {
         creatorId: userId,
@@ -167,7 +170,7 @@ export class BoardService {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Get boards where user is a member (approved status)
+    // Get boards where the specified user is a member (approved status)
     const memberBoards = await this.prisma.board.findMany({
       where: {
         members: {

@@ -36,6 +36,9 @@ export default function UserProfilePage() {
   const router = useRouter();
   const { user: currentUser } = useAuth();
   const t = useTranslations('userProfile');
+  // Get userId from URL params - this allows viewing any user's profile
+  // When viewing own profile: userId === currentUser.id
+  // When viewing other user's profile: userId !== currentUser.id
   const userId = params?.userId as string;
   
   const [user, setUser] = useState<User | null>(null);
@@ -191,6 +194,7 @@ export default function UserProfilePage() {
       
       try {
         setLoadingBoards(true);
+        // Use userId from URL params - works for both own profile and other users' profiles
         const boards = await boardsApi.getByUserId(userId);
         setCreatedBoards(boards.created);
         setMemberBoards(boards.member);
@@ -230,7 +234,7 @@ export default function UserProfilePage() {
       await boardsApi.approveMembership(membershipId);
       // Remove from pending requests
       setPendingRequests(prev => prev.filter(req => req.id !== membershipId));
-      // Refresh boards to show the new member
+      // Refresh boards to show the new member (using userId from URL params)
       const boards = await boardsApi.getByUserId(userId);
       setCreatedBoards(boards.created);
       setMemberBoards(boards.member);

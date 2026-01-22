@@ -54,8 +54,10 @@ export class BoardController {
   @Get('user/:userId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get boards created by user and boards user is a member of' })
+  @ApiOperation({ summary: 'Get boards created by user and boards user is a member of. Returns boards for the userId in URL parameter, not the logged-in user.' })
   findByUserId(@Param('userId') userId: string) {
+    // Use userId from URL parameter, not logged-in user
+    // This allows viewing any user's boards (when authenticated)
     return this.boardService.findByUserId(userId);
   }
 
