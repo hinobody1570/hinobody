@@ -127,7 +127,20 @@
     "cancel": "取消",
     "eyeMaskingImages": "眼部遮罩图片",
     "noEyeMaskingImages": "还没有上传眼部遮罩图片",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "communityBoards": "社区板块",
+    "createdBoards": "创建的板块",
+    "memberBoards": "成员板块",
+    "noBoards": "还没有社区板块",
+    "creator": "创建者",
+    "member": "成员",
+    "category": "分类",
+    "pendingRequests": "待处理的成员申请",
+    "wantsToJoin": "想要加入",
+    "requestedAt": "申请时间",
+    "approve": "批准",
+    "reject": "拒绝",
+    "noPendingRequests": "没有待处理的成员申请"
   },
   "boardProfile": {
     "category": "分类",

@@ -233,10 +233,14 @@ export interface BoardMembership {
   user?: {
     id: string;
     nickname: string;
+    email?: string;
+    avatar?: string;
+    createdAt?: string;
   };
   board?: {
     id: string;
     name: string;
+    description?: string;
     visibilityAccess: BoardVisibility;
   };
 }
@@ -280,6 +284,21 @@ export const boardsApi = {
   },
   delete: async (id: string): Promise<void> => {
     await api.delete(`${API_END_POINT.BOARDS}/${id}`);
+  },
+  getByUserId: async (userId: string): Promise<{ created: Board[]; member: Board[] }> => {
+    const response = await api.get<ApiResponse<{ created: Board[]; member: Board[] }>>(`${API_END_POINT.BOARDS}/user/${userId}`);
+    return response.data;
+  },
+  getPendingRequests: async (): Promise<BoardMembership[]> => {
+    const response = await api.get<ApiResponse<BoardMembership[]>>(`${API_END_POINT.BOARDS}/pending-requests`);
+    return response.data;
+  },
+  approveMembership: async (membershipId: string): Promise<BoardMembership> => {
+    const response = await api.patch<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/membership/${membershipId}/approve`);
+    return response.data;
+  },
+  rejectMembership: async (membershipId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/membership/${membershipId}/reject`);
   },
 };
 

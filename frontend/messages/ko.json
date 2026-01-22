@@ -127,7 +127,20 @@
     "cancel": "취소",
     "eyeMaskingImages": "눈 마스킹 이미지",
     "noEyeMaskingImages": "아직 업로드된 눈 마스킹 이미지가 없습니다",
-    "loading": "로딩 중..."
+    "loading": "로딩 중...",
+    "communityBoards": "커뮤니티 보드",
+    "createdBoards": "생성한 보드",
+    "memberBoards": "멤버 보드",
+    "noBoards": "아직 커뮤니티 보드가 없습니다",
+    "creator": "생성자",
+    "member": "멤버",
+    "category": "카테고리",
+    "pendingRequests": "대기 중인 멤버십 요청",
+    "wantsToJoin": "가 가입을 원합니다",
+    "requestedAt": "요청 시간",
+    "approve": "승인",
+    "reject": "거부",
+    "noPendingRequests": "대기 중인 멤버십 요청이 없습니다"
   },
   "boardProfile": {
     "category": "카테고리",

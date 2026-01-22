@@ -127,7 +127,20 @@
     "cancel": "キャンセル",
     "eyeMaskingImages": "目マスキング画像",
     "noEyeMaskingImages": "まだアップロードされた目マスキング画像がありません",
-    "loading": "読み込み中..."
+    "loading": "読み込み中...",
+    "communityBoards": "コミュニティボード",
+    "createdBoards": "作成したボード",
+    "memberBoards": "メンバーのボード",
+    "noBoards": "まだコミュニティボードがありません",
+    "creator": "作成者",
+    "member": "メンバー",
+    "category": "カテゴリ",
+    "pendingRequests": "保留中のメンバーシップリクエスト",
+    "wantsToJoin": "が参加を希望しています",
+    "requestedAt": "リクエスト日時",
+    "approve": "承認",
+    "reject": "拒否",
+    "noPendingRequests": "保留中のメンバーシップリクエストはありません"
   },
   "boardProfile": {
     "category": "カテゴリ",
