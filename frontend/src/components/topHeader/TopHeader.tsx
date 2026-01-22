@@ -59,23 +59,23 @@ export const RedditHeader = () => {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       {/* Main Header Row */}
-      <div className="flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 md:px-6 py-2 sm:py-3 lg:px-16">
+      <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4 lg:gap-6 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-16 py-2 sm:py-3">
         {/* Logo - Always visible */}
         <div className="flex-shrink-0">
           <Logo text="HiNobody" onClick={() => router.push(ROUTE_PATHS.HOME)} />
         </div>
 
-        {/* Desktop Search Bar - Hidden on mobile */}
-        <div className="hidden md:flex flex-1 max-w-2xl mx-4">
+        {/* Desktop Search Bar - Hidden on mobile, visible from 768px */}
+        <div className="hidden sm:flex flex-1 max-w-xs md:max-w-sm lg:max-w-md xl:max-w-xl mx-2 md:mx-3 lg:mx-4">
           <SearchBar placeholder={t("findAnything")} />
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
-          {/* Mobile Search Icon - Only visible on mobile */}
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 flex-shrink-0">
+          {/* Mobile Search Icon - Only visible on mobile, hidden from 640px */}
           <button
             onClick={() => setShowMobileSearch(!showMobileSearch)}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
+            className="sm:hidden flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
             aria-label="Search"
           >
             <IoIosSearch size={22} className="text-gray-600" />
@@ -99,9 +99,9 @@ export const RedditHeader = () => {
         </div>
       </div>
 
-      {/* Mobile Search Bar - Expandable on mobile */}
+      {/* Mobile Search Bar - Expandable on mobile, hidden from 640px */}
       {showMobileSearch && (
-        <div ref={mobileSearchRef} className="md:hidden px-3 pb-3 pt-2 border-t border-gray-200">
+        <div ref={mobileSearchRef} className="sm:hidden px-3 pb-3 pt-2 border-t border-gray-200">
           <div className="w-full [&>div]:max-w-none">
             <SearchBar placeholder={t("findAnything")} />
           </div>

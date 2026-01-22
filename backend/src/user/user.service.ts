@@ -193,6 +193,7 @@ export class UserService {
         avatar: true,
         createdAt: true,
         updatedAt: true,
+        emailVerified: true
       },
     });
 
