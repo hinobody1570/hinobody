@@ -30,6 +30,11 @@ const EyeMaskingForm = () => {
   const canvasRef = useRef<any>(null);
   const imageRef = useRef<any>(null);
   const fileInputRef = useRef<any>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const cameraCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [streamRef, setStreamRef] = useState<MediaStream | null>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -39,12 +44,9 @@ const EyeMaskingForm = () => {
         // Dynamically import face-api.js to avoid SSR issues
         if (typeof window === "undefined") return;
 
-        console.log("🔧 Loading face-api.js library...");
         // @ts-ignore - face-api.js will be available at runtime after npm install
         const faceApiModule = await import("face-api.js");
         faceapi = faceApiModule;
-
-        console.log("🔧 Loading face-api.js models...");
 
         // Load the models from CDN (face-api.js models)
         // Using @vladmandic/face-api CDN which hosts the models
@@ -52,7 +54,6 @@ const EyeMaskingForm = () => {
 
         await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL), faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)]);
 
-        console.log("✅ face-api.js models loaded successfully");
         setModel({ loaded: true }); // Set a simple flag since face-api.js doesn't need a model object
         setDebugInfo((prev: any) => ({ ...prev, modelLoaded: true, modelError: null }));
       } catch (error: any) {
@@ -82,7 +83,11 @@ const EyeMaskingForm = () => {
   const handleImageChange = (e: any) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log("📷 Image selected:", file.name, `(${(file.size / 1024).toFixed(2)} KB)`);
+      // Close camera if open
+      if (isCameraOpen) {
+        closeCamera();
+      }
+
       setImageFile(file);
       setMasks([]); // Reset masks when new image is selected
       setCroppedMasks([]); // Reset cropped masks
@@ -100,11 +105,220 @@ const EyeMaskingForm = () => {
       const reader = new FileReader();
       reader.onload = (event: any) => {
         setImagePreview(event.target.result);
-        console.log("✅ Image preview created");
       };
       reader.readAsDataURL(file);
     }
   };
+
+  // Open camera
+  const openCamera = async () => {
+    try {
+      setIsVideoReady(false);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false,
+      });
+
+      setStreamRef(stream);
+      setIsCameraOpen(true);
+
+      // Small delay to ensure video element is rendered in DOM
+      setTimeout(() => {
+        if (videoRef.current) {
+          const video = videoRef.current;
+          video.srcObject = stream;
+
+          // Function to set video as ready
+          const setVideoReady = () => {
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+              setIsVideoReady(true);
+              return true;
+            }
+            return false;
+          };
+
+          // Try to play the video
+          video.play().catch((err) => {
+            console.error("❌ Error playing video:", err);
+          });
+
+          // Check immediately (video might be ready right away)
+          if (setVideoReady()) {
+            return;
+          }
+
+          // Wait for loadedmetadata event
+          const onLoadedMetadata = () => {
+            setVideoReady();
+            video.removeEventListener("loadedmetadata", onLoadedMetadata);
+            video.removeEventListener("playing", onPlaying);
+            video.removeEventListener("canplay", onCanPlay);
+          };
+
+          const onPlaying = () => {
+            setVideoReady();
+            video.removeEventListener("loadedmetadata", onLoadedMetadata);
+            video.removeEventListener("playing", onPlaying);
+            video.removeEventListener("canplay", onCanPlay);
+          };
+
+          const onCanPlay = () => {
+            setVideoReady();
+            video.removeEventListener("loadedmetadata", onLoadedMetadata);
+            video.removeEventListener("playing", onPlaying);
+            video.removeEventListener("canplay", onCanPlay);
+          };
+
+          video.addEventListener("loadedmetadata", onLoadedMetadata);
+          video.addEventListener("playing", onPlaying);
+          video.addEventListener("canplay", onCanPlay);
+
+          // Fallback: Check periodically (max 5 seconds)
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds (50 * 100ms)
+          const checkInterval = setInterval(() => {
+            attempts++;
+            if (setVideoReady() || attempts >= maxAttempts) {
+              clearInterval(checkInterval);
+              video.removeEventListener("loadedmetadata", onLoadedMetadata);
+              video.removeEventListener("playing", onPlaying);
+              video.removeEventListener("canplay", onCanPlay);
+
+              if (attempts >= maxAttempts && video.videoWidth === 0) {
+                console.error("❌ Video never became ready after 5 seconds");
+                alert("Camera video is not loading. Please try closing and reopening the camera.");
+              }
+            }
+          }, 100);
+        } else {
+          console.error("❌ Video element not found after delay");
+        }
+      }, 100); // 100ms delay to ensure video element is rendered
+    } catch (error: any) {
+      console.error("Error accessing camera:", error);
+      setIsCameraOpen(false);
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        alert(t("cameraPermissionDenied"));
+      } else {
+        alert(t("cameraError") + ": " + error.message);
+      }
+    }
+  };
+
+  // Close camera
+  const closeCamera = () => {
+    if (streamRef) {
+      streamRef.getTracks().forEach((track) => track.stop());
+      setStreamRef(null);
+    }
+    setIsCameraOpen(false);
+    setIsVideoReady(false);
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  // Capture photo from camera
+  const capturePhoto = () => {
+    if (!videoRef.current || !cameraCanvasRef.current) {
+      console.error("❌ Video or canvas ref not available");
+      alert("Camera not ready. Please wait a moment and try again.");
+      return;
+    }
+
+    const video = videoRef.current;
+    const canvas = cameraCanvasRef.current;
+
+    // Check if video is ready
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+      console.error("❌ Video not ready. ReadyState:", video.readyState);
+      alert("Video not ready. Please wait a moment and try again.");
+      return;
+    }
+
+    // Check if video has valid dimensions
+    if (!video.videoWidth || !video.videoHeight || video.videoWidth === 0 || video.videoHeight === 0) {
+      console.error("❌ Video dimensions invalid:", video.videoWidth, video.videoHeight);
+      alert("Video dimensions not available. Please wait a moment and try again.");
+      return;
+    }
+
+    // Set canvas dimensions
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      console.error("❌ Could not get canvas context");
+      alert("Error capturing photo. Please try again.");
+      return;
+    }
+
+    // Draw video to canvas
+    // Note: CSS transform (mirror) only affects display, not the actual video data
+    // So we draw it directly - this gives us the natural (un-mirrored) image
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert canvas to blob
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          console.error("❌ Failed to create blob from canvas");
+          alert("Error creating image. Please try again.");
+          return;
+        }
+
+        const file = new File([blob], `camera-photo-${Date.now()}.jpg`, { type: "image/jpeg" });
+
+        // Set the image file and preview
+        setImageFile(file);
+        setMasks([]);
+        setCroppedMasks([]);
+        setUploadStatus("");
+        setDebugInfo((prev: any) => ({
+          ...prev,
+          imageLoaded: true,
+          imageName: file.name,
+          imageSize: file.size,
+          croppedMasksCount: 0,
+          croppedMasks: [],
+        }));
+
+        // Create preview URL
+        const reader = new FileReader();
+        reader.onload = (event: any) => {
+          const dataURL = event.target.result;
+          setImagePreview(dataURL);
+
+          // Show success message
+          setUploadStatus("✅ Photo captured successfully! You can now detect and mask eyes.");
+
+          // Close camera after a brief delay to show the captured image
+          setTimeout(() => {
+            closeCamera();
+            console.log("✅ Camera closed after capture");
+          }, 100);
+        };
+        reader.onerror = (error) => {
+          console.error("❌ Error reading file:", error);
+          alert("Error processing captured image. Please try again.");
+          closeCamera();
+        };
+        reader.readAsDataURL(file);
+      },
+      "image/jpeg",
+      0.9
+    );
+  };
+
+  // Cleanup camera stream on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef) {
+        streamRef.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [streamRef]);
 
   // Draw image and masks on canvas
   const drawCanvas = async () => {
@@ -157,11 +371,6 @@ const EyeMaskingForm = () => {
   // Crop all masks whenever masks array changes
   useEffect(() => {
     if (masks.length > 0 && imageRef.current && imagePreview) {
-      console.log(`🔄 Masks array changed (${masks.length} mask(s)), cropping ALL regions...`);
-      console.log(
-        "📋 Current masks:",
-        masks.map((m: any, i: any) => `Mask ${i + 1}: (${m.x}, ${m.y}) ${m.width}×${m.height}`)
-      );
       // Use a small delay to ensure imageRef is ready
       const timer = setTimeout(() => {
         if (imageRef.current) {
@@ -173,7 +382,6 @@ const EyeMaskingForm = () => {
       return () => clearTimeout(timer);
     } else if (masks.length === 0) {
       // Clear cropped masks when all masks are cleared
-      console.log("🔄 All masks cleared, clearing cropped masks");
       setCroppedMasks([]);
       setDebugInfo((prev: any) => ({ ...prev, croppedMasksCount: 0 }));
     }
@@ -181,7 +389,7 @@ const EyeMaskingForm = () => {
   }, [masks, imagePreview]);
 
   // Automatic eye detection and masking
- const detectAndMaskEyes = async () => {
+  const detectAndMaskEyes = async () => {
     if (!model || !model.loaded || !canvasRef.current || !imagePreview) {
       alert("Please wait for the model to load and select an image.");
       return;
@@ -207,8 +415,6 @@ const EyeMaskingForm = () => {
       ctx.drawImage(img, 0, 0);
 
       // Detect faces and landmarks using face-api.js
-      console.log("🔍 Starting face detection...");
-      console.log("📸 Image dimensions:", img.width, "x", img.height);
 
       if (!faceapi) {
         throw new Error("face-api.js not loaded. Please wait for the model to load.");
@@ -217,7 +423,6 @@ const EyeMaskingForm = () => {
       // Use face-api.js to detect faces with landmarks
       const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
 
-      console.log(`✅ Detected ${detections.length} face(s)`);
       setDebugInfo((prev: any) => ({ ...prev, facesDetected: detections.length }));
 
       const newMasks: any[] = [];
@@ -225,7 +430,7 @@ const EyeMaskingForm = () => {
       // Process each detected face
       for (let i = 0; i < detections.length; i++) {
         const detection = detections[i];
-        
+
         if (!detection.landmarks) {
           continue;
         }
@@ -249,7 +454,6 @@ const EyeMaskingForm = () => {
 
         // First validate if this is actually a human face (not an object like basket, mobile, etc.)
         const faceValidation = validateHumanFace(detection, img, leftEyeBounds, rightEyeBounds);
-        console.log("faceValidation", faceValidation);
         if (!faceValidation.isHuman) {
           console.error("❌ Non-human object detected:", faceValidation.reason);
           console.error("❌ REJECTING this detection - will NOT create masks");
@@ -260,8 +464,6 @@ const EyeMaskingForm = () => {
           }));
           continue; // CRITICAL: Skip this detection - it's not a human face
         }
-
-        console.log("✅ Human face validated:", faceValidation.reason);
 
         // Validate eye detection quality and check for glasses
         // Combine all landmarks for validation
@@ -316,8 +518,6 @@ const EyeMaskingForm = () => {
           };
 
           newMasks.push(combinedMask);
-          console.log("✅ Created combined eye mask covering both eyes:", combinedMask);
-          console.log("✅ Eye validation passed:", validation.issues);
         } else if (leftEyeBounds && leftEyeBounds.width > 0 && leftEyeBounds.height > 0) {
           // Fallback: if only left eye detected, use it with padding
           const paddingX = leftEyeBounds.width * 0.2;
@@ -342,7 +542,6 @@ const EyeMaskingForm = () => {
       }
 
       setMasks(newMasks);
-      console.log(`✅ Created ${newMasks.length} eye mask(s):`, newMasks);
       setDebugInfo((prev: any) => ({ ...prev, masksCreated: newMasks.length, masks: newMasks }));
 
       if (newMasks.length === 0) {
@@ -509,8 +708,6 @@ const EyeMaskingForm = () => {
       // Detect glasses using horizontal edge detection
       const glassesScore = detectGlasses(imageData);
 
-      console.log("🔍 Glasses detection score:", glassesScore.toFixed(3));
-
       // Higher threshold to reduce false positives - only flag obvious glasses
       if (glassesScore > 0.5) {
         issues.push("Glasses detected - please remove glasses or use manual masking");
@@ -586,12 +783,6 @@ const EyeMaskingForm = () => {
     // Combine both factors - glasses have both high density and high strength
     const combinedScore = edgeDensity * (avgEdgeStrength / 100);
 
-    console.log("📊 Glasses detection details:", {
-      edgeDensity: edgeDensity.toFixed(3),
-      avgEdgeStrength: avgEdgeStrength.toFixed(1),
-      combinedScore: combinedScore.toFixed(3),
-    });
-
     return Math.min(combinedScore, 1.0); // Cap at 1.0
   };
 
@@ -599,7 +790,6 @@ const EyeMaskingForm = () => {
   const cropMaskedRegions = async (maskArray: any, sourceImage: any) => {
     if (!maskArray || maskArray.length === 0 || !sourceImage) return;
 
-    console.log("✂️ Cropping masked regions...");
     const croppedPromises = [];
 
     for (let i = 0; i < maskArray.length; i++) {
@@ -650,14 +840,6 @@ const EyeMaskingForm = () => {
               index: i,
             };
 
-            console.log(`✅ Cropped mask ${i + 1}:`, {
-              x,
-              y,
-              width,
-              height,
-              size: `${(blob.size / 1024).toFixed(2)} KB`,
-            });
-
             resolve(croppedData);
           },
           "image/jpeg",
@@ -676,19 +858,8 @@ const EyeMaskingForm = () => {
     }
 
     try {
-      console.log(`⏳ Waiting for ${croppedPromises.length} crop(s) to complete...`);
       const croppedImages: any = await Promise.all(croppedPromises);
-      console.log(`✅ Successfully cropped and stored ${croppedImages.length} masked region(s)`);
-      console.log(
-        "📦 Cropped masks details:",
-        croppedImages.map((c: any, i: any) => ({
-          index: i + 1,
-          position: `(${c.x}, ${c.y})`,
-          size: `${c.width}×${c.height}`,
-          hasImage: !!c.image,
-          hasDataURL: !!c.dataURL,
-        }))
-      );
+
       setCroppedMasks(croppedImages);
       setDebugInfo((prev: any) => ({
         ...prev,
@@ -741,8 +912,6 @@ const EyeMaskingForm = () => {
     if (currentMask && currentMask.width > 5 && currentMask.height > 5) {
       const updatedMasks = [...masks, currentMask];
       setMasks(updatedMasks);
-      console.log("✅ Manual mask added:", currentMask);
-      console.log(`📊 Total masks: ${updatedMasks.length}`);
       setDebugInfo((prev: any) => ({ ...prev, masksCreated: updatedMasks.length }));
 
       // Note: Cropping will happen automatically via useEffect when masks state updates
@@ -756,7 +925,6 @@ const EyeMaskingForm = () => {
   const compressImage = async (blob: any) => {
     try {
       const originalSize = (blob.size / 1024).toFixed(2);
-      console.log(`🗜️ Compressing image... Original size: ${originalSize} KB`);
 
       const options = {
         maxSizeMB: 1,
@@ -767,7 +935,6 @@ const EyeMaskingForm = () => {
       const compressedFile = await imageCompression(blob, options);
       const compressedSize = (compressedFile.size / 1024).toFixed(2);
       const compressionRatio = ((1 - compressedFile.size / blob.size) * 100).toFixed(1);
-      console.log(`✅ Image compressed: ${compressedSize} KB (${compressionRatio}% reduction)`);
       setDebugInfo((prev: any) => ({ ...prev, originalSize, compressedSize, compressionRatio }));
       return compressedFile;
     } catch (error) {
@@ -829,7 +996,6 @@ const EyeMaskingForm = () => {
 
     setIsProcessing(true);
     setUploadStatus("Processing...");
-    console.log(`📤 Starting upload process... Mode: ${mode}, Masks: ${masks.length}, Cropped Masks: ${croppedMasks.length}`);
 
     try {
       let filesToUpload: File[] = [];
@@ -837,7 +1003,6 @@ const EyeMaskingForm = () => {
 
       // Check if we have cropped masks - if yes, upload all cropped masks
       if (croppedMasks && croppedMasks.length > 0) {
-        console.log(`📦 Found ${croppedMasks.length} cropped mask(s), uploading all...`);
         setUploadStatus(`Preparing ${croppedMasks.length} cropped image(s)...`);
 
         // Convert all cropped masks to Files
@@ -847,7 +1012,7 @@ const EyeMaskingForm = () => {
             const fileName = `masked-crop-${i + 1}-${Date.now()}-${imageFile.name}`;
             const file = blobToFile(cropped.image, fileName);
             filesToUpload.push(file);
-            
+
             // Prepare image data for database
             imageDataArray.push({
               url: "", // Will be filled after upload
@@ -863,19 +1028,15 @@ const EyeMaskingForm = () => {
         if (filesToUpload.length === 0) {
           throw new Error("No valid cropped masks to upload");
         }
-
-        console.log(`✅ Prepared ${filesToUpload.length} cropped image(s) for upload`);
       } else {
         // Fallback: Upload the main masked image from canvas
-        console.log("🎨 No cropped masks found, uploading main masked image from canvas...");
         setUploadStatus("Creating masked image from canvas...");
-        
+
         const maskedBlob = await getMaskedImageBlob();
         if (!maskedBlob) {
           throw new Error(t("failedToCreateMaskedImage"));
         }
 
-        console.log("✅ Masked image blob created successfully");
         const maskedFile = blobToFile(maskedBlob, `masked-${imageFile.name}`);
         filesToUpload.push(maskedFile);
 
@@ -892,11 +1053,9 @@ const EyeMaskingForm = () => {
 
       // Upload all files to S3 using bulk upload API
       setUploadStatus(`Uploading ${filesToUpload.length} image(s) to S3...`);
-      console.log(`☁️ Uploading ${filesToUpload.length} image(s) to S3...`);
-      console.log("⚠️ Note: Only the masked/cropped images are uploaded. Original image stays in browser.");
-      
+
       const uploadResults = await s3Api.uploadFiles(filesToUpload, "uploads/contractor");
-      
+
       if (!uploadResults || uploadResults.length === 0) {
         throw new Error("Failed to upload images to S3");
       }
@@ -904,8 +1063,6 @@ const EyeMaskingForm = () => {
       if (uploadResults.length !== filesToUpload.length) {
         console.warn(`⚠️ Uploaded ${uploadResults.length} images but expected ${filesToUpload.length}`);
       }
-
-      console.log(`✅ Success! ${uploadResults.length} image(s) uploaded to S3`);
 
       // Update image data with S3 URLs and keys
       for (let i = 0; i < uploadResults.length && i < imageDataArray.length; i++) {
@@ -915,19 +1072,17 @@ const EyeMaskingForm = () => {
 
       // Save all image URLs to database
       setUploadStatus("Saving to database...");
-      console.log(`💾 Saving ${imageDataArray.length} image record(s) to database...`);
-      
+
       const savedImages = await eyeMaskedImagesApi.createBulk(imageDataArray);
-      
-      console.log(`✅ Success! ${savedImages.length} image(s) saved to database`);
+
       setUploadStatus(`Success! ${savedImages.length} image(s) uploaded and saved.`);
-      setDebugInfo((prev: any) => ({ 
-        ...prev, 
+      setDebugInfo((prev: any) => ({
+        ...prev,
         uploadedCount: savedImages.length,
         s3Keys: uploadResults.map((r: any) => r.key),
         s3Urls: uploadResults.map((r: any) => r.url),
         dbIds: savedImages.map((img: any) => img.id),
-        uploadSuccess: true 
+        uploadSuccess: true,
       }));
 
       // Clear the original image from memory (privacy requirement)
@@ -983,8 +1138,66 @@ const EyeMaskingForm = () => {
       <form onSubmit={handleSubmit} className="masking-form">
         <div className="form-group">
           <label htmlFor="image-upload">{t("selectImage")}</label>
-          <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} ref={fileInputRef} disabled={isProcessing} />
+          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              ref={fileInputRef}
+              disabled={isProcessing || isCameraOpen}
+            />
+            <button
+              type="button"
+              onClick={openCamera}
+              disabled={isProcessing || isCameraOpen}
+              className="btn btn-secondary cursor-pointer"
+              style={{ padding: "8px 16px" }}
+            >
+              {t("takePhoto")}
+            </button>
+          </div>
         </div>
+
+        {/* Camera Preview */}
+        {isCameraOpen && (
+          <div
+            style={{
+              marginBottom: "20px",
+              padding: "20px",
+              border: "2px solid #ddd",
+              borderRadius: "8px",
+              backgroundColor: "#f9f9f9",
+            }}
+          >
+            <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: "100%" }}>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  borderRadius: "8px",
+                  transform: "scaleX(-1)", // Mirror the video
+                }}
+              />
+              <canvas ref={cameraCanvasRef} style={{ display: "none" }} />
+            </div>
+            <div style={{ marginTop: "15px", display: "flex", gap: "10px", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+              {!isVideoReady && <p style={{ color: "#666", marginBottom: "10px" }}>Loading camera...</p>}
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button type="button" onClick={capturePhoto} className="btn btn-primary cursor-pointer" disabled={isProcessing || !isVideoReady}>
+                  {t("capturePhoto")}
+                </button>
+                <button type="button" onClick={closeCamera} className="btn btn-secondary cursor-pointer" disabled={isProcessing}>
+                  {t("closeCamera")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {imagePreview && (
           <>
@@ -1030,8 +1243,8 @@ const EyeMaskingForm = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      pointerEvents: "none", 
-                      color: "white"
+                      pointerEvents: "none",
+                      color: "white",
                     }}
                   >
                     <ButtonLoader /> detecting....
@@ -1043,7 +1256,12 @@ const EyeMaskingForm = () => {
             <div className="controls">
               {mode === "auto" && (
                 <>
-                  <button type="button" onClick={detectAndMaskEyes} disabled={isProcessing || !model || !model.loaded} className="btn btn-primary cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={detectAndMaskEyes}
+                    disabled={isProcessing || !model || !model.loaded}
+                    className="btn btn-primary cursor-pointer"
+                  >
                     {isProcessing ? t("detecting") : t("detectAndMaskEyes")}
                   </button>
                   {masks.length === 0 && !debugInfo.validationFailed && (
