@@ -73,6 +73,45 @@ export class BlockService {
     });
   }
 
+  async findAllForAdmin(page: number = 1, limit: number = 20) {
+    const skip = (page - 1) * limit;
+    
+    const [blocks, total] = await Promise.all([
+      this.prisma.block.findMany({
+        skip,
+        take: limit,
+        include: {
+          blocker: {
+            select: {
+              id: true,
+              nickname: true,
+              email: true,
+            },
+          },
+          blocked: {
+            select: {
+              id: true,
+              nickname: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.block.count(),
+    ]);
+
+    return {
+      data: blocks,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async findOne(id: string) {
     const block = await this.prisma.block.findUnique({
       where: { id },

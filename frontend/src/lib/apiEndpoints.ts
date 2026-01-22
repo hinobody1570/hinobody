@@ -15,6 +15,7 @@ export const API_END_POINT = {
     VOTES: "/votes",
     COMMENTS: "/comments",
     REPORTS: "/reports",
+    BLOCKS: "/blocks",
     S3_UPLOAD: "/s3/upload",
     S3_UPLOAD_BULK: "/s3/upload/bulk",
     S3_FILES: "/s3/files",

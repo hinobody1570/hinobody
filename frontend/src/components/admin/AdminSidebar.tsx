@@ -8,7 +8,9 @@ import {
   FaFileAlt, 
   FaLayerGroup,
   FaHome,
-  FaEye
+  FaEye,
+  FaExclamationTriangle,
+  FaBan
 } from "react-icons/fa";
 
 interface SidebarItem {
@@ -42,6 +44,16 @@ export function AdminSidebar() {
       icon: FaEye,
       label: t("eyeMasking"),
       path: ROUTE_PATHS.ADMIN_EYE_MASKING,
+    },
+    {
+      icon: FaExclamationTriangle,
+      label: t("reports"),
+      path: ROUTE_PATHS.ADMIN_REPORTS,
+    },
+    {
+      icon: FaBan,
+      label: t("blocks"),
+      path: ROUTE_PATHS.ADMIN_BLOCKS,
     },
   ];
 

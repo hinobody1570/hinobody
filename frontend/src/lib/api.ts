@@ -670,21 +670,81 @@ export interface CreateReportDto {
   commentId?: string;
 }
 
+export interface ReportsResponse {
+  data: Report[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export interface Report {
   id: string;
   reason: string;
-  status: string;
+  status: 'PENDING' | 'REVIEWED' | 'RESOLVED' | 'DISMISSED';
   postId?: string;
   commentId?: string;
   reportedById: string;
   createdAt: string;
-  updatedAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  reportedBy?: {
+    id: string;
+    nickname: string;
+  };
+  post?: {
+    id: string;
+    title: string;
+    author?: {
+      id: string;
+      nickname: string;
+    };
+  };
+  comment?: {
+    id: string;
+    body: string;
+    author?: {
+      id: string;
+      nickname: string;
+    };
+  };
+}
+
+export interface UpdateReportDto {
+  status?: 'PENDING' | 'REVIEWED' | 'RESOLVED' | 'DISMISSED';
 }
 
 export const reportsApi = {
   create: async (createReportDto: CreateReportDto): Promise<Report> => {
     const response = await api.post<ApiResponse<Report>>(API_END_POINT.REPORTS, createReportDto);
     return response.data;
+  },
+  getAll: async (page: number = 1, limit: number = 20, status?: string, search?: string): Promise<ReportsResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (status) {
+      params.append('status', status);
+    }
+    if (search) {
+      params.append('search', search);
+    }
+    const response = await api.get<ApiResponse<ReportsResponse>>(`${API_END_POINT.REPORTS}?${params.toString()}`);
+    return response.data;
+  },
+  getById: async (id: string): Promise<Report> => {
+    const response = await api.get<ApiResponse<Report>>(`${API_END_POINT.REPORTS}/${id}`);
+    return response.data;
+  },
+  update: async (id: string, updateReportDto: UpdateReportDto): Promise<Report> => {
+    const response = await api.patch<ApiResponse<Report>>(`${API_END_POINT.REPORTS}/${id}`, updateReportDto);
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.REPORTS}/${id}`);
   },
 };
 
@@ -784,6 +844,49 @@ export const searchApi = {
     queryParams.append('page', page.toString());
     queryParams.append('limit', limit.toString());
     const response = await api.get<ApiResponse<SearchResponse>>(`/search?${queryParams.toString()}`);
+    return response.data;
+  },
+};
+
+// Blocks API endpoints
+export interface Block {
+  id: string;
+  blockerId: string;
+  blockedId: string;
+  createdAt: string;
+  blocker?: {
+    id: string;
+    nickname: string;
+    email: string;
+  };
+  blocked?: {
+    id: string;
+    nickname: string;
+    email: string;
+  };
+}
+
+export interface BlocksResponse {
+  data: Block[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export const blocksApi = {
+  getAll: async (page: number = 1, limit: number = 20): Promise<BlocksResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    const response = await api.get<ApiResponse<BlocksResponse>>(`${API_END_POINT.BLOCKS}/admin?${params.toString()}`);
+    return response.data;
+  },
+  getById: async (id: string): Promise<Block> => {
+    const response = await api.get<ApiResponse<Block>>(`${API_END_POINT.BLOCKS}/${id}`);
     return response.data;
   },
 };
