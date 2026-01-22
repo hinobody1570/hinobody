@@ -17,7 +17,7 @@ const transformPost = (post: Post): any => {
     id: post.id,
     boardId: post.boardId, // Add boardId for membership checks
     authorId: post.authorId, // Add authorId for comment OP badge
-    community: post.board?.name ? `r/${post.board.name}` : "r/community",
+    community: post.board?.name ? `r/${post.board.name}/${post.author?.nickname}` : "r/community",
     communityAvatar: DP, // Default avatar
     verified: false, // Can be enhanced later based on board settings
     timestamp: formatTimestamp(post.createdAt),
@@ -54,7 +54,7 @@ export const RedditFeed = () => {
   const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
-  const [selectedBoardName, setSelectedBoardName] = useState<string>(t('best'));
+  const [selectedBoardName, setSelectedBoardName] = useState<string>(t('allBoards'));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
@@ -117,6 +117,7 @@ export const RedditFeed = () => {
         limit: 20,
         boardId: boardId || undefined,
       });
+      console.log("console",response)
       const transformedPosts = response.data.map(transformPost);
       
       if (append) {
