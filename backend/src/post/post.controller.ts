@@ -67,8 +67,8 @@ export class PostController {
   })
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiResponse({ status: 200, description: 'List of posts with pagination' })
-  findAll(@Query() query: QueryPostsDto) {
-    return this.postService.findAll(query);
+  findAll(@Query() query: QueryPostsDto, @GetUser('id') userId: string) {
+    return this.postService.findAll(query, userId);
   }
 
   @Get('feed')
@@ -76,8 +76,8 @@ export class PostController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get home feed (all boards combined)' })
   @ApiResponse({ status: 200, description: 'Home feed posts' })
-  getHomeFeed(@Query() query: QueryPostsDto) {
-    return this.postService.getHomeFeed(query);
+  getHomeFeed(@Query() query: QueryPostsDto, @GetUser('id') userId: string) {
+    return this.postService.getHomeFeed(query, userId);
   }
 
   @Get(':id')

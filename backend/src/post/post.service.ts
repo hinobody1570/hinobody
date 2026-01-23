@@ -86,13 +86,36 @@ export class PostService {
     return post;
   }
 
-  async findAll(query: QueryPostsDto) {
+  async findAll(query: QueryPostsDto, userId?: string) {
     const { boardId, authorId, page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
 
+    // Get blocked user IDs if userId is provided
+    let blockedUserIds: string[] = [];
+    if (userId) {
+      const blocks = await this.prisma.block.findMany({
+        where: { blockerId: userId },
+        select: { blockedId: true },
+      });
+      blockedUserIds = blocks.map((block) => block.blockedId);
+    }
+
     // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
     if (search) {
-      return this.findAllWithFTS(query);
+      return this.findAllWithFTS(query, blockedUserIds);
+    }
+
+    // If authorId is specified and that author is blocked, return empty results
+    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      };
     }
 
     const where: Prisma.PostWhereInput = {
@@ -100,6 +123,12 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      // Exclude posts from blocked users (only if authorId is not specified)
+      ...(!authorId && blockedUserIds.length > 0 && {
+        authorId: {
+          notIn: blockedUserIds,
+        },
+      }),
     };
 
     const [posts, total] = await Promise.all([
@@ -142,9 +171,22 @@ export class PostService {
     };
   }
 
-  private async findAllWithFTS(query: QueryPostsDto) {
+  private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = []) {
     const { boardId, authorId, page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
+
+    // If authorId is specified and that author is blocked, return empty results
+    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      };
+    }
 
     // Use simple Prisma search instead of FTS to avoid requiring search_vector column
     const where: Prisma.PostWhereInput = {
@@ -152,6 +194,12 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      // Exclude posts from blocked users (only if authorId is not specified)
+      ...(!authorId && blockedUserIds.length > 0 && {
+        authorId: {
+          notIn: blockedUserIds,
+        },
+      }),
       OR: search
         ? [
             {
@@ -317,10 +365,13 @@ export class PostService {
   }
 
   // Get home feed (all boards combined)
-  async getHomeFeed(query: QueryPostsDto) {
-    return this.findAll({
-      ...query,
-      boardId: undefined, // Remove board filter for home feed
-    });
+  async getHomeFeed(query: QueryPostsDto, userId?: string) {
+    return this.findAll(
+      {
+        ...query,
+        boardId: undefined, // Remove board filter for home feed
+      },
+      userId,
+    );
   }
 }
