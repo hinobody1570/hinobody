@@ -51,6 +51,14 @@ export class BlockController {
     return this.blockService.findAll(userId);
   }
 
+  @Get('check/:blockedId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Check if current user has blocked a specific user' })
+  checkBlockStatus(@Param('blockedId') blockedId: string, @GetUser('id') userId: string) {
+    return this.blockService.isBlocked(userId, blockedId);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

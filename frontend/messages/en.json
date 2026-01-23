@@ -140,6 +140,12 @@
     "approve": "Approve",
     "reject": "Reject",
     "noPendingRequests": "No pending membership requests",
+    "blockUser": "Block User",
+    "unblockUser": "Unblock User",
+    "blockedUser": "Blocked User",
+    "confirmBlockUser": "Block User?",
+    "confirmBlockUserMessage": "Are you sure you want to block {name}? You won't be able to see their posts or interact with them.",
+    "confirmBlock": "Block",
     "loading": "Loading..."
   },
   "boardProfile": {

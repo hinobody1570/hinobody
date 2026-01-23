@@ -908,5 +908,16 @@ export const blocksApi = {
     const response = await api.get<ApiResponse<Block>>(`${API_END_POINT.BLOCKS}/${id}`);
     return response.data;
   },
+  checkBlockStatus: async (blockedId: string): Promise<boolean> => {
+    const response = await api.get<ApiResponse<boolean>>(`${API_END_POINT.BLOCKS}/check/${blockedId}`);
+    return response.data;
+  },
+  blockUser: async (blockedId: string): Promise<Block> => {
+    const response = await api.post<ApiResponse<Block>>(API_END_POINT.BLOCKS, { blockedId });
+    return response.data;
+  },
+  unblockUser: async (blockedId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BLOCKS}/${blockedId}`);
+  },
 };
 

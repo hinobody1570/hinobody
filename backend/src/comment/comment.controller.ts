@@ -40,7 +40,6 @@ export class CommentController {
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiQuery({ name: 'authorId', required: false, description: 'Filter by author ID' })
   findByPost(@Param('postId') postId: string, @Query() query: QueryCommentsDto) {
-    console.log("API CLICK.........")
     return this.commentService.findByPost(postId, { ...query, postId });
   }
 

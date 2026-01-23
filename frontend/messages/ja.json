@@ -140,7 +140,13 @@
     "requestedAt": "リクエスト日時",
     "approve": "承認",
     "reject": "拒否",
-    "noPendingRequests": "保留中のメンバーシップリクエストはありません"
+    "noPendingRequests": "保留中のメンバーシップリクエストはありません",
+    "blockUser": "ユーザーをブロック",
+    "unblockUser": "ブロック解除",
+    "blockedUser": "ブロックされたユーザー",
+    "confirmBlockUser": "ユーザーをブロックしますか？",
+    "confirmBlockUserMessage": "{name}をブロックしてもよろしいですか？彼らの投稿を見たり、やり取りしたりできなくなります。",
+    "confirmBlock": "ブロック"
   },
   "boardProfile": {
     "category": "カテゴリ",

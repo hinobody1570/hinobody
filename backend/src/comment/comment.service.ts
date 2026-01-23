@@ -115,7 +115,6 @@ export class CommentService {
       },
       orderBy: { createdAt: 'asc' },
     });
-    console.log("reply",directReplies)
     // Recursively fetch nested replies for each direct reply
     // This will fetch replies to replies, replies to those replies, etc.
     // If there are no direct replies, this will be an empty array
@@ -124,7 +123,6 @@ export class CommentService {
           directReplies.map((reply) => this.fetchCommentWithReplies(reply.id))
         )
       : [];
-        console.log("repliesWithNested",repliesWithNested)
     // Explicitly construct the return object to ensure all properties are included
     // This ensures nested replies are always included in the response
     return {
@@ -186,7 +184,6 @@ export class CommentService {
       }),
       this.prisma.comment.count({ where }),
     ]);
-    console.log("topLevelComments",topLevelComments)
     // Fetch nested replies for each top-level comment
     const commentsWithReplies = await Promise.all(
       topLevelComments.map((comment) => this.fetchCommentWithReplies(comment.id))

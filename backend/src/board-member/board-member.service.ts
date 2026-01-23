@@ -148,7 +148,6 @@ export class BoardMemberService {
         },
       },
     });
-    console.log("membership",membership)
     return membership || null;
   }
 

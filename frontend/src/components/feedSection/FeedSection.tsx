@@ -117,7 +117,6 @@ export const RedditFeed = () => {
         limit: 20,
         boardId: boardId || undefined,
       });
-      console.log("console",response)
       const transformedPosts = response.data.map(transformPost);
       
       if (append) {

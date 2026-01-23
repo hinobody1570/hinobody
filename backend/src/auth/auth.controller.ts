@@ -198,14 +198,6 @@ export class AuthController {
 
     const callbackURL = process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
     
-    // Debug logging (remove in production or use proper logger)
-    console.log('Apple OAuth Debug:', {
-      clientID,
-      callbackURL,
-      teamID: process.env.APPLE_TEAM_ID ? 'Set' : 'Missing',
-      keyID: process.env.APPLE_KEY_ID ? 'Set' : 'Missing',
-      privateKey: process.env.APPLE_PRIVATE_KEY ? 'Set' : 'Missing',
-    });
     
     // Ensure callback URL doesn't have trailing slash and matches exactly
     const normalizedCallbackURL = callbackURL.replace(/\/$/, '');
@@ -215,9 +207,7 @@ export class AuthController {
     // Build Apple authorization URL
     // Note: For localhost, Apple requires exact match in Service ID configuration
     const appleAuthURL = `https://appleid.apple.com/auth/authorize?client_id=${encodeURIComponent(clientID)}&redirect_uri=${redirectURI}&response_type=code&scope=email%20name&state=${state}&response_mode=form_post`;
-    
-    console.log('Redirecting to Apple:', appleAuthURL);
-    
+        
     res.redirect(appleAuthURL);
   }
 

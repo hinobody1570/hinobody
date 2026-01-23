@@ -140,7 +140,13 @@
     "requestedAt": "요청 시간",
     "approve": "승인",
     "reject": "거부",
-    "noPendingRequests": "대기 중인 멤버십 요청이 없습니다"
+    "noPendingRequests": "대기 중인 멤버십 요청이 없습니다",
+    "blockUser": "사용자 차단",
+    "unblockUser": "차단 해제",
+    "blockedUser": "차단된 사용자",
+    "confirmBlockUser": "사용자를 차단하시겠습니까?",
+    "confirmBlockUserMessage": "{name}을(를) 차단하시겠습니까? 해당 사용자의 게시물을 보거나 상호작용할 수 없게 됩니다.",
+    "confirmBlock": "차단"
   },
   "boardProfile": {
     "category": "카테고리",

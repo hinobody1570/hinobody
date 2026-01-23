@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage, s3Api, boardsApi, Board, BoardMembership } from '@/lib/api';
+import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage, s3Api, boardsApi, Board, BoardMembership, blocksApi } from '@/lib/api';
 import { ROUTE_PATHS } from '@/routes/paths';
 import Image from 'next/image';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { PostCard } from '@/components/reuseComponents/PostCard';
 import { useAuth } from '@/contexts/AuthContext';
-import { FiEdit, FiCamera, FiCheck, FiX } from 'react-icons/fi';
+import { FiEdit, FiCamera, FiCheck, FiX, FiUserX } from 'react-icons/fi';
 import { FaImages, FaUsers } from 'react-icons/fa';
 
 const transformPost = (post: Post): any => {
@@ -47,6 +47,10 @@ export default function UserProfilePage() {
   const [createdBoards, setCreatedBoards] = useState<Board[]>([]);
   const [memberBoards, setMemberBoards] = useState<Board[]>([]);
   const [pendingRequests, setPendingRequests] = useState<BoardMembership[]>([]);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [isCheckingBlock, setIsCheckingBlock] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
+  const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [loadingImages, setLoadingImages] = useState(true);
@@ -229,6 +233,56 @@ export default function UserProfilePage() {
     fetchPendingRequests();
   }, [userId, isOwnProfile]);
 
+  useEffect(() => {
+    const checkBlockStatus = async () => {
+      // Only check if viewing another user's profile and user is logged in
+      if (isOwnProfile || !currentUser || !userId) return;
+      
+      try {
+        setIsCheckingBlock(true);
+        const blocked = await blocksApi.checkBlockStatus(userId);
+        setIsBlocked(blocked);
+      } catch (err: any) {
+        console.error('Error checking block status:', err);
+      } finally {
+        setIsCheckingBlock(false);
+      }
+    };
+
+    checkBlockStatus();
+  }, [userId, isOwnProfile, currentUser]);
+
+  const handleBlockUser = async () => {
+    if (!userId || !currentUser) return;
+    
+    try {
+      setIsBlocking(true);
+      await blocksApi.blockUser(userId);
+      setIsBlocked(true);
+      setShowBlockConfirm(false);
+    } catch (err: any) {
+      console.error('Error blocking user:', err);
+      alert(err.message || 'Failed to block user');
+    } finally {
+      setIsBlocking(false);
+    }
+  };
+
+  const handleUnblockUser = async () => {
+    if (!userId || !currentUser) return;
+    
+    try {
+      setIsBlocking(true);
+      await blocksApi.unblockUser(userId);
+      setIsBlocked(false);
+    } catch (err: any) {
+      console.error('Error unblocking user:', err);
+      alert(err.message || 'Failed to unblock user');
+    } finally {
+      setIsBlocking(false);
+    }
+  };
+
   const handleApproveRequest = async (membershipId: string) => {
     try {
       await boardsApi.approveMembership(membershipId);
@@ -315,25 +369,58 @@ export default function UserProfilePage() {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-4 mb-2 justify-between">
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editForm.nickname}
-                    onChange={(e) => setEditForm({ ...editForm, nickname: e.target.value })}
-                    className="text-3xl font-bold text-gray-900 border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:border-blue-500"
-                  />
-                ) : (
-                  <h1 className="text-3xl font-bold text-gray-900">{user.nickname}</h1>
-                )}
-                {isOwnProfile && !isEditing && (
-                  <button
-                    onClick={handleEdit}
-                    className="flex items-center gap-2 px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-                  >
-                    <FiEdit size={16} />
-                    <span>{t('edit')}</span>
-                  </button>
-                )}
+                <div className="flex items-center gap-3">
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editForm.nickname}
+                      onChange={(e) => setEditForm({ ...editForm, nickname: e.target.value })}
+                      className="text-3xl font-bold text-gray-900 border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:border-blue-500"
+                    />
+                  ) : (
+                    <h1 className="text-3xl font-bold text-gray-900">{user.nickname}</h1>
+                  )}
+                  {!isOwnProfile && isBlocked && (
+                    <span className="text-sm bg-red-100 text-red-800 px-3 py-1 rounded-full flex items-center gap-1">
+                      <FiUserX size={14} />
+                      {t('blockedUser')}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {!isOwnProfile && currentUser && (
+                    <>
+                      {isBlocked ? (
+                        <button
+                          onClick={handleUnblockUser}
+                          disabled={isBlocking}
+                          className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          <FiUserX size={16} />
+                          <span>{isBlocking ? t('processing') : t('unblockUser')}</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setShowBlockConfirm(true)}
+                          disabled={isCheckingBlock || isBlocking}
+                          className="flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          <FiUserX size={16} />
+                          <span>{t('blockUser')}</span>
+                        </button>
+                      )}
+                    </>
+                  )}
+                  {isOwnProfile && !isEditing && (
+                    <button
+                      onClick={handleEdit}
+                      className="flex items-center gap-2 px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                    >
+                      <FiEdit size={16} />
+                      <span>{t('edit')}</span>
+                    </button>
+                  )}
+                </div>
               </div>
               <p className="text-gray-600 mb-4">{user.email}</p>
               <div className="flex items-center gap-6 text-sm text-gray-500">
@@ -360,6 +447,33 @@ export default function UserProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Block User Confirmation Dialog */}
+        {showBlockConfirm && (
+          <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('confirmBlockUser')}</h3>
+              <p className="text-gray-600 mb-6">
+                {t('confirmBlockUserMessage', { name: user.nickname })}
+              </p>
+              <div className="flex items-center gap-3 justify-end">
+                <button
+                  onClick={() => setShowBlockConfirm(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors cursor-pointer"
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  onClick={handleBlockUser}
+                  disabled={isBlocking}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isBlocking ? t('processing') : t('confirmBlock')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Eye Masking Images Section - Only show on own profile */}
         {isOwnProfile && (
