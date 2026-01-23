@@ -155,7 +155,11 @@
     "imageSizeTooLarge": "이미지 크기는 5MB 미만이어야 합니다",
     "uploading": "업로드 중...",
     "failedToApproveRequest": "요청 승인에 실패했습니다",
-    "failedToRejectRequest": "요청 거부에 실패했습니다"
+    "failedToRejectRequest": "요청 거부에 실패했습니다",
+    "loadingUserProfile": "사용자 프로필 로딩 중...",
+    "loadingPosts": "게시물 로딩 중...",
+    "userNotFound": "사용자를 찾을 수 없습니다",
+    "failedToLoadUserProfile": "사용자 프로필 로드에 실패했습니다"
   },
   "boardProfile": {
     "category": "카테고리",
@@ -166,10 +170,16 @@
     "loading": "로딩 중...",
     "posts": "게시물",
     "noPosts": "아직 게시물이 없습니다",
-    "backToHome": "홈으로 돌아가기"
+    "backToHome": "홈으로 돌아가기",
+    "loadingBoard": "보드 로딩 중...",
+    "boardNotFound": "보드를 찾을 수 없습니다",
+    "loadingPosts": "게시물 로딩 중...",
+    "failedToLoadBoard": "보드 로드에 실패했습니다"
   },
   "postDetail": {
-    "backToHome": "홈으로 돌아가기"
+    "backToHome": "홈으로 돌아가기",
+    "loadingPost": "게시물 로딩 중...",
+    "postNotFound": "게시물을 찾을 수 없습니다"
   },
   "admin": {
     "users": "사용자",
@@ -334,7 +344,13 @@
     "joined": "가입됨",
     "share": "공유",
     "upvotes": "추천",
-    "comments": "댓글"
+    "comments": "댓글",
+    "loadingPosts": "게시물 로딩 중...",
+    "loadingMorePosts": "더 많은 게시물 로딩 중...",
+    "noPostsAvailable": "사용 가능한 게시물이 없습니다",
+    "noMorePostsToLoad": "로드할 게시물이 더 이상 없습니다",
+    "noRecentPosts": "최근 게시물이 없습니다",
+    "failedToLoadPosts": "게시물 로드에 실패했습니다"
   },
   "sidebar": {
     "home": "홈",

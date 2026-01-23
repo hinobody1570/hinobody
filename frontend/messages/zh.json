@@ -155,7 +155,11 @@
     "imageSizeTooLarge": "图片大小应小于5MB",
     "uploading": "上传中...",
     "failedToApproveRequest": "批准请求失败",
-    "failedToRejectRequest": "拒绝请求失败"
+    "failedToRejectRequest": "拒绝请求失败",
+    "loadingUserProfile": "加载用户资料中...",
+    "loadingPosts": "加载帖子中...",
+    "userNotFound": "未找到用户",
+    "failedToLoadUserProfile": "加载用户资料失败"
   },
   "boardProfile": {
     "category": "分类",
@@ -166,10 +170,16 @@
     "loading": "加载中...",
     "posts": "帖子",
     "noPosts": "还没有帖子",
-    "backToHome": "返回首页"
+    "backToHome": "返回首页",
+    "loadingBoard": "加载板块中...",
+    "loadingPosts": "加载帖子中...",
+    "boardNotFound": "未找到板块",
+    "failedToLoadBoard": "加载板块失败"
   },
   "postDetail": {
-    "backToHome": "返回首页"
+    "backToHome": "返回首页",
+    "loadingPost": "加载帖子中...",
+    "postNotFound": "未找到帖子"
   },
   "admin": {
     "users": "用户",
@@ -334,7 +344,13 @@
     "joined": "已加入",
     "share": "分享",
     "upvotes": "赞",
-    "comments": "评论"
+    "comments": "评论",
+    "loadingPosts": "加载帖子中...",
+    "loadingMorePosts": "加载更多帖子...",
+    "noPostsAvailable": "没有可用帖子",
+    "noMorePostsToLoad": "没有更多帖子可加载",
+    "noRecentPosts": "没有最近的帖子",
+    "failedToLoadPosts": "加载帖子失败"
   },
   "sidebar": {
     "home": "首页",

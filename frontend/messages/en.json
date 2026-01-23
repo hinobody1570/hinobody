@@ -155,7 +155,11 @@
     "uploading": "Uploading...",
     "failedToApproveRequest": "Failed to approve request",
     "failedToRejectRequest": "Failed to reject request",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "loadingUserProfile": "Loading user profile...",
+    "loadingPosts": "Loading posts...",
+    "userNotFound": "User not found",
+    "failedToLoadUserProfile": "Failed to load user profile"
   },
   "boardProfile": {
     "category": "Category",
@@ -166,10 +170,16 @@
     "loading": "Loading...",
     "posts": "Posts",
     "noPosts": "No posts yet",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "loadingBoard": "Loading board...",
+    "boardNotFound": "Board not found",
+    "loadingPosts": "Loading posts...",
+    "failedToLoadBoard": "Failed to load board"
   },
   "postDetail": {
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "loadingPost": "Loading post...",
+    "postNotFound": "Post not found"
   },
   "admin": {
     "users": "Users",
@@ -334,7 +344,13 @@
     "joined": "Joined",
     "share": "Share",
     "upvotes": "upvotes",
-    "comments": "comments"
+    "comments": "comments",
+    "loadingPosts": "Loading posts...",
+    "loadingMorePosts": "Loading more posts...",
+    "noPostsAvailable": "No posts available",
+    "noMorePostsToLoad": "No more posts to load",
+    "noRecentPosts": "No recent posts",
+    "failedToLoadPosts": "Failed to load posts"
   },
   "sidebar": {
     "home": "Home",

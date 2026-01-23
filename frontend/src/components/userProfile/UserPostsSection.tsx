@@ -17,7 +17,7 @@ export function UserPostsSection({ posts, loading }: UserPostsSectionProps) {
       
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="text-gray-500">Loading posts...</div>
+          <div className="text-gray-500">{t('loadingPosts')}</div>
         </div>
       ) : posts.length > 0 ? (
         <div className="space-y-4">

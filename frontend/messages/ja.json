@@ -155,7 +155,11 @@
     "imageSizeTooLarge": "画像サイズは5MB未満である必要があります",
     "uploading": "アップロード中...",
     "failedToApproveRequest": "リクエストの承認に失敗しました",
-    "failedToRejectRequest": "リクエストの拒否に失敗しました"
+    "failedToRejectRequest": "リクエストの拒否に失敗しました",
+    "loadingUserProfile": "ユーザープロフィールを読み込み中...",
+    "loadingPosts": "投稿を読み込み中...",
+    "userNotFound": "ユーザーが見つかりません",
+    "failedToLoadUserProfile": "ユーザープロフィールの読み込みに失敗しました"
   },
   "boardProfile": {
     "category": "カテゴリ",
@@ -166,10 +170,16 @@
     "loading": "読み込み中...",
     "posts": "投稿",
     "noPosts": "まだ投稿がありません",
-    "backToHome": "ホームに戻る"
+    "backToHome": "ホームに戻る",
+    "loadingBoard": "ボードを読み込み中...",
+    "boardNotFound": "ボードが見つかりません",
+    "loadingPosts": "投稿を読み込み中...",
+    "failedToLoadBoard": "ボードの読み込みに失敗しました"
   },
   "postDetail": {
-    "backToHome": "ホームに戻る"
+    "backToHome": "ホームに戻る",
+    "loadingPost": "投稿を読み込み中...",
+    "postNotFound": "投稿が見つかりません"
   },
   "admin": {
     "users": "ユーザー",
@@ -334,7 +344,13 @@
     "joined": "参加済み",
     "share": "共有",
     "upvotes": "アップ投票",
-    "comments": "コメント"
+    "comments": "コメント",
+    "loadingPosts": "投稿を読み込み中...",
+    "loadingMorePosts": "さらに投稿を読み込み中...",
+    "noPostsAvailable": "投稿がありません",
+    "noMorePostsToLoad": "これ以上読み込む投稿がありません",
+    "noRecentPosts": "最近の投稿がありません",
+    "failedToLoadPosts": "投稿の読み込みに失敗しました"
   },
   "sidebar": {
     "home": "ホーム",
