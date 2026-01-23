@@ -83,8 +83,8 @@ export class PostController {
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(id);
+  findOne(@Param('id') id: string, @GetUser('id') userId: string) {
+    return this.postService.findOne(id, userId);
   }
 
   @Patch(':id')

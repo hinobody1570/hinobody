@@ -146,7 +146,16 @@
     "blockedUser": "已屏蔽用户",
     "confirmBlockUser": "屏蔽用户？",
     "confirmBlockUserMessage": "您确定要屏蔽{name}吗？您将无法看到他们的帖子或与他们互动。",
-    "confirmBlock": "屏蔽"
+    "confirmBlock": "屏蔽",
+    "failedToBlockUser": "屏蔽用户失败",
+    "failedToUnblockUser": "取消屏蔽失败",
+    "failedToUpdateProfile": "更新个人资料失败",
+    "failedToUploadAvatar": "上传头像失败",
+    "pleaseSelectImageFile": "请选择图片文件",
+    "imageSizeTooLarge": "图片大小应小于5MB",
+    "uploading": "上传中...",
+    "failedToApproveRequest": "批准请求失败",
+    "failedToRejectRequest": "拒绝请求失败"
   },
   "boardProfile": {
     "category": "分类",

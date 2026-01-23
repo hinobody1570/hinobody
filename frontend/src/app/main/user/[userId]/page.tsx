@@ -198,7 +198,7 @@ export default function UserProfilePage() {
       setShowBlockConfirm(false);
     } catch (err: any) {
       console.error('Error blocking user:', err);
-      alert(err.message || 'Failed to block user');
+      alert(err.message || t('failedToBlockUser'));
     } finally {
       setIsBlocking(false);
     }
@@ -213,7 +213,7 @@ export default function UserProfilePage() {
       setIsBlocked(false);
     } catch (err: any) {
       console.error('Error unblocking user:', err);
-      alert(err.message || 'Failed to unblock user');
+      alert(err.message || t('failedToUnblockUser'));
     } finally {
       setIsBlocking(false);
     }
@@ -230,7 +230,7 @@ export default function UserProfilePage() {
       setMemberBoards(boards.member);
     } catch (err: any) {
       console.error('Error approving request:', err);
-      alert(err.message || 'Failed to approve request');
+      alert(err.message || t('failedToApproveRequest'));
     }
   };
 
@@ -241,7 +241,7 @@ export default function UserProfilePage() {
       setPendingRequests(prev => prev.filter(req => req.id !== membershipId));
     } catch (err: any) {
       console.error('Error rejecting request:', err);
-      alert(err.message || 'Failed to reject request');
+      alert(err.message || t('failedToRejectRequest'));
     }
   };
 

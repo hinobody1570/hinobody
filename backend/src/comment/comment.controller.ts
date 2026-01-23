@@ -39,8 +39,12 @@ export class CommentController {
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiQuery({ name: 'authorId', required: false, description: 'Filter by author ID' })
-  findByPost(@Param('postId') postId: string, @Query() query: QueryCommentsDto) {
-    return this.commentService.findByPost(postId, { ...query, postId });
+  findByPost(
+    @Param('postId') postId: string,
+    @Query() query: QueryCommentsDto,
+    @GetUser('id') userId: string,
+  ) {
+    return this.commentService.findByPost(postId, { ...query, postId }, userId);
   }
 
   @Get(':id')

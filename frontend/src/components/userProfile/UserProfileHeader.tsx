@@ -57,7 +57,7 @@ export function UserProfileHeader({
       }
     } catch (err: any) {
       console.error('Error updating user:', err);
-      alert(err.message || 'Failed to update profile');
+      alert(err.message || t('failedToUpdateProfile'));
     }
   };
 
@@ -66,12 +66,12 @@ export function UserProfileHeader({
     if (!file || !user) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      alert(t('pleaseSelectImageFile'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
+      alert(t('imageSizeTooLarge'));
       return;
     }
 
@@ -84,7 +84,7 @@ export function UserProfileHeader({
       }
     } catch (err: any) {
       console.error('Error uploading avatar:', err);
-      alert(err.message || 'Failed to upload avatar');
+      alert(err.message || t('failedToUploadAvatar'));
     } finally {
       setIsUploadingAvatar(false);
       e.target.value = '';
@@ -97,7 +97,7 @@ export function UserProfileHeader({
         <div className="relative">
           {isUploadingAvatar ? (
             <div className="w-24 h-24 rounded-full border-2 border-gray-300 bg-gray-100 flex items-center justify-center">
-              <div className="text-gray-400 text-sm">Uploading...</div>
+              <div className="text-gray-400 text-sm">{t('uploading')}</div>
             </div>
           ) : (
             <Image

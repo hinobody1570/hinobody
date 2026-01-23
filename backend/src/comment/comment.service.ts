@@ -71,7 +71,7 @@ export class CommentService {
   }
 
   // Helper function to recursively fetch nested replies
-  private async fetchCommentWithReplies(commentId: string): Promise<any> {
+  private async fetchCommentWithReplies(commentId: string, blockedUserIds: string[] = []): Promise<any> {
     const comment = await this.prisma.comment.findUnique({
       where: { id: commentId },
       include: {
@@ -92,12 +92,22 @@ export class CommentService {
 
     if (!comment) return null;
 
-    // Fetch direct replies (first level)
+    // If comment author is blocked, return null to exclude it
+    if (blockedUserIds.length > 0 && blockedUserIds.includes(comment.authorId)) {
+      return null;
+    }
+
+    // Fetch direct replies (first level), excluding blocked users
     const directReplies = await this.prisma.comment.findMany({
       where: {
         parentId: commentId,
         isActive: true,
         isDeleted: false,
+        ...(blockedUserIds.length > 0 && {
+          authorId: {
+            notIn: blockedUserIds,
+          },
+        }),
       },
       include: {
         author: {
@@ -120,7 +130,7 @@ export class CommentService {
     // If there are no direct replies, this will be an empty array
     const repliesWithNested = directReplies.length > 0
       ? await Promise.all(
-          directReplies.map((reply) => this.fetchCommentWithReplies(reply.id))
+          directReplies.map((reply) => this.fetchCommentWithReplies(reply.id, blockedUserIds))
         )
       : [];
     // Explicitly construct the return object to ensure all properties are included
@@ -144,13 +154,36 @@ export class CommentService {
     };
   }
 
-  async findByPost(postId: string, query?: QueryCommentsDto) {
+  async findByPost(postId: string, query?: QueryCommentsDto, userId?: string) {
     const { page = 1, limit = 20, search, authorId } = query || {};
     const skip = (page - 1) * limit;
 
+    // Get blocked user IDs if userId is provided
+    let blockedUserIds: string[] = [];
+    if (userId) {
+      const blocks = await this.prisma.block.findMany({
+        where: { blockerId: userId },
+        select: { blockedId: true },
+      });
+      blockedUserIds = blocks.map((block) => block.blockedId);
+    }
+
+    // If authorId is specified and that author is blocked, return empty results
+    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      };
+    }
+
     // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
     if (search) {
-      return this.findByPostWithFTS(postId, query);
+      return this.findByPostWithFTS(postId, query, blockedUserIds);
     }
 
     const where: Prisma.CommentWhereInput = {
@@ -159,6 +192,12 @@ export class CommentService {
       isDeleted: false,
       parentId: null, // Top-level comments only
       ...(authorId && { authorId }),
+      // Exclude comments from blocked users (only if authorId is not specified)
+      ...(!authorId && blockedUserIds.length > 0 && {
+        authorId: {
+          notIn: blockedUserIds,
+        },
+      }),
     };
 
     const [topLevelComments, total] = await Promise.all([
@@ -186,7 +225,7 @@ export class CommentService {
     ]);
     // Fetch nested replies for each top-level comment
     const commentsWithReplies = await Promise.all(
-      topLevelComments.map((comment) => this.fetchCommentWithReplies(comment.id))
+      topLevelComments.map((comment) => this.fetchCommentWithReplies(comment.id, blockedUserIds))
     );
 
     return {
@@ -200,9 +239,22 @@ export class CommentService {
     };
   }
 
-  private async findByPostWithFTS(postId: string, query: QueryCommentsDto) {
+  private async findByPostWithFTS(postId: string, query: QueryCommentsDto, blockedUserIds: string[] = []) {
     const { page = 1, limit = 20, search, authorId } = query;
     const skip = (page - 1) * limit;
+
+    // If authorId is specified and that author is blocked, return empty results
+    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      };
+    }
 
     // Use simple ILIKE search instead of FTS to avoid requiring search_vector column
     const where: Prisma.CommentWhereInput = {
@@ -215,6 +267,12 @@ export class CommentService {
         mode: 'insensitive',
       },
       ...(authorId && { authorId }),
+      // Exclude comments from blocked users (only if authorId is not specified)
+      ...(!authorId && blockedUserIds.length > 0 && {
+        authorId: {
+          notIn: blockedUserIds,
+        },
+      }),
     };
 
     const [topLevelComments, total] = await Promise.all([
@@ -243,7 +301,7 @@ export class CommentService {
 
     // Fetch nested replies for each top-level comment
     const commentsWithReplies = await Promise.all(
-      topLevelComments.map((comment) => this.fetchCommentWithReplies(comment.id))
+      topLevelComments.map((comment) => this.fetchCommentWithReplies(comment.id, blockedUserIds))
     );
 
     return {

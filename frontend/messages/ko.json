@@ -146,7 +146,16 @@
     "blockedUser": "차단된 사용자",
     "confirmBlockUser": "사용자를 차단하시겠습니까?",
     "confirmBlockUserMessage": "{name}을(를) 차단하시겠습니까? 해당 사용자의 게시물을 보거나 상호작용할 수 없게 됩니다.",
-    "confirmBlock": "차단"
+    "confirmBlock": "차단",
+    "failedToBlockUser": "사용자 차단에 실패했습니다",
+    "failedToUnblockUser": "차단 해제에 실패했습니다",
+    "failedToUpdateProfile": "프로필 업데이트에 실패했습니다",
+    "failedToUploadAvatar": "아바타 업로드에 실패했습니다",
+    "pleaseSelectImageFile": "이미지 파일을 선택해주세요",
+    "imageSizeTooLarge": "이미지 크기는 5MB 미만이어야 합니다",
+    "uploading": "업로드 중...",
+    "failedToApproveRequest": "요청 승인에 실패했습니다",
+    "failedToRejectRequest": "요청 거부에 실패했습니다"
   },
   "boardProfile": {
     "category": "카테고리",

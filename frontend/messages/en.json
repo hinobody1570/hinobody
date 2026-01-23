@@ -146,6 +146,15 @@
     "confirmBlockUser": "Block User?",
     "confirmBlockUserMessage": "Are you sure you want to block {name}? You won't be able to see their posts or interact with them.",
     "confirmBlock": "Block",
+    "failedToBlockUser": "Failed to block user",
+    "failedToUnblockUser": "Failed to unblock user",
+    "failedToUpdateProfile": "Failed to update profile",
+    "failedToUploadAvatar": "Failed to upload avatar",
+    "pleaseSelectImageFile": "Please select an image file",
+    "imageSizeTooLarge": "Image size should be less than 5MB",
+    "uploading": "Uploading...",
+    "failedToApproveRequest": "Failed to approve request",
+    "failedToRejectRequest": "Failed to reject request",
     "loading": "Loading..."
   },
   "boardProfile": {

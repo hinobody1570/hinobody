@@ -146,7 +146,16 @@
     "blockedUser": "ブロックされたユーザー",
     "confirmBlockUser": "ユーザーをブロックしますか？",
     "confirmBlockUserMessage": "{name}をブロックしてもよろしいですか？彼らの投稿を見たり、やり取りしたりできなくなります。",
-    "confirmBlock": "ブロック"
+    "confirmBlock": "ブロック",
+    "failedToBlockUser": "ユーザーのブロックに失敗しました",
+    "failedToUnblockUser": "ブロック解除に失敗しました",
+    "failedToUpdateProfile": "プロフィールの更新に失敗しました",
+    "failedToUploadAvatar": "アバターのアップロードに失敗しました",
+    "pleaseSelectImageFile": "画像ファイルを選択してください",
+    "imageSizeTooLarge": "画像サイズは5MB未満である必要があります",
+    "uploading": "アップロード中...",
+    "failedToApproveRequest": "リクエストの承認に失敗しました",
+    "failedToRejectRequest": "リクエストの拒否に失敗しました"
   },
   "boardProfile": {
     "category": "カテゴリ",
