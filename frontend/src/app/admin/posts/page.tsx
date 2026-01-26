@@ -11,6 +11,7 @@ import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Loading from "@/components/reuseComponents/Loading";
+import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 type ActionType = "delete" | "activate" | "deactivate" | null;
 
@@ -143,9 +144,7 @@ export default function AdminPostsPage() {
     {
       key: "title",
       header: t("title"),
-      render: (value: string) => (
-        <span className="max-w-md truncate block">{value}</span>
-      ),
+      render: (value: string) => <span className="max-w-md truncate block">{value}</span>,
     },
     {
       key: "author",
@@ -169,13 +168,7 @@ export default function AdminPostsPage() {
       key: "isActive",
       header: t("status"),
       render: (value: boolean) => (
-        <span
-          className={`px-2 py-1 text-xs font-semibold rounded-full ${
-            value
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
           {value ? t("active") : t("inactive")}
         </span>
       ),
@@ -231,17 +224,11 @@ export default function AdminPostsPage() {
   ];
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
+    return <ErrorSection error={error} />;
   }
 
   const modalContent = getModalContent();
@@ -264,4 +251,3 @@ export default function AdminPostsPage() {
     </div>
   );
 }
-

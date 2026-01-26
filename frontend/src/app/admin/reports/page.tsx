@@ -10,6 +10,7 @@ import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { StatusUpdateModal } from "@/components/modals/StatusUpdateModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import Loading from "@/components/reuseComponents/Loading";
+import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 export default function AdminReportsPage() {
   const t = useTranslations("admin");
@@ -218,11 +219,7 @@ export default function AdminReportsPage() {
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
+    return <ErrorSection error={error} />;
   }
 
   return (

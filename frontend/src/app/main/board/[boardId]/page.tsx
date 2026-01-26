@@ -10,6 +10,7 @@ import { formatTimestamp } from '@/utils/helperFunction';
 import Image from 'next/image';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { useAuth } from '@/contexts/AuthContext';
+import Loading from '@/components/reuseComponents/Loading';
 
 const transformPost = (post: Post): any => {
   return {
@@ -125,9 +126,7 @@ export default function BoardProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">{t('loadingBoard')}</div>
-      </div>
+      <Loading title={t('loadingBoard')} />
     );
   }
 
@@ -163,7 +162,7 @@ export default function BoardProfilePage() {
                   <p className="text-gray-600 mb-4">{board.description}</p>
                 )}
                 <div className="flex items-center gap-6 text-sm text-gray-500">
-                  <span>{t('category')}: {board.category}</span>
+                  <span>{t('category')}: {board.category?.name || '-'}</span>
                   <span>{t('visibility')}: {board.visibilityAccess}</span>
                   <span>{t('created')}: {formatTimestamp(board.createdAt)}</span>
                 </div>

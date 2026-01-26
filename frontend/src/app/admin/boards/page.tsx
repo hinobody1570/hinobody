@@ -11,6 +11,7 @@ import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Loading from "@/components/reuseComponents/Loading";
+import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 type ActionType = "delete" | "activate" | "deactivate" | null;
 
@@ -148,9 +149,7 @@ export default function AdminBoardsPage() {
     {
       key: "category",
       header: t("category"),
-      render: (value: any, row: Board) => (
-        <span>{row.category?.name || "-"}</span>
-      ),
+      render: (value: any, row: Board) => <span>{row.category?.name || "-"}</span>,
     },
     {
       key: "description",
@@ -228,11 +227,7 @@ export default function AdminBoardsPage() {
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
+    return <ErrorSection error={error} />;
   }
 
   const modalContent = getModalContent();

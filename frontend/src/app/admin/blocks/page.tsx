@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTable } from "@/components/admin/DataTable";
+import ErrorSection from "@/components/reuseComponents/ErrorSection";
 import Loading from "@/components/reuseComponents/Loading";
 import { Block, blocksApi } from "@/lib/api";
 import { formatTimestamp } from "@/utils/helperFunction";
@@ -59,9 +60,7 @@ export default function AdminBlocksPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error}</p>
-      </div>
+      <ErrorSection error={error}/>
     );
   }
 

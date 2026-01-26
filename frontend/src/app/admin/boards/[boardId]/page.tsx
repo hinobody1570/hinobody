@@ -114,7 +114,7 @@ export default function AdminBoardDetailPage() {
             )}
             <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
               <span>
-                <strong>{t("category")}:</strong> {board.category}
+                <strong>{t("category")}:</strong> {board.category?.name || '-'}
               </span>
               <span>
                 <strong>{t("visibility")}:</strong>{" "}
