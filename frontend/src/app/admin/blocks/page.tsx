@@ -1,16 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
 import { DataTable } from "@/components/admin/DataTable";
-import { blocksApi, Block } from "@/lib/api";
+import Loading from "@/components/reuseComponents/Loading";
+import { Block, blocksApi } from "@/lib/api";
 import { formatTimestamp } from "@/utils/helperFunction";
-import { useToast } from "@/contexts/ToastContext";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
 export default function AdminBlocksPage() {
   const t = useTranslations("admin");
-  const tToast = useTranslations("toast");
-  const { showSuccess, showError } = useToast();
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,11 +54,7 @@ export default function AdminBlocksPage() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -78,4 +72,3 @@ export default function AdminBlocksPage() {
     </div>
   );
 }
-

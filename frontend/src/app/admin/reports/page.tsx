@@ -9,6 +9,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { StatusUpdateModal } from "@/components/modals/StatusUpdateModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import Loading from "@/components/reuseComponents/Loading";
 
 export default function AdminReportsPage() {
   const t = useTranslations("admin");
@@ -99,11 +100,11 @@ export default function AdminReportsPage() {
       setActionLoading(statusModal.reportId);
       await reportsApi.update(statusModal.reportId, { status: newStatus as any });
       showSuccess(t("reportStatusUpdated"));
-      
+
       // Refresh reports list
       const response = await reportsApi.getAll(1, 20);
       setReports(response.data);
-      
+
       closeStatusModal();
     } catch (err: any) {
       console.error("Error updating report status:", err);
@@ -120,11 +121,11 @@ export default function AdminReportsPage() {
       setActionLoading(deleteModal.reportId);
       await reportsApi.delete(deleteModal.reportId);
       showSuccess(t("reportDeleted"));
-      
+
       // Refresh reports list
       const response = await reportsApi.getAll(1, 20);
       setReports(response.data);
-      
+
       closeDeleteModal();
     } catch (err: any) {
       console.error("Error deleting report:", err);
@@ -160,11 +161,7 @@ export default function AdminReportsPage() {
           DISMISSED: t("statusDismissed"),
         };
         return (
-          <span
-            className={`px-2 py-1 text-xs font-semibold rounded-full ${
-              statusColors[value] || "bg-gray-100 text-gray-800"
-            }`}
-          >
+          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColors[value] || "bg-gray-100 text-gray-800"}`}>
             {statusLabels[value] || value}
           </span>
         );
@@ -183,7 +180,7 @@ export default function AdminReportsPage() {
     {
       key: "comment",
       header: t("comment"),
-      render: (value: any) => (value ? (value.body?.substring(0, 50) + "...") : "-"),
+      render: (value: any) => (value ? value.body?.substring(0, 50) + "..." : "-"),
     },
     {
       key: "createdAt",
@@ -217,11 +214,7 @@ export default function AdminReportsPage() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -236,7 +229,7 @@ export default function AdminReportsPage() {
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{t("reports")}</h1>
       <DataTable columns={columns} data={reports} />
-      
+
       <StatusUpdateModal
         isOpen={statusModal.isOpen}
         onClose={closeStatusModal}
@@ -246,7 +239,7 @@ export default function AdminReportsPage() {
         statusOptions={statusOptions}
         isLoading={!!actionLoading}
       />
-      
+
       <ConfirmationModal
         isOpen={deleteModal.isOpen}
         onClose={closeDeleteModal}
@@ -260,4 +253,3 @@ export default function AdminReportsPage() {
     </div>
   );
 }
-

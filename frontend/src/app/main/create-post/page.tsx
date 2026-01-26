@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useTranslations } from "next-intl";
-import { BiChevronDown, BiSearch } from "react-icons/bi";
-import { Tab } from "@/components/reuseComponents/Tabs";
-import RichTextEditor from "@/components/reuseComponents/RichTextEditor";
-import PostingGuide from "@/components/reuseComponents/PostingGuide";
-import TagsInput from "@/components/reuseComponents/TagsInput";
 import { JoinBoardPopup } from "@/components/modals/JoinBoardPopup";
-import { boardsApi, Board, postsApi, Language } from "@/lib/api";
-import { useToast } from "@/contexts/ToastContext";
+import Loading from "@/components/reuseComponents/Loading";
+import PostingGuide from "@/components/reuseComponents/PostingGuide";
+import RichTextEditor from "@/components/reuseComponents/RichTextEditor";
+import { Tab } from "@/components/reuseComponents/Tabs";
+import TagsInput from "@/components/reuseComponents/TagsInput";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/contexts/ToastContext";
+import { Board, boardsApi, Language, postsApi } from "@/lib/api";
+import { ROUTE_PATHS } from "@/routes/paths";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { BiChevronDown, BiSearch } from "react-icons/bi";
 
 // Main Create Post Component
 const CreatePost = () => {
@@ -106,7 +108,7 @@ const CreatePost = () => {
       setTags([]);
       
       // Optionally navigate to the post or feed
-      // router.push(`/main/feed`);
+      router.push(ROUTE_PATHS.HOME);
     } catch (error: any) {
       console.error("Error creating post:", error);
       const errorMessage = error?.message || tToast("postError") || "Failed to create post. Please try again.";
@@ -296,9 +298,7 @@ const CreatePost = () => {
                 {showDropdown && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50">
                     {isLoadingBoards ? (
-                      <div className="p-4 text-center text-gray-500 text-sm">
-                        Loading...
-                      </div>
+                      <Loading />
                     ) : boards.length > 0 ? (
                       boards.map((board) => (
                         <button

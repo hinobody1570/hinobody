@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { usersApi, User, postsApi, Post, boardsApi, Board, eyeMaskedImagesApi, EyeMaskedImage, s3Api, S3File } from "@/lib/api";
-import { formatTimestamp } from "@/utils/helperFunction";
-import { PostCard } from "@/components/reuseComponents/PostCard";
-import { FaArrowLeft, FaUser, FaEnvelope, FaShieldAlt, FaGlobe, FaCheckCircle, FaTimesCircle, FaImage, FaImages, FaTrash } from "react-icons/fa";
-import Image from "next/image";
-import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import AdminDetailHeader from "@/components/admin/AdminDetailHeader";
+import { PostCard } from "@/components/reuseComponents/PostCard";
+import { Board, EyeMaskedImage, Post, User, boardsApi, eyeMaskedImagesApi, postsApi, usersApi } from "@/lib/api";
 import { ROUTE_PATHS } from "@/routes/paths";
+import { formatTimestamp } from "@/utils/helperFunction";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaCheckCircle, FaEnvelope, FaGlobe, FaImage, FaImages, FaShieldAlt, FaTimesCircle } from "react-icons/fa";
+import DP from "../../../../../public/assets/images/avatar_default_4.png";
+import Loading from "@/components/reuseComponents/Loading";
 
 const transformPost = (post: Post): any => {
   return {
@@ -123,13 +124,8 @@ export default function AdminUserDetailPage() {
     fetchEyeMaskedImages();
   }, [userId]);
 
-
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error || !user) {
@@ -159,7 +155,13 @@ export default function AdminUserDetailPage() {
           <div className="px-6 pb-6 -mt-16">
             <div className="flex items-end gap-6">
               <div className="relative">
-                <Image src={user.avatar ?  user.avatar : DP} alt={user.nickname || user.email} width={120} height={120} className="rounded-full border-4 border-white shadow-lg" />
+                <Image
+                  src={user.avatar ? user.avatar : DP}
+                  alt={user.nickname || user.email}
+                  width={120}
+                  height={120}
+                  className="rounded-full border-4 border-white shadow-lg"
+                />
               </div>
               <div className="flex-1 pb-4">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2 capitalize">{user.nickname || user.email}</h2>
@@ -335,13 +337,18 @@ export default function AdminUserDetailPage() {
                   className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer group"
                   onClick={() => window.open(image.url, "_blank")}
                 >
-                  <Image src={image.url} alt="Eye masked image" height={100} width={400} className="object-containt group-hover:scale-105 transition-transform" />
+                  <Image
+                    src={image.url}
+                    alt="Eye masked image"
+                    height={100}
+                    width={400}
+                    className="object-containt group-hover:scale-105 transition-transform"
+                  />
                 </div>
               ))}
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

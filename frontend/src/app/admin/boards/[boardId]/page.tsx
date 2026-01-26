@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { boardsApi, Board, postsApi, Post } from "@/lib/api";
-import { formatTimestamp } from "@/utils/helperFunction";
-import { PostCard } from "@/components/reuseComponents/PostCard";
 import AdminDetailHeader from "@/components/admin/AdminDetailHeader";
-import Image from "next/image";
-import DP from "../../../../../public/assets/images/avatar_default_4.png";
+import { PostCard } from "@/components/reuseComponents/PostCard";
+import { Board, boardsApi, Post, postsApi } from "@/lib/api";
 import { ROUTE_PATHS } from "@/routes/paths";
+import { formatTimestamp } from "@/utils/helperFunction";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import DP from "../../../../../public/assets/images/avatar_default_4.png";
+import Loading from "@/components/reuseComponents/Loading";
 
 const transformPost = (post: Post): any => {
   return {
@@ -81,9 +81,7 @@ export default function AdminBoardDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
+      <Loading />
     );
   }
 

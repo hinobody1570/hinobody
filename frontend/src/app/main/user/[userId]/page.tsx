@@ -14,6 +14,7 @@ import { EyeMaskingImagesSection } from '@/components/userProfile/EyeMaskingImag
 import { CommunityBoardsSection } from '@/components/userProfile/CommunityBoardsSection';
 import { PendingRequestsSection } from '@/components/userProfile/PendingRequestsSection';
 import { UserPostsSection } from '@/components/userProfile/UserPostsSection';
+import Loading from '@/components/reuseComponents/Loading';
 
 const transformPost = (post: Post): any => {
   return {
@@ -247,9 +248,7 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">{t('loadingUserProfile')}</div>
-      </div>
+      <Loading title={t('loadingUserProfile')} />
     );
   }
 

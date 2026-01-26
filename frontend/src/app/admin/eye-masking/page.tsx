@@ -9,6 +9,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { FaTrash } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import Image from "next/image";
+import Loading from "@/components/reuseComponents/Loading";
 
 export default function AdminEyeMaskingPage() {
   const t = useTranslations("admin");
@@ -70,11 +71,11 @@ export default function AdminEyeMaskingPage() {
       setActionLoading(imageId);
       await eyeMaskedImagesApi.delete(imageId);
       showSuccess(t("eyeMaskedImageDeleted"));
-      
+
       // Refresh images list
       const allImages = await eyeMaskedImagesApi.getAll();
       setImages(allImages);
-      
+
       closeConfirmationModal();
     } catch (err: any) {
       console.error("Error deleting eye masked image:", err);
@@ -88,42 +89,30 @@ export default function AdminEyeMaskingPage() {
     {
       key: "id",
       header: t("id"),
-      render: (value: string) => (
-        <span className="font-mono text-xs">{value.substring(0, 8)}...</span>
-      ),
+      render: (value: string) => <span className="font-mono text-xs">{value.substring(0, 8)}...</span>,
     },
     {
       key: "image",
       header: t("image"),
       render: (_: any, row: EyeMaskedImage) => (
-        <div className="relative w-32 h-12 rounded-lg overflow-hidden border border-gray-200 cursor-pointer" onClick={() => window.open(row.url, "_blank")}>
-          <Image
-            src={row.url}
-            alt="Eye masked image"
-            fill
-            className="object-containt"
-            unoptimized
-          />
+        <div
+          className="relative w-32 h-12 rounded-lg overflow-hidden border border-gray-200 cursor-pointer"
+          onClick={() => window.open(row.url, "_blank")}
+        >
+          <Image src={row.url} alt="Eye masked image" fill className="object-containt" unoptimized />
         </div>
       ),
     },
     {
       key: "nickname",
       header: t("nickname"),
-      render: (_: any, row: EyeMaskedImage) => (
-        <span>{row.user?.nickname || "-"}</span>
-      ),
+      render: (_: any, row: EyeMaskedImage) => <span>{row.user?.nickname || "-"}</span>,
     },
     {
       key: "url",
       header: t("url"),
       render: (value: string) => (
-        <a
-          href={value}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline truncate max-w-md block"
-        >
+        <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate max-w-md block">
           {value}
         </a>
       ),
@@ -131,9 +120,7 @@ export default function AdminEyeMaskingPage() {
     {
       key: "size",
       header: t("size"),
-      render: (value: number) => (
-        <span>{value ? `${(value / 1024).toFixed(2)} KB` : "-"}</span>
-      ),
+      render: (value: number) => <span>{value ? `${(value / 1024).toFixed(2)} KB` : "-"}</span>,
     },
     {
       key: "createdAt",
@@ -159,11 +146,7 @@ export default function AdminEyeMaskingPage() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -192,4 +175,3 @@ export default function AdminEyeMaskingPage() {
     </div>
   );
 }
-

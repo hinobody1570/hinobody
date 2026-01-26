@@ -2,9 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useRouter } from "next/navigation";
-import { ROUTE_PATHS } from "@/routes/paths";
 
 // Loading component for dynamic import
 const LoadingComponent = () => {

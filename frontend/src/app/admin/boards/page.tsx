@@ -10,6 +10,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { ROUTE_PATHS } from "@/routes/paths";
+import Loading from "@/components/reuseComponents/Loading";
 
 type ActionType = "delete" | "activate" | "deactivate" | null;
 
@@ -142,9 +143,7 @@ export default function AdminBoardsPage() {
     {
       key: "name",
       header: t("name"),
-      render: (value: string) => (
-        <span className="font-semibold">r/{value}</span>
-      ),
+      render: (value: string) => <span className="font-semibold">r/{value}</span>,
     },
     {
       key: "category",
@@ -153,30 +152,20 @@ export default function AdminBoardsPage() {
     {
       key: "description",
       header: t("description"),
-      render: (value: string) => (
-        <span className="max-w-md truncate block">{value || "-"}</span>
-      ),
+      render: (value: string) => <span className="max-w-md truncate block">{value || "-"}</span>,
     },
     {
       key: "visibilityAccess",
       header: t("visibility"),
       render: (value: string) => (
-        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 capitalize">
-          {value}
-        </span>
+        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 capitalize">{value}</span>
       ),
     },
     {
       key: "isActive",
       header: t("status"),
       render: (value: boolean) => (
-        <span
-          className={`px-2 py-1 text-xs font-semibold rounded-full ${
-            value
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
           {value ? t("active") : t("inactive")}
         </span>
       ),
@@ -232,11 +221,7 @@ export default function AdminBoardsPage() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -267,4 +252,3 @@ export default function AdminBoardsPage() {
     </div>
   );
 }
-

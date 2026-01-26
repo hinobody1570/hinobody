@@ -3,15 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ROUTE_PATHS } from "@/routes/paths";
-import { 
-  FaUsers, 
-  FaFileAlt, 
-  FaLayerGroup,
-  FaHome,
-  FaEye,
-  FaExclamationTriangle,
-  FaBan
-} from "react-icons/fa";
+import { FaUsers, FaFileAlt, FaLayerGroup, FaHome, FaEye, FaExclamationTriangle, FaBan } from "react-icons/fa";
 
 interface SidebarItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -79,9 +71,7 @@ export function AdminSidebar() {
                 <button
                   onClick={() => handleNavigation(item.path)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                    isActive
-                      ? "bg-blue-800 text-white"
-                      : "text-blue-100 hover:bg-blue-600"
+                    isActive ? "bg-blue-800 text-white" : "text-blue-100 hover:bg-blue-600"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -106,4 +96,3 @@ export function AdminSidebar() {
     </div>
   );
 }
-
