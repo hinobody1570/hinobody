@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { IoClose, IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { boardsApi, CreateBoardDto, BoardVisibility } from "@/lib/api";
+import { boardsApi, boardCategoriesApi, CreateBoardDto, BoardVisibility, BoardCategory } from "@/lib/api";
 import { useToast } from "@/contexts/ToastContext";
 
 interface StartCommunityPopupProps {
@@ -12,35 +12,14 @@ interface StartCommunityPopupProps {
   onClose: () => void;
 }
 
-const CATEGORIES = [
-  "health",
-  "sport",
-  "study",
-  "tourist",
-  "entertainment",
-  "technology",
-  "food",
-  "travel",
-  "fashion",
-  "music",
-  "art",
-  "photography",
-  "gaming",
-  "books",
-  "movies",
-  "science",
-  "business",
-  "education",
-  "lifestyle",
-  "pets",
-];
-
 const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
   const t = useTranslations("startCommunity");
   const tToast = useTranslations("toast");
   const { showSuccess, showError } = useToast();
   const [step, setStep] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [categories, setCategories] = useState<BoardCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [visibility, setVisibility] = useState<BoardVisibility>("PUBLIC");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -54,11 +33,31 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
     return () => setMounted(false);
   }, []);
 
+  // Fetch categories when modal opens
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (isOpen) {
+        try {
+          setCategoriesLoading(true);
+          const response = await boardCategoriesApi.getAll(1, 100, undefined, true); // Only active categories
+          setCategories(response.data);
+        } catch (error: any) {
+          console.error("Error fetching categories:", error);
+          showError(error.message || "Failed to load categories");
+        } finally {
+          setCategoriesLoading(false);
+        }
+      }
+    };
+
+    fetchCategories();
+  }, [isOpen, showError]);
+
   // Reset form when popup closes
   useEffect(() => {
     if (!isOpen) {
       setStep(1);
-      setSelectedCategory("");
+      setSelectedCategoryId("");
       setVisibility("PUBLIC");
       setName("");
       setDescription("");
@@ -81,12 +80,12 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
     }
   }, [isOpen, onClose]);
 
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategoryId(categoryId);
   };
 
   const handleNext = () => {
-    if (step === 1 && selectedCategory) {
+    if (step === 1 && selectedCategoryId) {
       setStep(2);
     } else if (step === 2) {
       setStep(3);
@@ -105,7 +104,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
       return;
     }
 
-    if (!selectedCategory) {
+    if (!selectedCategoryId) {
       showError(t("categoryRequired"));
       return;
     }
@@ -114,7 +113,7 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
     try {
       const boardData: CreateBoardDto = {
         name: name.trim(),
-        category: selectedCategory,
+        categoryId: selectedCategoryId,
         description: description.trim() || undefined,
         visibilityAccess: visibility,
       };
@@ -154,22 +153,32 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
           {step === 1 && (
             <div>
               <p className="text-gray-600 mb-4">{t("step1Description")}</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {CATEGORIES.map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => handleCategorySelect(category)}
-                    className={`px-4 py-3 cursor-pointer rounded-lg border-2 transition-all text-sm font-medium ${
-                      selectedCategory === category
-                        ? "border-blue-600 bg-blue-50 text-blue-700"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
-                    }`}
-                  >
-                    {t(`categories.${category}`) || category}
-                  </button>
-                ))}
-              </div>
+              {categoriesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-gray-500">{t("loadingCategories") || "Loading categories..."}</div>
+                </div>
+              ) : categories.length === 0 ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-gray-500">{t("noCategoriesAvailable") || "No categories available"}</div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() => handleCategorySelect(category.id)}
+                      className={`px-4 py-3 cursor-pointer rounded-lg border-2 transition-all text-sm font-medium ${
+                        selectedCategoryId === category.id
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                      }`}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -272,9 +281,9 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
               <button
                 type="button"
                 onClick={handleNext}
-                disabled={(step === 1 && !selectedCategory) || (step === 2 && !visibility)}
+                disabled={(step === 1 && !selectedCategoryId) || (step === 2 && !visibility) || categoriesLoading}
                 className={`px-6 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                  (step === 1 && selectedCategory) || (step === 2 && visibility)
+                  (step === 1 && selectedCategoryId && !categoriesLoading) || (step === 2 && visibility)
                     ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}

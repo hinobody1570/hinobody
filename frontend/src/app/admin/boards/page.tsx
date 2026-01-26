@@ -148,6 +148,9 @@ export default function AdminBoardsPage() {
     {
       key: "category",
       header: t("category"),
+      render: (value: any, row: Board) => (
+        <span>{row.category?.name || "-"}</span>
+      ),
     },
     {
       key: "description",

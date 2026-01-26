@@ -13,13 +13,13 @@ export class CreateBoardDto {
   name: string;
 
   @ApiProperty({
-    example: 'technology',
+    example: 'clx1234567890',
     minLength: 1,
-    description: 'Category of the board',
+    description: 'Category ID of the board',
   })
   @IsString()
   @MinLength(1)
-  category: string;
+  categoryId: string;
 
   @ApiPropertyOptional({
     example: 'This board is used to manage project tasks',

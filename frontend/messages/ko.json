@@ -328,7 +328,31 @@
     "deleteReport": "신고 삭제",
     "confirmDeleteReportDescription": "이 신고를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
     "reportDeleted": "신고가 성공적으로 삭제되었습니다",
-    "deleteReportError": "신고 삭제 실패"
+    "deleteReportError": "신고 삭제 실패",
+    "boardCategories": "보드 카테고리",
+    "addNew": "새로 추가",
+    "addNewCategory": "새 카테고리 추가",
+    "editCategory": "카테고리 편집",
+    "categoryName": "카테고리 이름",
+    "categoryNameRequired": "카테고리 이름이 필요합니다",
+    "enterCategoryName": "카테고리 이름을 입력하세요",
+    "create": "생성",
+    "edit": "편집",
+    "deleteCategory": "카테고리 삭제",
+    "activateCategory": "카테고리 활성화",
+    "deactivateCategory": "카테고리 비활성화",
+    "confirmDeleteCategoryDescription": "카테고리 \"{name}\"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다. 이 카테고리가 보드에서 사용 중인 경우 삭제가 실패합니다.",
+    "confirmActivateCategoryDescription": "카테고리 \"{name}\"을(를) 활성화하시겠습니까? 보드에서 사용할 수 있게 됩니다.",
+    "confirmDeactivateCategoryDescription": "카테고리 \"{name}\"을(를) 비활성화하시겠습니까? 숨겨지고 새 보드에서 사용할 수 없게 됩니다.",
+    "categoryDeleted": "카테고리가 성공적으로 삭제되었습니다",
+    "categoryActivated": "카테고리가 성공적으로 활성화되었습니다",
+    "categoryDeactivated": "카테고리가 성공적으로 비활성화되었습니다",
+    "categoryCreated": "카테고리가 성공적으로 생성되었습니다",
+    "categoryUpdated": "카테고리가 성공적으로 업데이트되었습니다",
+    "deleteCategoryError": "카테고리 삭제 실패",
+    "activateCategoryError": "카테고리 활성화 실패",
+    "deactivateCategoryError": "카테고리 비활성화 실패",
+    "saveCategoryError": "카테고리 저장 실패"
   },
   "feed": {
     "best": "베스트",
@@ -767,6 +791,8 @@
     "createCommunity": "커뮤니티 만들기",
     "creating": "만드는 중...",
     "communityCreatedSuccess": "커뮤니티가 성공적으로 생성되었습니다!",
-    "communityCreatedError": "커뮤니티 생성에 실패했습니다. 다시 시도해주세요."
+    "communityCreatedError": "커뮤니티 생성에 실패했습니다. 다시 시도해주세요.",
+    "loadingCategories": "카테고리 로딩 중...",
+    "noCategoriesAvailable": "사용 가능한 카테고리가 없습니다"
   }
 }

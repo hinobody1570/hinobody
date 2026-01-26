@@ -197,7 +197,12 @@ export type BoardVisibility = 'PUBLIC' | 'PRIVATE' | 'RESTRICTED';
 export interface Board {
   id: string;
   name: string;
-  category: string;
+  categoryId: string;
+  category?: {
+    id: string;
+    name: string;
+    active: boolean;
+  };
   description: string | null;
   visibilityAccess: BoardVisibility;
   isActive: boolean;
@@ -208,7 +213,7 @@ export interface Board {
 
 export interface CreateBoardDto {
   name: string;
-  category: string;
+  categoryId: string;
   description?: string;
   visibilityAccess?: BoardVisibility;
 }
@@ -299,6 +304,67 @@ export const boardsApi = {
   },
   rejectMembership: async (membershipId: string): Promise<void> => {
     await api.delete(`${API_END_POINT.BOARDS}/membership/${membershipId}/reject`);
+  },
+};
+
+// Board Categories API endpoints
+export interface BoardCategory {
+  id: string;
+  name: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BoardCategoriesResponse {
+  data: BoardCategory[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface CreateBoardCategoryDto {
+  name: string;
+  active?: boolean;
+}
+
+export interface UpdateBoardCategoryDto {
+  name?: string;
+  active?: boolean;
+}
+
+export const boardCategoriesApi = {
+  getAll: async (page: number = 1, limit: number = 20, search?: string, active?: boolean): Promise<BoardCategoriesResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) {
+      params.append('search', search);
+    }
+    if (active !== undefined) {
+      params.append('active', active.toString());
+    }
+    const response = await api.get<ApiResponse<BoardCategoriesResponse>>(`${API_END_POINT.BOARD_CATEGORIES}?${params.toString()}`);
+    return response.data;
+  },
+  getById: async (id: string): Promise<BoardCategory> => {
+    const response = await api.get<ApiResponse<BoardCategory>>(`${API_END_POINT.BOARD_CATEGORIES}/${id}`);
+    return response.data;
+  },
+  create: async (createBoardCategoryDto: CreateBoardCategoryDto): Promise<BoardCategory> => {
+    const response = await api.post<ApiResponse<BoardCategory>>(API_END_POINT.BOARD_CATEGORIES, createBoardCategoryDto);
+    return response.data;
+  },
+  update: async (id: string, updateBoardCategoryDto: UpdateBoardCategoryDto): Promise<BoardCategory> => {
+    const response = await api.patch<ApiResponse<BoardCategory>>(`${API_END_POINT.BOARD_CATEGORIES}/${id}`, updateBoardCategoryDto);
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARD_CATEGORIES}/${id}`);
   },
 };
 

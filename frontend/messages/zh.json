@@ -328,7 +328,31 @@
     "deleteReport": "删除举报",
     "confirmDeleteReportDescription": "您确定要删除此举报吗？此操作无法撤销。",
     "reportDeleted": "举报删除成功",
-    "deleteReportError": "删除举报失败"
+    "deleteReportError": "删除举报失败",
+    "boardCategories": "看板分类",
+    "addNew": "添加新项",
+    "addNewCategory": "添加新分类",
+    "editCategory": "编辑分类",
+    "categoryName": "分类名称",
+    "categoryNameRequired": "分类名称是必需的",
+    "enterCategoryName": "请输入分类名称",
+    "create": "创建",
+    "edit": "编辑",
+    "deleteCategory": "删除分类",
+    "activateCategory": "激活分类",
+    "deactivateCategory": "停用分类",
+    "confirmDeleteCategoryDescription": "您确定要删除分类 \"{name}\" 吗？此操作无法撤销。如果此分类正在被看板使用，删除将失败。",
+    "confirmActivateCategoryDescription": "您确定要激活分类 \"{name}\" 吗？它将可以在看板中使用。",
+    "confirmDeactivateCategoryDescription": "您确定要停用分类 \"{name}\" 吗？它将隐藏，无法在新的看板中使用。",
+    "categoryDeleted": "分类删除成功",
+    "categoryActivated": "分类激活成功",
+    "categoryDeactivated": "分类停用成功",
+    "categoryCreated": "分类创建成功",
+    "categoryUpdated": "分类更新成功",
+    "deleteCategoryError": "删除分类失败",
+    "activateCategoryError": "激活分类失败",
+    "deactivateCategoryError": "停用分类失败",
+    "saveCategoryError": "保存分类失败"
   },
   "feed": {
     "best": "最佳",
@@ -767,6 +791,8 @@
     "createCommunity": "创建社区",
     "creating": "创建中...",
     "communityCreatedSuccess": "社区创建成功！",
-    "communityCreatedError": "创建社区失败。请重试。"
+    "communityCreatedError": "创建社区失败。请重试。",
+    "loadingCategories": "加载分类中...",
+    "noCategoriesAvailable": "没有可用的分类"
   }
 }

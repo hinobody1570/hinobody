@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -24,6 +25,23 @@ export class BoardService {
       throw new ConflictException('Board with this name already exists');
     }
 
+    // Validate category exists and is active
+    const category = await this.prisma.boardCategory.findUnique({
+      where: { id: createBoardDto.categoryId },
+    });
+
+    if (!category) {
+      throw new NotFoundException(
+        `Board category with ID ${createBoardDto.categoryId} not found`,
+      );
+    }
+
+    if (!category.active) {
+      throw new BadRequestException(
+        'Cannot create board with inactive category',
+      );
+    }
+
     // Create board with creator and auto-approve creator as member
     const board = await this.prisma.board.create({
       data: {
@@ -42,6 +60,13 @@ export class BoardService {
             id: true,
             nickname: true,
             email: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            active: true,
           },
         },
       },
@@ -69,6 +94,15 @@ export class BoardService {
         skip,
         take: limit,
         orderBy: { createdAt: 'asc' },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              active: true,
+            },
+          },
+        },
       }),
       this.prisma.board.count({ where }),
     ]);
@@ -113,6 +147,15 @@ export class BoardService {
         skip,
         take: limit,
         orderBy: { createdAt: 'asc' },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              active: true,
+            },
+          },
+        },
       }),
       this.prisma.board.count({ where }),
     ]);
@@ -131,6 +174,15 @@ export class BoardService {
   async findOne(id: string): Promise<Board> {
     const board = await this.prisma.board.findUnique({
       where: { id },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            active: true,
+          },
+        },
+      },
     });
 
     if (!board) {
@@ -144,9 +196,37 @@ export class BoardService {
   async update(id: string, updateBoardDto: UpdateBoardDto): Promise<Board> {
     await this.findOne(id); // Check if exists
 
+    // If categoryId is being updated, validate it exists and is active
+    if (updateBoardDto.categoryId) {
+      const category = await this.prisma.boardCategory.findUnique({
+        where: { id: updateBoardDto.categoryId },
+      });
+
+      if (!category) {
+        throw new NotFoundException(
+          `Board category with ID ${updateBoardDto.categoryId} not found`,
+        );
+      }
+
+      if (!category.active) {
+        throw new BadRequestException(
+          'Cannot update board to inactive category',
+        );
+      }
+    }
+
     return this.prisma.board.update({
       where: { id },
       data: updateBoardDto,
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            active: true,
+          },
+        },
+      },
     });
   }
 
@@ -168,6 +248,15 @@ export class BoardService {
         isActive: true,
       },
       orderBy: { createdAt: 'desc' },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            active: true,
+          },
+        },
+      },
     });
 
     // Get boards where the specified user is a member (approved status)
@@ -186,6 +275,15 @@ export class BoardService {
         },
       },
       orderBy: { createdAt: 'desc' },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            active: true,
+          },
+        },
+      },
     });
 
     return {

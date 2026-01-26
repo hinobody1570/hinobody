@@ -52,14 +52,27 @@ model Board {
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   visibilityAccess BoardVisibility @default(PUBLIC)
-  category         String
+  categoryId       String
   creatorId        String
   members          BoardMember[]
   creator          User            @relation("BoardCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  category         BoardCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   posts            Post[]
 
   @@index([creatorId])
+  @@index([categoryId])
   @@map("boards")
+}
+
+model BoardCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  boards    Board[]
+
+  @@map("board_categories")
 }
 
 model Post {
