@@ -310,7 +310,7 @@ export default function AdminUserDetailPage() {
                   <h4 className="font-semibold text-gray-900 mb-2">{board.name}</h4>
                   <p className="text-sm text-gray-600 mb-3 line-clamp-2">{board.description || t("noDescription")}</p>
                   <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span className="capitalize">{board.category}</span>
+                    <span className="capitalize">{board.category?.name || '-'}</span>
                     <span className="capitalize">{board.visibilityAccess}</span>
                   </div>
                 </div>

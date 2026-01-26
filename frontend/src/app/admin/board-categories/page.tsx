@@ -10,6 +10,7 @@ import { FaBan, FaCheck, FaTrash, FaEdit } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { BoardCategoryModal } from "@/components/modals/BoardCategoryModal";
 import Loading from "@/components/reuseComponents/Loading";
+import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 type ActionType = "delete" | "activate" | "deactivate" | null;
 
@@ -113,12 +114,7 @@ export default function AdminBoardCategoriesPage() {
       closeConfirmationModal();
     } catch (err: any) {
       console.error(`Error ${action}ing category:`, err);
-      const errorKey =
-        action === "delete"
-          ? "deleteCategoryError"
-          : action === "activate"
-          ? "activateCategoryError"
-          : "deactivateCategoryError";
+      const errorKey = action === "delete" ? "deleteCategoryError" : action === "activate" ? "activateCategoryError" : "deactivateCategoryError";
       showError(err.message || t(errorKey));
     } finally {
       setActionLoading(null);
@@ -192,11 +188,7 @@ export default function AdminBoardCategoriesPage() {
       key: "active",
       header: t("status"),
       render: (value: boolean) => (
-        <span
-          className={`px-2 py-1 text-xs font-semibold rounded-full ${
-            value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
-        >
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
           {value ? t("active") : t("inactive")}
         </span>
       ),
@@ -261,11 +253,7 @@ export default function AdminBoardCategoriesPage() {
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
+    return <ErrorSection error={error} />;
   }
 
   const modalContent = getModalContent();

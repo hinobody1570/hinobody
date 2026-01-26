@@ -58,7 +58,7 @@ export function CommunityBoardsSection({
                         <p className="text-sm text-gray-600 mb-2 line-clamp-2">{board.description}</p>
                       )}
                       <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span>{t('category')}: {board.category}</span>
+                        <span>{t('category')}: {board.category?.name || '-'}</span>
                         <span>•</span>
                         <span>{formatTimestamp(board.createdAt)}</span>
                       </div>
@@ -93,7 +93,7 @@ export function CommunityBoardsSection({
                         <p className="text-sm text-gray-600 mb-2 line-clamp-2">{board.description}</p>
                       )}
                       <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span>{t('category')}: {board.category}</span>
+                        <span>{t('category')}: {board.category?.name || '-'}</span>
                         <span>•</span>
                         <span>{formatTimestamp(board.createdAt)}</span>
                       </div>

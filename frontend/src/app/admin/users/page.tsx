@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaBan, FaCheck, FaEye, FaTrash } from "react-icons/fa";
 import DP from "../../../../public/assets/images/avatar_default_4.png";
+import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 type ActionType = "block" | "unblock" | "delete" | null;
 
@@ -267,11 +268,7 @@ export default function AdminUsersPage() {
   }
 
   if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
+    return <ErrorSection error={error} />;
   }
 
   const modalContent = getModalContent();
