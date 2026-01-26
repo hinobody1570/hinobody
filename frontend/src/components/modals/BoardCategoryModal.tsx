@@ -8,7 +8,8 @@ import { BoardCategory, CreateBoardCategoryDto, UpdateBoardCategoryDto } from "@
 interface BoardCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: CreateBoardCategoryDto | UpdateBoardCategoryDto) => Promise<void>;
+  // onSave: (data: CreateBoardCategoryDto | UpdateBoardCategoryDto) => Promise<void>;
+  onSave: any;
   category?: BoardCategory | null;
   isLoading?: boolean;
 }
