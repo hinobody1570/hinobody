@@ -41,18 +41,19 @@ FRONTEND_URL=http://localhost:3000
 1. Go to [Apple Developer Portal](https://developer.apple.com/)
 2. Navigate to "Certificates, Identifiers & Profiles"
 3. Create a new App ID with "Sign in with Apple" capability
-4. Create a Service ID for Sign in with Apple
-5. Create a Key with "Sign in with Apple" enabled
+4. Create a **Service ID** for Sign in with Apple (use this as `APPLE_CLIENT_ID` for web)
+5. Create a Key with "Sign in with Apple" enabled; note the **Key ID** (e.g. from `AuthKey_XXXXX.p8`)
 6. Download the `.p8` key file
-7. Note your Team ID, Key ID, and Client ID
+7. Note your **Team ID**, **Key ID**, and **Service ID** (Client ID)
 8. Configure the Service ID:
-   - Add your callback URL: `http://localhost:3001/auth/apple/callback`
-   - Add your domain
-9. Add the credentials to your `.env` file:
-   - Copy the entire private key content from the `.p8` file (including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----` lines)
-   - Add it as `APPLE_PRIVATE_KEY` in your `.env` file. You can either:
-     * Use a single line with `\n` for line breaks: `APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nKEY_CONTENT\n-----END PRIVATE KEY-----"`
-     * Or paste the key directly (some .env parsers support multi-line values in quotes)
+   - Add your domain and **Return URL** (e.g. `https://your-api.com/auth/apple/callback`)
+   - Return URL must match `APPLE_CALLBACK_URL` exactly (no trailing slash)
+9. Add the credentials to your `.env` file. The `client_secret` is generated as a JWT with:
+   - **iss** = Team ID
+   - **sub** = Service ID
+   - **aud** = `https://appleid.apple.com`
+   - **kid** = Key ID (in JWT header)
+10. `APPLE_PRIVATE_KEY`: use either full PEM (including `-----BEGIN PRIVATE KEY-----` / `-----END PRIVATE KEY-----`) or raw base64 only.
 
 ## Frontend Environment Variables
 

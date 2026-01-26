@@ -193,21 +193,15 @@ export class AuthController {
     // Check if Apple OAuth is configured
     const clientID = process.env.APPLE_CLIENT_ID;
     if (!clientID || clientID === 'your-apple-client-id') {
-      throw new Error('Apple OAuth is not configured. Please set APPLE_CLIENT_ID in your .env file.');
+      throw new Error('Apple OAuth is not configured. Please set APPLE_CLIENT_ID (Service ID) in your .env file.');
     }
 
-    const callbackURL = process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
-    
-    
-    // Ensure callback URL doesn't have trailing slash and matches exactly
-    const normalizedCallbackURL = callbackURL.replace(/\/$/, '');
-    const redirectURI = encodeURIComponent(normalizedCallbackURL);
+    const redirectURI = this.getAppleRedirectUri();
     const state = Math.random().toString(36).substring(7); // Generate state for CSRF protection
-    
-    // Build Apple authorization URL
-    // Note: For localhost, Apple requires exact match in Service ID configuration
+
+    // Build Apple authorization URL – redirect_uri must match Service ID Return URL exactly
     const appleAuthURL = `https://appleid.apple.com/auth/authorize?client_id=${encodeURIComponent(clientID)}&redirect_uri=${redirectURI}&response_type=code&scope=email%20name&state=${state}&response_mode=form_post`;
-        
+
     res.redirect(appleAuthURL);
   }
 
@@ -266,12 +260,29 @@ export class AuthController {
     }
   }
 
+  /**
+   * Returns normalized Apple callback URL (no trailing slash).
+   * Must match Service ID Return URL exactly. Used for both authorize redirect_uri and token exchange.
+   */
+  private getAppleCallbackUrl(): string {
+    const raw =
+      process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
+    return raw.replace(/\/$/, '');
+  }
+
+  /**
+   * Returns encoded redirect_uri for Apple authorize URL query string.
+   */
+  private getAppleRedirectUri(): string {
+    return encodeURIComponent(this.getAppleCallbackUrl());
+  }
+
   private async exchangeAppleCode(code: string): Promise<any> {
-    const clientID = process.env.APPLE_CLIENT_ID;
+    const clientID = process.env.APPLE_CLIENT_ID; // Service ID (e.g. com.hinobody.web)
     const teamID = process.env.APPLE_TEAM_ID;
     const keyID = process.env.APPLE_KEY_ID;
     let privateKey = process.env.APPLE_PRIVATE_KEY || '';
-    const callbackURL = process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
+    const redirectUri = this.getAppleCallbackUrl();
 
     if (!clientID || !teamID || !keyID || !privateKey) {
       throw new Error('Apple OAuth credentials not fully configured');
@@ -281,8 +292,14 @@ export class AuthController {
     if (privateKey.includes('\\n')) {
       privateKey = privateKey.replace(/\\n/g, '\n');
     }
-    
-    // Ensure proper formatting if key is on single line
+
+    // If key is raw base64 without PEM headers (e.g. from .env), wrap it
+    if (privateKey && !privateKey.includes('-----BEGIN')) {
+      const b64 = privateKey.replace(/\s/g, '').trim();
+      privateKey = `-----BEGIN PRIVATE KEY-----\n${b64}\n-----END PRIVATE KEY-----`;
+    }
+
+    // Ensure proper formatting if key is on single line but has PEM headers
     if (privateKey && !privateKey.includes('\n') && privateKey.includes('-----')) {
       privateKey = privateKey
         .replace(/-----BEGIN PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----\n')
@@ -290,13 +307,14 @@ export class AuthController {
         .replace(/\n+/g, '\n');
     }
 
-    // Create client secret (JWT)
+    // Create client_secret JWT per Apple spec: iss=Team ID, sub=Service ID, aud=appleid.apple.com, kid=Key ID
     const jwt = require('jsonwebtoken');
+    const now = Math.floor(Date.now() / 1000);
     const clientSecret = jwt.sign(
       {
         iss: teamID,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+        iat: now,
+        exp: now + 3600, // 1 hour (max 6 months)
         aud: 'https://appleid.apple.com',
         sub: clientID,
       },
@@ -307,7 +325,7 @@ export class AuthController {
       },
     );
 
-    // Exchange authorization code for tokens
+    // Exchange authorization code for tokens. redirect_uri must match authorize request exactly.
     const response = await fetch('https://appleid.apple.com/auth/token', {
       method: 'POST',
       headers: {
@@ -318,7 +336,7 @@ export class AuthController {
         client_secret: clientSecret,
         code,
         grant_type: 'authorization_code',
-        redirect_uri: callbackURL,
+        redirect_uri: redirectUri,
       }),
     });
 
@@ -338,7 +356,7 @@ export class AuthController {
     const teamID = process.env.APPLE_TEAM_ID;
     const keyID = process.env.APPLE_KEY_ID;
     const privateKey = process.env.APPLE_PRIVATE_KEY;
-    const callbackURL = process.env.APPLE_CALLBACK_URL || 'http://localhost:3001/auth/apple/callback';
+    const callbackURL = this.getAppleCallbackUrl();
 
     const config = {
       clientID: clientID ? (clientID.length > 0 ? '✓ Set' : '✗ Empty') : '✗ Missing',
@@ -367,12 +385,13 @@ export class AuthController {
         invalidClientError: [
           '1. Verify your Service ID exists in Apple Developer Portal',
           '2. Ensure "Sign in with Apple" is enabled for the Service ID',
-          `3. Check that the callback URL "${callbackURL}" is added to your Service ID\'s Return URLs`,
+          `3. Check that the callback URL "${callbackURL}" is added to your Service ID's Return URLs`,
           '4. Verify you\'re using a Service ID (not App ID) for web authentication',
-          '5. Wait a few minutes after making changes in Apple Developer Portal (changes can take time to propagate)',
+          '5. JWT client_secret: iss=Team ID, sub=Service ID, aud=https://appleid.apple.com, kid=Key ID',
+          '6. Wait a few minutes after making changes in Apple Developer Portal (changes can take time to propagate)',
         ],
         callbackUrlMismatch: [
-          `Make sure "${callbackURL}" exactly matches (including http:// and no trailing slash)`,
+          `Make sure "${callbackURL}" exactly matches (including https:// and no trailing slash)`,
           'what you configured in Apple Developer Portal > Service ID > Return URLs',
         ],
       },
