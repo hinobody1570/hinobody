@@ -36,7 +36,7 @@ export default function BoardProfilePage() {
   const { user } = useAuth();
   const boardId = params?.boardId as string;
   
-  const [board, setBoard] = useState<Board | null>(null);
+  const [board, setBoard] = useState<Board | null | any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
