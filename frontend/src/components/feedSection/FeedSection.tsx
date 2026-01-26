@@ -17,7 +17,7 @@ const transformPost = (post: Post): any => {
     id: post.id,
     boardId: post.boardId, // Add boardId for membership checks
     authorId: post.authorId, // Add authorId for comment OP badge
-    community: post.board?.name ? `r/${post.board.name}` : "r/community",
+    community: post.board?.name ? `r/${post.board.name}/${post.author?.nickname}` : "r/community",
     communityAvatar: DP, // Default avatar
     verified: false, // Can be enhanced later based on board settings
     timestamp: formatTimestamp(post.createdAt),
@@ -54,7 +54,7 @@ export const RedditFeed = () => {
   const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
-  const [selectedBoardName, setSelectedBoardName] = useState<string>(t('best'));
+  const [selectedBoardName, setSelectedBoardName] = useState<string>(t('allBoards'));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
@@ -129,7 +129,7 @@ export const RedditFeed = () => {
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
       console.error('Error fetching posts:', err);
-      setError(err.message || 'Failed to load posts');
+      setError(err.message || t('failedToLoadPosts'));
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -249,7 +249,7 @@ export const RedditFeed = () => {
             {/* Loading State */}
             {loading && (
               <div className="flex items-center justify-center py-12">
-                <div className="text-gray-500">Loading posts...</div>
+                <div className="text-gray-500">{t('loadingPosts')}</div>
               </div>
             )}
 
@@ -263,7 +263,7 @@ export const RedditFeed = () => {
             {/* Posts */}
             {!loading && !error && posts.length === 0 && (
               <div className="flex items-center justify-center py-12">
-                <div className="text-gray-500">No posts available</div>
+                <div className="text-gray-500">{t('noPostsAvailable')}</div>
               </div>
             )}
 
@@ -278,7 +278,7 @@ export const RedditFeed = () => {
                   <div ref={setObserverTarget} className="py-4">
                     {loadingMore && (
                       <div className="flex items-center justify-center py-8">
-                        <div className="text-gray-500">Loading more posts...</div>
+                        <div className="text-gray-500">{t('loadingMorePosts')}</div>
                       </div>
                     )}
                   </div>
@@ -287,7 +287,7 @@ export const RedditFeed = () => {
                 {/* End of feed message */}
                 {!hasMore && posts.length > 0 && (
                   <div className="flex items-center justify-center py-8">
-                    <div className="text-gray-500">No more posts to load</div>
+                    <div className="text-gray-500">{t('noMorePostsToLoad')}</div>
                   </div>
                 )}
               </>
@@ -310,7 +310,7 @@ export const RedditFeed = () => {
 
                 {loadingRecentPosts ? (
                   <div className="flex items-center justify-center py-8">
-                    <div className="text-gray-500 text-sm">Loading...</div>
+                    <div className="text-gray-500 text-sm">{t('loadingPosts')}</div>
                   </div>
                 ) : recentPosts.length > 0 ? (
                   <div className="space-y-2">
@@ -320,7 +320,7 @@ export const RedditFeed = () => {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center py-8">
-                    <div className="text-gray-500 text-sm">No recent posts</div>
+                    <div className="text-gray-500 text-sm">{t('noRecentPosts')}</div>
                   </div>
                 )}
 

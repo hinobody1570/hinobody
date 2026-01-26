@@ -43,6 +43,24 @@ export class BoardController {
     return this.boardService.findAll(query);
   }
 
+  @Get('pending-requests')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get pending membership requests for boards created by user' })
+  getPendingRequests(@GetUser('id') userId: string) {
+    return this.boardService.getPendingRequests(userId);
+  }
+
+  @Get('user/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get boards created by user and boards user is a member of. Returns boards for the userId in URL parameter, not the logged-in user.' })
+  findByUserId(@Param('userId') userId: string) {
+    // Use userId from URL parameter, not logged-in user
+    // This allows viewing any user's boards (when authenticated)
+    return this.boardService.findByUserId(userId);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
@@ -64,5 +82,29 @@ export class BoardController {
   @ApiBearerAuth('JWT-auth')
   remove(@Param('id') id: string) {
     return this.boardService.remove(id);
+  }
+
+  @Post(':boardId/join')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Join a board (creates PENDING request for PRIVATE boards)' })
+  joinBoard(@Param('boardId') boardId: string, @GetUser('id') userId: string) {
+    return this.boardService.joinBoard(boardId, userId);
+  }
+
+  @Patch('membership/:membershipId/approve')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Approve a membership request' })
+  approveMembership(@Param('membershipId') membershipId: string, @GetUser('id') userId: string) {
+    return this.boardService.approveMembership(membershipId, userId);
+  }
+
+  @Delete('membership/:membershipId/reject')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Reject a membership request' })
+  rejectMembership(@Param('membershipId') membershipId: string, @GetUser('id') userId: string) {
+    return this.boardService.rejectMembership(membershipId, userId);
   }
 }

@@ -53,7 +53,7 @@ export default function BoardProfilePage() {
         setBoard(boardData);
       } catch (err: any) {
         console.error('Error fetching board:', err);
-        setError(err.message || 'Failed to load board');
+        setError(err.message || t('failedToLoadBoard'));
       } finally {
         setLoading(false);
       }
@@ -126,7 +126,7 @@ export default function BoardProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading board...</div>
+        <div className="text-gray-500">{t('loadingBoard')}</div>
       </div>
     );
   }
@@ -135,7 +135,7 @@ export default function BoardProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Board not found'}</p>
+          <p className="text-red-600 mb-4">{error || t('boardNotFound')}</p>
           <button
             onClick={() => router.push(ROUTE_PATHS.HOME)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
@@ -189,7 +189,7 @@ export default function BoardProfilePage() {
           
           {loadingPosts ? (
             <div className="flex items-center justify-center py-12">
-              <div className="text-gray-500">Loading posts...</div>
+              <div className="text-gray-500">{t('loadingPosts')}</div>
             </div>
           ) : posts.length > 0 ? (
             <div className="space-y-4">

@@ -207,7 +207,7 @@ export const PostCard = ({ post }: any) => {
     //   onClick: () => console.log("About clicked"),
     // },
   ];
-  console.log("post",post)
+
   return (
     <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
       {/* Post Header */}
@@ -264,7 +264,7 @@ export const PostCard = ({ post }: any) => {
         </div>
       )} */}
 
-      {post?.body && <div className="" dangerouslySetInnerHTML={{ __html: post?.body }} />}
+      {post?.body && <div className="px-3 pb-2" dangerouslySetInnerHTML={{ __html: post?.body }} />}
 
       {/* Post Actions */}
       <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200">

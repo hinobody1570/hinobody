@@ -36,27 +36,30 @@ export class AppleAuthService {
     if (privateKey.includes('\\n')) {
       privateKey = privateKey.replace(/\\n/g, '\n');
     }
-    
+
+    // If key is raw base64 without PEM headers (e.g. from .env), wrap it
+    if (privateKey && !privateKey.includes('-----BEGIN')) {
+      const b64 = privateKey.replace(/\s/g, '').trim();
+      privateKey = `-----BEGIN PRIVATE KEY-----\n${b64}\n-----END PRIVATE KEY-----`;
+    }
+
     // Handle multi-line keys from .env file (Windows compatibility)
-    // If key contains actual newlines, ensure proper formatting
     if (privateKey.includes('\n')) {
-      // Clean up any extra whitespace/newlines
       privateKey = privateKey
         .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
         .join('\n');
     }
-    
-    // Ensure proper formatting if key is on single line
+
+    // Ensure proper formatting if key is on single line but has PEM headers
     if (privateKey && !privateKey.includes('\n') && privateKey.includes('-----')) {
-      // If key is on single line, try to format it properly
       privateKey = privateKey
         .replace(/-----BEGIN PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----\n')
         .replace(/-----END PRIVATE KEY-----/g, '\n-----END PRIVATE KEY-----')
-        .replace(/\n+/g, '\n'); // Remove duplicate newlines
+        .replace(/\n+/g, '\n');
     }
-    
+
     this.applePrivateKey = privateKey.trim();
 
     // Initialize JWKS client for verifying Apple tokens
@@ -115,7 +118,8 @@ export class AppleAuthService {
   }
 
   /**
-   * Generate client secret for Apple (if needed for server-to-server communication)
+   * Generate client_secret JWT for Apple token endpoint.
+   * Must use: iss=Team ID, sub=Service ID, aud=https://appleid.apple.com, kid=Key ID.
    */
   generateClientSecret(): string {
     if (!this.applePrivateKey || !this.appleTeamId || !this.appleClientId || !this.appleKeyId) {
@@ -126,9 +130,9 @@ export class AppleAuthService {
     const payload = {
       iss: this.appleTeamId,
       iat: now,
-      exp: now + 3600, // 1 hour
+      exp: now + 3600, // 1 hour (max 6 months)
       aud: 'https://appleid.apple.com',
-      sub: this.appleClientId,
+      sub: this.appleClientId, // Service ID
     };
 
     return jwt.sign(payload, this.applePrivateKey, {

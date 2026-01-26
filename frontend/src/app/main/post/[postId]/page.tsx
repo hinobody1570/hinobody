@@ -49,7 +49,7 @@ export default function PostDetailPage() {
         setPost(transformedPost);
       } catch (err: any) {
         console.error('Error fetching post:', err);
-        setError(err.message || 'Failed to load post');
+        setError(err.message || t('postNotFound'));
       } finally {
         setLoading(false);
       }
@@ -63,7 +63,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading post...</div>
+        <div className="text-gray-500">{t('loadingPost')}</div>
       </div>
     );
   }
@@ -72,7 +72,7 @@ export default function PostDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Post not found'}</p>
+          <p className="text-red-600 mb-4">{error || t('postNotFound')}</p>
           <button
             onClick={() => router.push(ROUTE_PATHS.HOME)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"

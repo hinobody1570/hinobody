@@ -84,7 +84,7 @@ export default function AdminUsersPage() {
 
     try {
       setActionLoading(userId);
-      
+
       switch (action) {
         case "block":
           await usersApi.block(userId);
@@ -103,7 +103,7 @@ export default function AdminUsersPage() {
       // Refresh users list
       const response = await usersApi.getAll(1, 20);
       setUsers(response.data);
-      
+
       // Close modal
       closeConfirmationModal();
     } catch (err: any) {
@@ -119,7 +119,7 @@ export default function AdminUsersPage() {
     if (!confirmationModal.action || !confirmationModal.userName) return { title: "", description: "" };
 
     const userName = confirmationModal.userName;
-    
+
     switch (confirmationModal.action) {
       case "block":
         return {
@@ -155,11 +155,11 @@ export default function AdminUsersPage() {
     {
       key: "avatar",
       header: t("avatar"),
-      render: (value:string) => (
+      render: (value: string) => (
         <div>
-          <Image src={value ? value : DP} alt="DP" width={80} height={80} className="rounded-full"/>
+          <Image src={value ? value : DP} alt="DP" width={80} height={80} className="rounded-full" />
         </div>
-      )
+      ),
     },
     {
       key: "nickname",
@@ -172,30 +172,18 @@ export default function AdminUsersPage() {
     {
       key: "role",
       header: t("role"),
-      render: (value: string) => (
-        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">
-          {value}
-        </span>
-      ),
+      render: (value: string) => <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">{value}</span>,
     },
     {
       key: "language",
       header: t("language"),
-      render: (value: string) => (
-        <span className="uppercase">{value}</span>
-      ),
+      render: (value: string) => <span className="uppercase">{value}</span>,
     },
     {
       key: "isActive",
       header: t("status"),
       render: (value: boolean) => (
-        <span
-          className={`px-2 py-1 text-xs font-semibold rounded-full ${
-            value
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
           {value ? t("active") : t("inactive")}
         </span>
       ),
@@ -204,13 +192,7 @@ export default function AdminUsersPage() {
       key: "emailVerified",
       header: t("emailVerified"),
       render: (value: boolean) => (
-        <span
-          className={`px-2 py-1 text-xs font-semibold rounded-full ${
-            value
-              ? "bg-green-100 text-green-800"
-              : "bg-yellow-100 text-yellow-800"
-          }`}
-        >
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${value ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
           {value ? t("verified") : t("nonVerified")}
         </span>
       ),
@@ -232,41 +214,41 @@ export default function AdminUsersPage() {
 
             return (
               <>
-          {row.isActive ? (
-            <button
-              onClick={() => openConfirmationModal("block", row.id, row.nickname || row.email)}
-              disabled={isDisabled}
-              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              title={t("block")}
-            >
-              <FaBan size={16} />
-            </button>
-          ) : (
-            <button
-              onClick={() => openConfirmationModal("unblock", row.id, row.nickname || row.email)}
-              disabled={isDisabled}
-              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              title={t("unblock")}
-            >
-              <FaCheck size={16} />
-            </button>
-          )}
-          <button
-            onClick={() => openConfirmationModal("delete", row.id, row.nickname || row.email)}
-            disabled={isDisabled}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            title={t("delete")}
-          >
-            <FaTrash size={16} />
-          </button>
-          <button
-            onClick={() => router.push(`${ROUTE_PATHS.ADMIN_USER_DETAIL}/${row.id}`)}
-            disabled={isBusy}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            title={t("viewDetails")}
-          >
-            <FaEye size={16} />
-          </button>
+                {row.isActive ? (
+                  <button
+                    onClick={() => openConfirmationModal("block", row.id, row.nickname || row.email)}
+                    disabled={isDisabled}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    title={t("block")}
+                  >
+                    <FaBan size={16} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => openConfirmationModal("unblock", row.id, row.nickname || row.email)}
+                    disabled={isDisabled}
+                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    title={t("unblock")}
+                  >
+                    <FaCheck size={16} />
+                  </button>
+                )}
+                <button
+                  onClick={() => openConfirmationModal("delete", row.id, row.nickname || row.email)}
+                  disabled={isDisabled}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  title={t("delete")}
+                >
+                  <FaTrash size={16} />
+                </button>
+                <button
+                  onClick={() => router.push(`${ROUTE_PATHS.ADMIN_USER_DETAIL}/${row.id}`)}
+                  disabled={isBusy}
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  title={t("viewDetails")}
+                >
+                  <FaEye size={16} />
+                </button>
               </>
             );
           })()}
@@ -297,7 +279,7 @@ export default function AdminUsersPage() {
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{t("users")}</h1>
       <DataTable columns={columns} data={users} />
-      
+
       <ConfirmationModal
         isOpen={confirmationModal.isOpen}
         onClose={closeConfirmationModal}
@@ -311,4 +293,3 @@ export default function AdminUsersPage() {
     </div>
   );
 }
-

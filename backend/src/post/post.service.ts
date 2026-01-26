@@ -16,7 +16,7 @@ export class PostService {
   constructor(
     private prisma: PrismaService,
     private boardMemberService: BoardMemberService,
-  ) {}
+  ) { }
 
   async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
     // Verify board exists
@@ -31,14 +31,14 @@ export class PostService {
     // If isActive is not provided, default to true (published)
     // If isActive is false, it's a draft and we skip membership check
     const isDraft = createPostDto.isActive === false;
-    
+
     // Only check membership if posting (not saving as draft)
     if (!isDraft) {
       // Check if user is an approved member of the board
       const isMember = await this.boardMemberService.isMember(createPostDto.boardId, userId);
       if (!isMember) {
         const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId, userId);
-        
+
         if (!membership) {
           throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
         } else if (membership.status === 'PENDING') {
@@ -60,8 +60,8 @@ export class PostService {
         isActive: createPostDto.isActive !== undefined ? createPostDto.isActive : true,
         images: createPostDto.imageIds
           ? {
-              connect: createPostDto.imageIds.map((id) => ({ id })),
-            }
+            connect: createPostDto.imageIds.map((id) => ({ id })),
+          }
           : undefined,
       },
       include: {
@@ -86,13 +86,36 @@ export class PostService {
     return post;
   }
 
-  async findAll(query: QueryPostsDto) {
+  async findAll(query: QueryPostsDto, userId?: string) {
     const { boardId, authorId, page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
 
+    // Get blocked user IDs if userId is provided
+    let blockedUserIds: string[] = [];
+    if (userId) {
+      const blocks = await this.prisma.block.findMany({
+        where: { blockerId: userId },
+        select: { blockedId: true },
+      });
+      blockedUserIds = blocks.map((block) => block.blockedId);
+    }
+
     // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
     if (search) {
-      return this.findAllWithFTS(query);
+      return this.findAllWithFTS(query, blockedUserIds);
+    }
+
+    // If authorId is specified and that author is blocked, return empty results
+    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      };
     }
 
     const where: Prisma.PostWhereInput = {
@@ -100,6 +123,12 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      // Exclude posts from blocked users (only if authorId is not specified)
+      ...(!authorId && blockedUserIds.length > 0 && {
+        authorId: {
+          notIn: blockedUserIds,
+        },
+      }),
     };
 
     const [posts, total] = await Promise.all([
@@ -122,7 +151,6 @@ export class PostService {
           },
           _count: {
             select: {
-              comments: true,
               votes: true,
             },
           },
@@ -131,8 +159,41 @@ export class PostService {
       this.prisma.post.count({ where }),
     ]);
 
+    // Calculate comment counts excluding blocked users
+    const postsWithFilteredCounts = await Promise.all(
+      posts.map(async (post) => {
+        const commentCount = blockedUserIds.length > 0
+          ? await this.prisma.comment.count({
+            where: {
+              postId: post.id,
+              isActive: true,
+              isDeleted: false,
+              authorId: {
+                notIn: blockedUserIds,
+              },
+            },
+          })
+          : await this.prisma.comment.count({
+            where: {
+              postId: post.id,
+              isActive: true,
+              isDeleted: false,
+            },
+          });
+
+        return {
+          ...post,
+          commentCount: commentCount, // Update the commentCount field
+          _count: {
+            ...post._count,
+            comments: commentCount,
+          },
+        };
+      })
+    );
+
     return {
-      data: posts,
+      data: postsWithFilteredCounts,
       meta: {
         total,
         page,
@@ -142,9 +203,22 @@ export class PostService {
     };
   }
 
-  private async findAllWithFTS(query: QueryPostsDto) {
+  private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = []) {
     const { boardId, authorId, page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
+
+    // If authorId is specified and that author is blocked, return empty results
+    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
+      return {
+        data: [],
+        meta: {
+          total: 0,
+          page,
+          limit,
+          totalPages: 0,
+        },
+      };
+    }
 
     // Use simple Prisma search instead of FTS to avoid requiring search_vector column
     const where: Prisma.PostWhereInput = {
@@ -152,21 +226,27 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      // Exclude posts from blocked users (only if authorId is not specified)
+      ...(!authorId && blockedUserIds.length > 0 && {
+        authorId: {
+          notIn: blockedUserIds,
+        },
+      }),
       OR: search
         ? [
-            {
-              title: {
-                contains: search,
-                mode: 'insensitive',
-              },
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
             },
-            {
-              body: {
-                contains: search,
-                mode: 'insensitive',
-              },
+          },
+          {
+            body: {
+              contains: search,
+              mode: 'insensitive',
             },
-          ]
+          },
+        ]
         : undefined,
     };
 
@@ -190,7 +270,6 @@ export class PostService {
           },
           _count: {
             select: {
-              comments: true,
               votes: true,
             },
           },
@@ -199,8 +278,41 @@ export class PostService {
       this.prisma.post.count({ where }),
     ]);
 
+    // Calculate comment counts excluding blocked users
+    const postsWithFilteredCounts = await Promise.all(
+      posts.map(async (post) => {
+        const commentCount = blockedUserIds.length > 0
+          ? await this.prisma.comment.count({
+            where: {
+              postId: post.id,
+              isActive: true,
+              isDeleted: false,
+              authorId: {
+                notIn: blockedUserIds,
+              },
+            },
+          })
+          : await this.prisma.comment.count({
+            where: {
+              postId: post.id,
+              isActive: true,
+              isDeleted: false,
+            },
+          });
+
+        return {
+          ...post,
+          commentCount: commentCount, // Update the commentCount field
+          _count: {
+            ...post._count,
+            comments: commentCount,
+          },
+        };
+      })
+    );
+
     return {
-      data: posts,
+      data: postsWithFilteredCounts,
       meta: {
         total,
         page,
@@ -210,7 +322,16 @@ export class PostService {
     };
   }
 
-  async findOne(id: string): Promise<Post> {
+  async findOne(id: string, userId?: string): Promise<Post> {
+    let blockedUserIds: string[] = [];
+    if (userId) {
+      const blocks = await this.prisma.block.findMany({
+        where: { blockerId: userId },
+        select: { blockedId: true },
+      });
+      blockedUserIds = blocks.map((block) => block.blockedId);
+    }
+    
     const post = await this.prisma.post.findUnique({
       where: { id },
       include: {
@@ -227,6 +348,11 @@ export class PostService {
           where: {
             isActive: true,
             isDeleted: false,
+            ...(blockedUserIds.length > 0 && {
+              authorId: {
+                notIn: blockedUserIds,
+              },
+            }),
           },
           include: {
             author: {
@@ -241,7 +367,6 @@ export class PostService {
         },
         _count: {
           select: {
-            comments: true,
             votes: true,
           },
         },
@@ -252,13 +377,40 @@ export class PostService {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
+    // Calculate comment count excluding blocked users
+    const commentCount = blockedUserIds.length > 0
+      ? await this.prisma.comment.count({
+        where: {
+          postId: post.id,
+          isActive: true,
+          isDeleted: false,
+          authorId: {
+            notIn: blockedUserIds,
+          },
+        },
+      })
+      : await this.prisma.comment.count({
+        where: {
+          postId: post.id,
+          isActive: true,
+          isDeleted: false,
+        },
+      });
+
     // Increment view count
     await this.prisma.post.update({
       where: { id },
       data: { viewCount: { increment: 1 } },
     });
 
-    return post;
+    return {
+      ...post,
+      commentCount: commentCount, // Update the commentCount field for frontend
+      _count: {
+        ...post._count,
+        comments: commentCount,
+      },
+    } as any;
   }
 
   async update(
@@ -267,7 +419,7 @@ export class PostService {
     userId: string,
     isAdmin: boolean = false,
   ): Promise<Post> {
-    const post = await this.findOne(id);
+    const post = await this.findOne(id, userId);
 
     // Check if user is the author or admin
     if (post.authorId !== userId && !isAdmin) {
@@ -317,10 +469,13 @@ export class PostService {
   }
 
   // Get home feed (all boards combined)
-  async getHomeFeed(query: QueryPostsDto) {
-    return this.findAll({
-      ...query,
-      boardId: undefined, // Remove board filter for home feed
-    });
+  async getHomeFeed(query: QueryPostsDto, userId?: string) {
+    return this.findAll(
+      {
+        ...query,
+        boardId: undefined, // Remove board filter for home feed
+      },
+      userId,
+    );
   }
 }
