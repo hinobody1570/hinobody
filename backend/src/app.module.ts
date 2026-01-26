@@ -17,6 +17,7 @@ import { EmailModule } from './email/email.module';
 import { EyeMaskedImageModule } from './eye-masked-image/eye-masked-image.module';
 import { VoteModule } from './vote/vote.module';
 import { SearchModule } from './search/search.module';
+import { BoardCategoryModule } from './board-category/board-category.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SearchModule } from './search/search.module';
     BlockModule,
     BoardModule,
     BoardMemberModule,
+    BoardCategoryModule,
     CommentModule,
     ImageModule,
     PostModule,

@@ -10,6 +10,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { ROUTE_PATHS } from "@/routes/paths";
+import Loading from "@/components/reuseComponents/Loading";
 
 type ActionType = "delete" | "activate" | "deactivate" | null;
 
@@ -231,9 +232,7 @@ export default function AdminPostsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
+      <Loading />
     );
   }
 

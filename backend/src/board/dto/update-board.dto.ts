@@ -21,6 +21,16 @@ export class UpdateBoardDto {
   description?: string;
 
   @ApiPropertyOptional({
+    example: 'clx1234567890',
+    minLength: 1,
+    description: 'Updated category ID of the board',
+  })
+  @IsString()
+  @MinLength(1)
+  @IsOptional()
+  categoryId?: string;
+
+  @ApiPropertyOptional({
     example: true,
     description: 'Enable or disable the board',
   })

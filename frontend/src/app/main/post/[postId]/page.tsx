@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { postsApi, Post } from '@/lib/api';
-import { ROUTE_PATHS } from '@/routes/paths';
-import { PostCard } from '@/components/reuseComponents/PostCard';
-import { formatTimestamp } from '@/utils/helperFunction';
-import Image from 'next/image';
-import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { CommentsSection } from '@/components/commentSection/CommentSection';
+import { PostCard } from '@/components/reuseComponents/PostCard';
+import { Post, postsApi } from '@/lib/api';
+import { ROUTE_PATHS } from '@/routes/paths';
+import { formatTimestamp } from '@/utils/helperFunction';
+import { useTranslations } from 'next-intl';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import DP from '../../../../../public/assets/images/avatar_default_4.png';
+import Loading from '@/components/reuseComponents/Loading';
 
 const transformPost = (post: Post): any => {
   return {
@@ -62,9 +62,7 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">{t('loadingPost')}</div>
-      </div>
+      <Loading />
     );
   }
 

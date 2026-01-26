@@ -10,6 +10,7 @@ import AdminDetailHeader from "@/components/admin/AdminDetailHeader";
 import Image from "next/image";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import { ROUTE_PATHS } from "@/routes/paths";
+import Loading from "@/components/reuseComponents/Loading";
 
 const transformPost = (post: Post): any => {
   return {
@@ -59,11 +60,7 @@ export default function AdminPostDetailPage() {
   }, [postId, t]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error || !post) {
@@ -101,9 +98,7 @@ export default function AdminPostDetailPage() {
               </span>
               <span>
                 <strong>{t("status")}:</strong>{" "}
-                <span className={post.isActive ? "text-green-600" : "text-red-600"}>
-                  {post.isActive ? t("active") : t("inactive")}
-                </span>
+                <span className={post.isActive ? "text-green-600" : "text-red-600"}>{post.isActive ? t("active") : t("inactive")}</span>
               </span>
               <span>
                 <strong>{t("createdAt")}:</strong> {formatTimestamp(post.createdAt)}
@@ -159,4 +154,3 @@ export default function AdminPostDetailPage() {
     </div>
   );
 }
-

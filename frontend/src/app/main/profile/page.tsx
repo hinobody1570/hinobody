@@ -4,17 +4,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { ROUTE_PATHS } from '@/routes/paths';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const t = useTranslations('profile');
   const tAuth = useTranslations('auth');
-  const tDashboard = useTranslations('dashboard');
 
   const handleLogout = () => {
     logout();
-    router.push('/');
+    router.push(ROUTE_PATHS.DEFAULT);
   };
 
   return (

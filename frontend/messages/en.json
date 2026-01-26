@@ -328,7 +328,31 @@
     "deleteReport": "Delete Report",
     "confirmDeleteReportDescription": "Are you sure you want to delete this report? This action cannot be undone.",
     "reportDeleted": "Report deleted successfully",
-    "deleteReportError": "Failed to delete report"
+    "deleteReportError": "Failed to delete report",
+    "boardCategories": "Board Categories",
+    "addNew": "Add New",
+    "addNewCategory": "Add New Category",
+    "editCategory": "Edit Category",
+    "categoryName": "Category Name",
+    "categoryNameRequired": "Category name is required",
+    "enterCategoryName": "Enter category name",
+    "create": "Create",
+    "edit": "Edit",
+    "deleteCategory": "Delete Category",
+    "activateCategory": "Activate Category",
+    "deactivateCategory": "Deactivate Category",
+    "confirmDeleteCategoryDescription": "Are you sure you want to delete the category \"{name}\"? This action cannot be undone. If this category is being used by boards, deletion will fail.",
+    "confirmActivateCategoryDescription": "Are you sure you want to activate the category \"{name}\"? It will be available for use in boards.",
+    "confirmDeactivateCategoryDescription": "Are you sure you want to deactivate the category \"{name}\"? It will be hidden and cannot be used in new boards.",
+    "categoryDeleted": "Category deleted successfully",
+    "categoryActivated": "Category activated successfully",
+    "categoryDeactivated": "Category deactivated successfully",
+    "categoryCreated": "Category created successfully",
+    "categoryUpdated": "Category updated successfully",
+    "deleteCategoryError": "Failed to delete category",
+    "activateCategoryError": "Failed to activate category",
+    "deactivateCategoryError": "Failed to deactivate category",
+    "saveCategoryError": "Failed to save category"
   },
   "feed": {
     "best": "Best",
@@ -771,6 +795,8 @@
     "createCommunity": "Create Community",
     "creating": "Creating...",
     "communityCreatedSuccess": "Community created successfully!",
-    "communityCreatedError": "Failed to create community. Please try again."
+    "communityCreatedError": "Failed to create community. Please try again.",
+    "loadingCategories": "Loading categories...",
+    "noCategoriesAvailable": "No categories available"
   }
 }

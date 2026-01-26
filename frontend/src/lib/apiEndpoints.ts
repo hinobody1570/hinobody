@@ -21,5 +21,6 @@ export const API_END_POINT = {
     S3_FILES: "/s3/files",
     EYE_MASKED_IMAGES: "/eye-masked-images",
     EYE_MASKED_IMAGES_BULK: "/eye-masked-images/bulk",
+    BOARD_CATEGORIES: "/board-categories",
     
 }

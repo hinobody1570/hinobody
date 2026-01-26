@@ -109,7 +109,6 @@ export default function EmailVerification() {
       const response = await authApi.verifyEmail(email, verificationCode);
       
       // Success - show success message and redirect
-      console.log("Email verified successfully:", response);
       setIsLoading(false);
       setIsVerified(true);
       

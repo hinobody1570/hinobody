@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { ROUTE_PATHS } from "@/routes/paths";
-import { Logo } from "@/components/reuseComponents/Logo";
 import ProfileDropdown from "@/components/profileDropDown/ProfileDropdown";
+import { Logo } from "@/components/reuseComponents/Logo";
+import { useAuth } from "@/contexts/AuthContext";
+import { ROUTE_PATHS } from "@/routes/paths";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import LanguageSwitcher from "../LanguageSwitcher";
 
 export function AdminTopBar() {

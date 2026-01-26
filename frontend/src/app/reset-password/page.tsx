@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { GoArrowLeft } from "react-icons/go";
-import { FiLock } from "react-icons/fi";
-import Link from "next/link";
-import { ROUTE_PATHS } from "@/routes/paths";
 import ConfirmationMessage from "@/components/reuseComponents/ConfirmationMessage";
+import FormButton from "@/components/reuseComponents/FormButton";
 import FormLabel from "@/components/reuseComponents/FormLabel";
 import PasswordInput from "@/components/reuseComponents/PasswordInput";
-import FormButton from "@/components/reuseComponents/FormButton";
-import { useTranslations } from "next-intl";
-import { authApi } from "@/lib/api";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/contexts/ToastContext";
+import { authApi } from "@/lib/api";
+import { ROUTE_PATHS } from "@/routes/paths";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FiLock } from "react-icons/fi";
+import { GoArrowLeft } from "react-icons/go";
 
 const ResetPassword = () => {
   const t = useTranslations("auth.resetPasswordPage");
@@ -92,7 +92,7 @@ const ResetPassword = () => {
       // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push(ROUTE_PATHS.DEFAULT);
-      }, 2000);
+      }, 1000);
     } catch (error: any) {
       // Handle API errors
       setIsLoading(false);

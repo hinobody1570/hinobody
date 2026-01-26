@@ -1,23 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
 import { DataTable } from "@/components/admin/DataTable";
-import { usersApi, User } from "@/lib/api";
-import { formatTimestamp } from "@/utils/helperFunction";
-import { useToast } from "@/contexts/ToastContext";
-import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import Loading from "@/components/reuseComponents/Loading";
+import { useToast } from "@/contexts/ToastContext";
+import { User, usersApi } from "@/lib/api";
 import { ROUTE_PATHS } from "@/routes/paths";
-import DP from "../../../../public/assets/images/avatar_default_4.png";
+import { formatTimestamp } from "@/utils/helperFunction";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaBan, FaCheck, FaEye, FaTrash } from "react-icons/fa";
+import DP from "../../../../public/assets/images/avatar_default_4.png";
 
 type ActionType = "block" | "unblock" | "delete" | null;
 
 export default function AdminUsersPage() {
   const t = useTranslations("admin");
-  const tToast = useTranslations("toast");
   const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [users, setUsers] = useState<User[]>([]);
@@ -191,7 +191,7 @@ export default function AdminUsersPage() {
     {
       key: "provider",
       header: "Provider",
-      render: (value: string) => <span className="capitalize">{value}</span>
+      render: (value: string) => <span className="capitalize">{value}</span>,
     },
     {
       key: "emailVerified",
@@ -263,11 +263,7 @@ export default function AdminUsersPage() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">{t("loading")}</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {

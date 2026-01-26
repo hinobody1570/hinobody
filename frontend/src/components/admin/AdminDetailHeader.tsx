@@ -2,11 +2,11 @@ import React from "react";
 import { FaArrowLeft } from "react-icons/fa";
 
 interface propTypes {
-    title: string;
-    onClick: ()=> void;
+  title: string;
+  onClick: () => void;
 }
 
-const AdminDetailHeader = ({title, onClick}:propTypes ) => {
+const AdminDetailHeader = ({ title, onClick }: propTypes) => {
   return (
     <div className="bg-white border-b border-gray-200">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">

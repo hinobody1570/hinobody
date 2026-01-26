@@ -1,13 +1,13 @@
-import type { Metadata, Viewport } from 'next';
+import { LocaleProvider } from '@/components/LocaleProvider';
+import { ToastContainer } from '@/components/Toast';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { ToastProvider } from '@/contexts/ToastContext';
-import { LocaleProvider } from '@/components/LocaleProvider';
-import { ToastContainer } from '@/components/Toast';
-import RouteGuard from '@/routes/RouteGuard';
-import { headers } from 'next/headers';
 import { parseLocaleFromCookies } from '@/lib/locale-cookie';
+import RouteGuard from '@/routes/RouteGuard';
+import type { Metadata, Viewport } from 'next';
 import { getMessages } from 'next-intl/server';
+import { headers } from 'next/headers';
 import './globals.css';
 
 export const metadata: Metadata = {
