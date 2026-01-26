@@ -108,6 +108,7 @@ export class UserService {
           avatar: true,
           createdAt: true,
           updatedAt: true,
+          provider: true
         },
         orderBy: { createdAt: 'desc' },
       }),

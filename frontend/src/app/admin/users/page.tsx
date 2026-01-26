@@ -174,11 +174,11 @@ export default function AdminUsersPage() {
       header: t("role"),
       render: (value: string) => <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 capitalize">{value}</span>,
     },
-    {
-      key: "language",
-      header: t("language"),
-      render: (value: string) => <span className="uppercase">{value}</span>,
-    },
+    // {
+    //   key: "language",
+    //   header: t("language"),
+    //   render: (value: string) => <span className="uppercase">{value}</span>,
+    // },
     {
       key: "isActive",
       header: t("status"),
@@ -187,6 +187,11 @@ export default function AdminUsersPage() {
           {value ? t("active") : t("inactive")}
         </span>
       ),
+    },
+    {
+      key: "provider",
+      header: "Provider",
+      render: (value: string) => <span className="capitalize">{value}</span>
     },
     {
       key: "emailVerified",
