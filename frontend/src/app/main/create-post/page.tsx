@@ -42,7 +42,7 @@ const CreatePost = () => {
     const localeMap: Record<string, Language> = {
       en: 'EN',
       ko: 'KO',
-      zh: 'ZH',
+      zh: 'ZH', 
       ja: 'JA',
     };
     return localeMap[locale] || 'EN';

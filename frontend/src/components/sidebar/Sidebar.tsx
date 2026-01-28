@@ -3,7 +3,7 @@
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BiBarChartSquare } from "react-icons/bi";
 import { CgArrowTopRightO } from "react-icons/cg";
 import { FaRegUserCircle } from "react-icons/fa";
@@ -23,29 +23,15 @@ import StartCommunityPopup from "../modals/StartCommunityPopup";
 
 /* ---------------- COMPONENT ---------------- */
 
-const RedditSidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface RedditSidebarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
   const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
   const t = useTranslations("sidebar");
   const router = useRouter();
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 640px)");
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsOpen(e.matches); // true on desktop, false on mobile
-    };
-
-    // set initial value
-    setIsOpen(mq.matches);
-
-    // listen for changes
-    mq.addEventListener("change", handleChange);
-
-    return () => {
-      mq.removeEventListener("change", handleChange);
-    };
-  }, []);
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
@@ -139,7 +125,7 @@ const RedditSidebar = () => {
 
       {/* Toggle Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={onToggle}
         className={`fixed cursor-pointer top-24 ${
           isOpen ? "left-63" : "left-3"
         } z-50 p-2 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors`}
