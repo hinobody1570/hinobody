@@ -175,35 +175,35 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
   };
 
   return (
-    <div className="w-full mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="w-full mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6">
 
-      {/* Comment Input */}
-      <form onSubmit={handleSubmitComment} className="mb-6">
-        <div className="flex gap-2">
+      {/* Comment Input - stacked on mobile, row on tablet+ */}
+      <form onSubmit={handleSubmitComment} className="mb-4 sm:mb-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
           <input
             type="text"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={isAuthenticated ? t('joinConversation') : t('loginToComment')}
             disabled={!isAuthenticated || isSubmitting}
-            className="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 min-w-0 px-4 py-3 bg-gray-50 border border-gray-300 rounded-full text-base sm:text-inherit focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <button
             type="submit"
             disabled={!isAuthenticated || isSubmitting || !newComment.trim()}
-            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation flex-shrink-0"
           >
             {isSubmitting ? t('posting') : t('post')}
           </button>
         </div>
       </form>
 
-      {/* Sort and Search */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex items-center gap-2">
+      {/* Sort and Search - stacked on mobile, row on tablet+ */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-sm text-gray-600">{t('sortBy')}</span>
           <button
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors cursor-pointer touch-manipulation"
             onClick={() => setSortBy(t('best'))}
           >
             {sortBy}
@@ -211,19 +211,20 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
           </button>
         </div>
 
-        <div className="relative flex-1 max-w-md">
-          <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="relative flex-1 w-full min-w-0 max-w-full sm:max-w-md">
+          <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 flex-shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchComments')}
-            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+            className="w-full pl-10 pr-9 sm:pr-4 py-2.5 sm:py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full cursor-pointer touch-manipulation"
               aria-label="Clear search"
             >
               ×
@@ -234,29 +235,29 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
 
       {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">{t('loadingComments')}</div>
+        <div className="flex items-center justify-center py-6 sm:py-8">
+          <div className="text-gray-500 text-sm sm:text-base">{t('loadingComments')}</div>
         </div>
       )}
 
       {/* Error State */}
       {error && !loading && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-600">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
+          <p className="text-red-600 text-sm sm:text-base">{error}</p>
         </div>
       )}
 
       {/* Comments List */}
       {!loading && !error && comments.length === 0 && (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500">
+        <div className="flex items-center justify-center py-6 sm:py-8">
+          <div className="text-gray-500 text-sm sm:text-base text-center px-2">
             {isSearching || searchQuery ? t('noCommentsFound') : t('noCommentsYet')}
           </div>
         </div>
       )}
 
       {!loading && !error && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {comments.map((comment) => (
             <Comment 
               key={comment.id} 
@@ -269,19 +270,19 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
           
           {/* Infinite scroll trigger - only show when not searching */}
           {!searchQuery && hasMore && (
-            <div ref={setObserverTarget} className="py-4">
+            <div ref={setObserverTarget} className="py-3 sm:py-4">
               {loadingMore && (
-                <div className="flex items-center justify-center py-4">
-                  <div className="text-gray-500">{t('loadingMoreComments')}</div>
+                <div className="flex items-center justify-center py-3 sm:py-4">
+                  <div className="text-gray-500 text-sm sm:text-base">{t('loadingMoreComments')}</div>
                 </div>
               )}
             </div>
           )}
-          
+
           {/* End of comments message - only show when not searching */}
           {!searchQuery && !hasMore && comments.length > 0 && (
-            <div className="flex items-center justify-center py-4">
-              <div className="text-gray-500">{t('noMoreComments')}</div>
+            <div className="flex items-center justify-center py-3 sm:py-4">
+              <div className="text-gray-500 text-sm sm:text-base">{t('noMoreComments')}</div>
             </div>
           )}
         </div>

@@ -210,25 +210,38 @@ export const PostCard = ({ post }: any) => {
 
   return (
     <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
-      {/* Post Header */}
-      <div className="flex items-center justify-between px-3 py-2">
-        <div className="flex items-center gap-2">
-          <Image src={post?.communityAvatar} alt={post?.community} className="w-6 h-6 rounded-full" />
-          <span className="font-bold text-sm hover:underline cursor-pointer">{post?.community}</span>
-          {post?.verified && (
-            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">✓</span>
-            </div>
-          )}
-          <span className="text-gray-500 text-xs">• {post?.timestamp}</span>
-          {post?.badge && <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold">{post.badge}</span>}
+      {/* Post Header - responsive: stacked on mobile, single row on tablet+ */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-3 py-2 sm:gap-3">
+        {/* Left: board avatar, name, verified, timestamp, badge */}
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <Image src={post?.communityAvatar} alt={post?.community} className="w-6 h-6 rounded-full flex-shrink-0" />
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
+            <span className="font-bold text-sm hover:underline cursor-pointer truncate min-w-0" title={post?.community}>
+              {post?.community}
+            </span>
+            {post?.verified && (
+              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs">✓</span>
+              </div>
+            )}
+            <span className="text-gray-500 text-xs flex-shrink-0">•</span>
+            <span className="text-gray-500 text-xs min-w-0 truncate max-w-[110px] sm:max-w-none" title={post?.timestamp}>
+              {post?.timestamp}
+            </span>
+            {post?.badge && (
+              <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-semibold flex-shrink-0">
+                {post.badge}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Right: join button, burger menu */}
+        <div className="flex items-center gap-2 flex-shrink-0 justify-end sm:justify-start">
           {isAuthenticated && post?.boardId && (
             <button
               onClick={handleJoinLeave}
               disabled={isJoining || isMember === null}
-              className={`px-4 cursor-pointer py-1 text-sm font-semibold rounded-full transition-colors ${
+              className={`min-h-[36px] px-3 py-1.5 sm:px-4 sm:py-1 cursor-pointer text-sm font-semibold rounded-full transition-colors touch-manipulation ${
                 isMember
                   ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   : "bg-blue-600 text-white hover:bg-blue-700"
@@ -243,10 +256,7 @@ export const PostCard = ({ post }: any) => {
                 : t("join")}
             </button>
           )}
-          {/* <button className="p-1 hover:bg-gray-100 rounded-full transition-colors">
-            <FiMoreHorizontal size={20} className="text-gray-600" />
-          </button> */}
-          <div className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
+          <div className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors -m-1">
             <DropdownMenu items={postMenuItems} />
           </div>
         </div>

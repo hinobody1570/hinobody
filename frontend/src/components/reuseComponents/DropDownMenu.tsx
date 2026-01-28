@@ -37,10 +37,10 @@ export const DropdownMenu = ({ items }: DropdownMenuProps) => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Trigger */}
+      {/* Trigger - min 44px touch target on mobile */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+        className="p-2 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors cursor-pointer touch-manipulation"
         aria-label="More options"
       >
         <FiMoreHorizontal size={20} className="text-gray-700" />
@@ -48,7 +48,7 @@ export const DropdownMenu = ({ items }: DropdownMenuProps) => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+        <div className="absolute top-full right-0 mt-2 w-56 max-w-[calc(100vw-1.5rem)] bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
           {items.map((item, index) => (
             <MenuItem
               key={index}
