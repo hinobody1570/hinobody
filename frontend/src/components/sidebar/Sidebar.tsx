@@ -3,7 +3,7 @@
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BiBarChartSquare } from "react-icons/bi";
 import { CgArrowTopRightO } from "react-icons/cg";
 import { FaRegUserCircle } from "react-icons/fa";
@@ -24,7 +24,26 @@ import StartCommunityPopup from "../modals/StartCommunityPopup";
 /* ---------------- COMPONENT ---------------- */
 
 const RedditSidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsOpen(e.matches); // true on desktop, false on mobile
+    };
+
+    // set initial value
+    setIsOpen(mq.matches);
+
+    // listen for changes
+    mq.addEventListener("change", handleChange);
+
+    return () => {
+      mq.removeEventListener("change", handleChange);
+    };
+  }, []);
+
   const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
   const t = useTranslations("sidebar");
   const router = useRouter();
@@ -130,10 +149,7 @@ const RedditSidebar = () => {
       </button>
 
       {/* Start Community Popup */}
-      <StartCommunityPopup
-        isOpen={isCommunityPopupOpen}
-        onClose={() => setIsCommunityPopupOpen(false)}
-      />
+      <StartCommunityPopup isOpen={isCommunityPopupOpen} onClose={() => setIsCommunityPopupOpen(false)} />
     </div>
   );
 };
