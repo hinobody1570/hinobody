@@ -81,10 +81,8 @@ export const RedditHeader = () => {
             <IoIosSearch size={22} className="text-gray-600" />
           </button>
 
-          {/* Language Switcher - Hidden on very small screens */}
-          <div className="hidden sm:block">
-            <LanguageSwitcher />
-          </div>
+          {/* Language Switcher - Visible on all screen sizes, responsive */}
+          <LanguageSwitcher />
 
           {/* Header Actions - Icons only on mobile, with labels on desktop */}
           {headerActions.map((action, index) => (
