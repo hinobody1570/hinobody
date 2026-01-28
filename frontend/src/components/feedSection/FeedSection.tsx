@@ -10,7 +10,6 @@ import { postsApi, Post, boardsApi, Board } from "@/lib/api";
 import DP from "./../../../public/assets/images/avatar_default_4.png";
 import { formatTimestamp } from "@/utils/helperFunction";
 
-
 // Transform API post to PostCard format
 const transformPost = (post: Post): any => {
   return {

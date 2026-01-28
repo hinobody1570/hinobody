@@ -20,3 +20,4 @@ export const formatTimestamp = (dateString: string): string => {
     return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
   }
 };
+

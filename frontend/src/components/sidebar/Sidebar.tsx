@@ -25,7 +25,10 @@ import StartCommunityPopup from "../modals/StartCommunityPopup";
 
 const RedditSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  
+  const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
+  const t = useTranslations("sidebar");
+  const router = useRouter();
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 640px)");
 
@@ -43,10 +46,6 @@ const RedditSidebar = () => {
       mq.removeEventListener("change", handleChange);
     };
   }, []);
-
-  const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
-  const t = useTranslations("sidebar");
-  const router = useRouter();
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },

@@ -10,6 +10,7 @@ import { FaTrash } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import Image from "next/image";
 import Loading from "@/components/reuseComponents/Loading";
+import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 export default function AdminEyeMaskingPage() {
   const t = useTranslations("admin");
@@ -151,9 +152,7 @@ export default function AdminEyeMaskingPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">{error}</p>
-      </div>
+      <ErrorSection error={error}/>
     );
   }
 

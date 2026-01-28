@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { FaBan, FaCheck, FaEye, FaTrash } from "react-icons/fa";
 import DP from "../../../../public/assets/images/avatar_default_4.png";
 import ErrorSection from "@/components/reuseComponents/ErrorSection";
+import { USER_ROLES } from "@/constant/constant";
 
 type ActionType = "block" | "unblock" | "delete" | null;
 
@@ -58,7 +59,7 @@ export default function AdminUsersPage() {
   const openConfirmationModal = (action: ActionType, userId: string, userName: string) => {
     // Do not allow block/unblock/delete actions for ADMIN users
     const targetUser = users.find((u) => u.id === userId);
-    if (targetUser?.role?.toUpperCase?.() === "ADMIN") return;
+    if (targetUser?.role?.toUpperCase?.() === USER_ROLES.ADMIN) return;
 
     setConfirmationModal({
       isOpen: true,
@@ -214,7 +215,7 @@ export default function AdminUsersPage() {
       actions: (row: User) => (
         <div className="flex items-center gap-2">
           {(() => {
-            const isAdminUser = row.role?.toUpperCase?.() === "ADMIN";
+            const isAdminUser = row.role?.toUpperCase?.() === USER_ROLES.ADMIN;
             const isBusy = actionLoading === row.id;
             const isDisabled = isAdminUser || isBusy;
 

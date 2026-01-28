@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Image from "next/image";
 import AvatarImage from "../../../public/assets/images/avatar_default_4.png";
+import { USER_ROLES } from "@/constant/constant";
 
 export default function ProfileDropdown() {
   const [darkMode, setDarkMode] = useState(false);
@@ -128,7 +129,7 @@ export default function ProfileDropdown() {
         </button>
       </div> */}
 
-      {user?.role == "ADMIN" && (
+      {user?.role == USER_ROLES.ADMIN && (
         <button
           onClick={() => router.push(ROUTE_PATHS.ADMIN_USERS)}
           className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3"

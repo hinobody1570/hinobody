@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminTopBar } from "@/components/admin/AdminTopBar";
 import Loading from "@/components/reuseComponents/Loading";
+import { USER_ROLES } from "@/constant/constant";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -13,7 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return <Loading />;
   }
 
-  if (!user || user.role !== "ADMIN") {
+  if (!user || user.role !== USER_ROLES.ADMIN) {
     return null;
   }
 
