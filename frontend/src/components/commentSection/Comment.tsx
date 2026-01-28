@@ -217,64 +217,81 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
     }
   };
 
+  const replyFormMarginLeft = level > 0
+    ? "ml-4 sm:ml-6 md:ml-12"
+    : "ml-9 sm:ml-11 md:ml-14";
+
   return (
-    <div className={`${level > 0 ? "ml-8 border-l-2 border-gray-200 pl-4" : ""}`}>
-      <div className="flex gap-3 mb-4">
+    <div className={`${level > 0 ? "ml-3 sm:ml-4 md:ml-6 lg:ml-8 border-l-2 border-gray-200 pl-2 sm:pl-3 md:pl-4" : ""}`}>
+      <div className="flex gap-2 sm:gap-3 mb-3 sm:mb-4">
         {/* Collapse Button */}
-        <button onClick={() => setIsCollapsed(!isCollapsed)} className="flex-shrink-0 w-6 h-6 mt-1 hover:bg-gray-100 rounded transition-colors cursor-pointer">
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-          </div>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="flex-shrink-0 w-8 h-8 sm:w-6 sm:h-6 mt-0.5 sm:mt-1 -ml-1 sm:ml-0 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer touch-manipulation"
+          aria-label={isCollapsed ? "Expand comment" : "Collapse comment"}
+        >
+          <div className="w-1.5 h-1.5 sm:w-1 sm:h-1 bg-gray-400 rounded-full" />
         </button>
 
-        <div className="flex-1">
-          {/* Comment Header */}
-          <div className="flex items-center gap-2 mb-2">
+        <div className="flex-1 min-w-0">
+          {/* Comment Header - wrap on narrow screens */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1.5 sm:mb-2">
             <img
               src={"https://hinobody-uploads.s3.ap-northeast-2.amazonaws.com/uploads/contractor/1768388540764-dwcgwro84bh.png"}
               alt={comment.username}
-              className="w-6 h-6 rounded-full"
+              className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0"
             />
-            <span className="font-semibold text-sm text-gray-900">{comment.username}</span>
+            <span className="font-semibold text-sm text-gray-900 truncate max-w-[120px] sm:max-w-[180px] md:max-w-none" title={comment.username}>
+              {comment.username}
+            </span>
             {comment.badge && (
               <span
-                className={`text-xs font-bold px-1.5 py-0.5 rounded ${
+                className={`text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0 ${
                   comment.badge === "MOD" ? "bg-green-100 text-green-700" : comment.badge === "OP" ? "bg-blue-100 text-blue-700" : ""
                 }`}
               >
                 {comment.badge}
               </span>
             )}
-            <span className="text-xs text-gray-500">• {comment.timestamp}</span>
-            {comment.stickied && <PiNavigationArrow size={14} className="text-green-600" />}
-            {comment.edited && <span className="text-xs text-gray-500">• {t('edited')} {comment.editedTime}</span>}
+            <span className="text-xs text-gray-500 flex-shrink-0">•</span>
+            <span className="text-xs text-gray-500 truncate max-w-[90px] sm:max-w-none" title={comment.timestamp}>
+              {comment.timestamp}
+            </span>
+            {comment.stickied && <PiNavigationArrow size={14} className="text-green-600 flex-shrink-0" />}
+            {comment.edited && (
+              <span className="text-xs text-gray-500 flex-shrink-0 hidden sm:inline">
+                • {t('edited')} {comment.editedTime}
+              </span>
+            )}
           </div>
 
           {/* Comment Content */}
           {!isCollapsed && (
             <>
-              <div className={`text-sm text-gray-800 mb-3 ${comment.highlighted ? "bg-yellow-50 p-3 rounded" : ""}`}>{comment.text}</div>
+              <div className={`text-sm text-gray-800 mb-2 sm:mb-3 break-words ${comment.highlighted ? "bg-yellow-50 p-2 sm:p-3 rounded" : ""}`}>
+                {comment.text}
+              </div>
 
-              {/* Comment Actions */}
-              <div className="flex items-center gap-2">
+              {/* Comment Actions - wrap on mobile */}
+              <div className="flex flex-wrap items-center gap-x-1 gap-y-2 sm:gap-2">
                 {/* Vote Buttons */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-50 rounded-full">
                   <button
                     onClick={handleUpvote}
                     disabled={!isAuthenticated || isVoting}
-                    className={`p-1 hover:bg-gray-100 cursor-pointer rounded transition-colors ${
+                    className={`p-1.5 sm:p-1 hover:bg-gray-100 cursor-pointer rounded-l-full transition-colors touch-manipulation ${
                       voteState === "up" ? "text-orange-500" : "text-gray-500"
                     } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <HiOutlineArrowUp size={18} fill={voteState === "up" ? "currentColor" : "none"} />
                   </button>
-                  <span className="text-xs font-bold text-gray-700 min-w-[30px] text-center">
+                  <span className="text-xs font-bold text-gray-700 min-w-[28px] sm:min-w-[30px] text-center px-0.5">
                     {upvotes - downvotes}
                   </span>
                   <button
                     onClick={handleDownvote}
                     disabled={!isAuthenticated || isVoting}
-                    className={`p-1 hover:bg-gray-100 rounded cursor-pointer transition-colors ${
+                    className={`p-1.5 sm:p-1 hover:bg-gray-100 rounded-r-full cursor-pointer transition-colors touch-manipulation ${
                       voteState === "down" ? "text-blue-500" : "text-gray-500"
                     } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
@@ -285,68 +302,61 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                 {/* Reply Button */}
                 <button
                   onClick={() => setShowReplyComment(!showReplyComment)}
-                  className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-2 py-1.5 sm:py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer touch-manipulation"
                 >
                   <BiMessageSquare size={16} />
                   <span>{t('reply')}</span>
                 </button>
 
-                {/* Award Button */}
-                {/* <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
-                  <BiAward size={16} />
-                  <span>{t('award')}</span>
-                </button> */}
-
-                {/* Share Button */}
-                {/* <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
-                  <CiShare2 size={16} />
-                  <span>{t('share')}</span>
-                </button> */}
-
                 {/* Awards Display */}
                 {comment.awards > 0 && (
-                  <div className="flex items-center gap-1 ml-2">
+                  <div className="flex items-center gap-1 flex-shrink-0">
                     <span className="text-lg">🎁</span>
                     <span className="text-xs font-semibold text-gray-700">{comment.awards}</span>
                   </div>
                 )}
 
                 {/* More Options */}
-                <button className="hover:bg-gray-100 rounded-full cursor-pointer transition-colors ml-auto">
+                <div className="hover:bg-gray-100 rounded-full cursor-pointer ml-auto -mr-1">
                   <DropdownMenu items={getMenuItems(t, () => setShowReportModal(true), isAuthenticated, showError)} />
-                </button>
+                </div>
               </div>
             </>
           )}
         </div>
       </div>
       {showReplyComment && (
-        <form onSubmit={handleSubmitReply} className="flex gap-2 mt-2 ml-20 max-w-md">
+        <form
+          onSubmit={handleSubmitReply}
+          className={`flex flex-col gap-2 sm:flex-row sm:gap-2 mt-2 ${replyFormMarginLeft} w-full max-w-full sm:max-w-md`}
+        >
           <input
             type="text"
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             placeholder={isAuthenticated ? t('enterReply') : t('loginToReply')}
             disabled={!isAuthenticated || isSubmittingReply}
-            className="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 min-w-0 px-4 py-2.5 sm:py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
-          <button
-            type="submit"
-            disabled={!isAuthenticated || isSubmittingReply || !replyText.trim()}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmittingReply ? '...' : t('reply')}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setShowReplyComment(false);
-              setReplyText('');
-            }}
-            className="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            {t('cancel')}
-          </button>
+          <div className="flex gap-2 flex-shrink-0">
+            <button
+              type="submit"
+              disabled={!isAuthenticated || isSubmittingReply || !replyText.trim()}
+              className="flex-1 sm:flex-initial min-h-[40px] sm:min-h-0 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+            >
+              {isSubmittingReply ? '...' : t('reply')}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowReplyComment(false);
+                setReplyText('');
+              }}
+              className="flex-1 sm:flex-initial min-h-[40px] sm:min-h-0 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-full transition-colors touch-manipulation"
+            >
+              {t('cancel')}
+            </button>
+          </div>
         </form>
       )}
 
