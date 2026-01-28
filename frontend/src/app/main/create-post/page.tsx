@@ -247,41 +247,47 @@ const CreatePost = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
+      <div className="max-w-4xl mx-auto w-full">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">{t("title")}</h1>
-          <button className="text-sm text-gray-600 hover:text-gray-800 font-semibold cursor-pointer">{t("drafts")}</button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t("title")}</h1>
+          <button
+            type="button"
+            className="text-sm text-gray-600 hover:text-gray-800 font-semibold cursor-pointer w-fit touch-manipulation"
+          >
+            {t("drafts")}
+          </button>
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           {/* Community Selector */}
           <div ref={communityRef}>
             {!showCommunity && (
-              <div className="p-6 pb-4">
+              <div className="p-3 sm:p-4 md:p-6 pb-2 sm:pb-4">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowCommunity(true);
                     setShowDropdown(true);
                     fetchBoards("");
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+                  className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start px-4 py-2.5 sm:py-2 min-h-[44px] sm:min-h-0 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer touch-manipulation"
                 >
-                  <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">r</span>
                   </div>
-                  <span className="text-sm font-semibold text-gray-700">
+                  <span className="text-sm font-semibold text-gray-700 truncate min-w-0">
                     {selectedCommunity ? `r/${selectedCommunity.name}` : t("selectCommunity")}
                   </span>
-                  <BiChevronDown size={16} className="text-gray-600" />
+                  <BiChevronDown size={16} className="text-gray-600 flex-shrink-0" />
                 </button>
               </div>
             )}
             {showCommunity && (
-              <div className="relative flex-1 max-w-md m-4">
-                <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
+              <div className="relative w-full max-w-full sm:max-w-md m-3 sm:m-4">
+                <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10 flex-shrink-0" />
                 <input
                   type="text"
                   placeholder={t("selectCommunity")}
@@ -291,26 +297,26 @@ const CreatePost = () => {
                     setShowDropdown(true);
                   }}
                   onFocus={() => setShowDropdown(true)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-2 bg-gray-50 border border-gray-300 rounded-full text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
                 />
-                
                 {/* Dropdown with boards */}
                 {showDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[min(320px,60vh)] overflow-y-auto z-50">
                     {isLoadingBoards ? (
                       <Loading />
                     ) : boards.length > 0 ? (
                       boards.map((board) => (
                         <button
                           key={board.id}
+                          type="button"
                           onClick={() => handleSelectBoard(board)}
-                          className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer"
+                          className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer min-h-[44px] sm:min-h-0 touch-manipulation"
                         >
                           <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs font-bold">r</span>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900">r/{board.name}</p>
+                            <p className="text-sm font-semibold text-gray-900 truncate">r/{board.name}</p>
                             {board.description && (
                               <p className="text-xs text-gray-500 truncate">{board.description}</p>
                             )}
@@ -328,8 +334,8 @@ const CreatePost = () => {
             )}
           </div>
           {/* Tabs */}
-          <div className="px-6 border-b border-gray-200">
-            <div className="flex gap-12">
+          <div className="px-3 sm:px-4 md:px-6 border-b border-gray-200 overflow-x-auto">
+            <div className="flex flex-nowrap gap-4 sm:gap-8 md:gap-12 min-w-min">
               {tabs.map((tab) => (
                 <Tab key={tab.id} label={tab.label} active={activeTab === tab.id} onClick={() => !tab.disabled && setActiveTab(tab.id)} />
               ))}
@@ -337,16 +343,16 @@ const CreatePost = () => {
           </div>
 
           {/* Form Content */}
-          <div className="p-6">
+          <div className="p-3 sm:p-4 md:p-6">
             {/* Title Input */}
-            <div className="mb-4">
+            <div className="mb-3 sm:mb-4">
               <input
                 type="text"
                 placeholder={t("titlePlaceholder")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={300}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400"
+                className="w-full min-w-0 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400 text-base sm:text-inherit"
               />
               <div className="text-right mt-1">
                 <span className="text-xs text-gray-500">
@@ -358,17 +364,18 @@ const CreatePost = () => {
             {/* Tags Input */}
             <TagsInput tags={tags} onChange={setTags} />
 
-            {/* Rich Text Editor */}
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
+            {/* Rich Text Editor - toolbar scrolls horizontally on small screens */}
+            <div className="border border-gray-300 rounded-lg overflow-x-auto overflow-y-hidden">
               <RichTextEditor value={body} onChange={(text: any) => setBody(text) }/>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 mt-6">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
               <button
+                type="button"
                 onClick={handleSaveDraft}
                 disabled={isPosting || !selectedCommunity}
-                className={`px-6 py-2 text-sm font-semibold rounded-full transition-colors ${
+                className={`w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
                   !isPosting && selectedCommunity
                     ? "text-gray-700 hover:bg-gray-100"
                     : "text-gray-400 cursor-not-allowed"
@@ -377,9 +384,10 @@ const CreatePost = () => {
                 {isPosting ? t("saving") : t("saveDraft")}
               </button>
               <button
+                type="button"
                 onClick={handlePost}
                 disabled={!title.trim() || isPosting || !selectedCommunity}
-                className={`px-8 py-2 text-sm font-semibold rounded-full transition-colors ${
+                className={`w-full sm:w-auto min-h-[44px] sm:min-h-0 px-8 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
                   title.trim() && !isPosting && selectedCommunity
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"

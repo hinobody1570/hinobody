@@ -254,12 +254,12 @@ export default function UserProfilePage() {
 
   if (error || !user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error || t('userNotFound')}</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-6">
+        <div className="text-center max-w-md w-full">
+          <p className="text-red-600 mb-4 text-sm sm:text-base">{error || t('userNotFound')}</p>
           <button
             onClick={() => router.push(ROUTE_PATHS.HOME)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+            className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer touch-manipulation"
           >
             {t('backToHome')}
           </button>
@@ -270,7 +270,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
         {/* User Header */}
         {user && (
           <UserProfileHeader

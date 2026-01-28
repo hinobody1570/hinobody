@@ -1138,7 +1138,7 @@ const EyeMaskingForm = () => {
       <form onSubmit={handleSubmit} className="masking-form">
         <div className="form-group">
           <label htmlFor="image-upload">{t("selectImage")}</label>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+          <div className="upload-actions">
             <input
               id="image-upload"
               type="file"
@@ -1152,7 +1152,6 @@ const EyeMaskingForm = () => {
               onClick={openCamera}
               disabled={isProcessing || isCameraOpen}
               className="btn btn-secondary cursor-pointer"
-              style={{ padding: "8px 16px" }}
             >
               {t("takePhoto")}
             </button>
@@ -1161,33 +1160,14 @@ const EyeMaskingForm = () => {
 
         {/* Camera Preview */}
         {isCameraOpen && (
-          <div
-            style={{
-              marginBottom: "20px",
-              padding: "20px",
-              border: "2px solid #ddd",
-              borderRadius: "8px",
-              backgroundColor: "#f9f9f9",
-            }}
-          >
-            <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: "100%" }}>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                style={{
-                  width: "100%",
-                  maxWidth: "100%",
-                  borderRadius: "8px",
-                  transform: "scaleX(-1)", // Mirror the video
-                }}
-              />
+          <div className="camera-preview">
+            <div className="camera-preview-inner">
+              <video ref={videoRef} autoPlay playsInline muted />
               <canvas ref={cameraCanvasRef} style={{ display: "none" }} />
             </div>
-            <div style={{ marginTop: "15px", display: "flex", gap: "10px", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
-              {!isVideoReady && <p style={{ color: "#666", marginBottom: "10px" }}>Loading camera...</p>}
-              <div style={{ display: "flex", gap: "10px" }}>
+            <div className="camera-actions">
+              {!isVideoReady && <p className="camera-loading">Loading camera...</p>}
+              <div className="camera-actions-buttons">
                 <button type="button" onClick={capturePhoto} className="btn btn-primary cursor-pointer" disabled={isProcessing || !isVideoReady}>
                   {t("capturePhoto")}
                 </button>
@@ -1213,13 +1193,7 @@ const EyeMaskingForm = () => {
             </div>
 
             <div className="canvas-container">
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  display: "inline-block",
-                }}
-              >
+              <div className="canvas-container-inner">
                 <canvas
                   ref={canvasRef}
                   className="masking-canvas"
@@ -1228,14 +1202,13 @@ const EyeMaskingForm = () => {
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
                   style={{
-                    maxWidth: "100%",
-                    height: "auto",
                     cursor: mode === "manual" ? "crosshair" : "default",
                   }}
                 />
 
                 {isProcessing && (
                   <div
+                    className="canvas-overlay"
                     style={{
                       position: "absolute",
                       inset: 0,
