@@ -193,7 +193,7 @@ export default function AdminUsersPage() {
     },
     {
       key: "provider",
-      header: "Provider",
+      header: t("provider"),
       render: (value: string) => <span className="capitalize">{value}</span>,
     },
     {

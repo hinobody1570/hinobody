@@ -253,6 +253,7 @@
     "previous": "Previous",
     "next": "Next",
     "actions": "Actions",
+    "provider": "Provider",
     "block": "Block",
     "unblock": "Unblock",
     "delete": "Delete",

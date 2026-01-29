@@ -253,6 +253,7 @@
     "previous": "이전",
     "next": "다음",
     "actions": "작업",
+    "provider": "제공자",
     "block": "차단",
     "unblock": "차단 해제",
     "delete": "삭제",
@@ -470,7 +471,10 @@
       "emailRequired": "이메일은 필수입니다",
       "emailInvalid": "이메일 형식이 올바르지 않습니다",
       "passwordRequired": "비밀번호는 필수입니다",
-      "passwordMinLength8": "비밀번호는 최소 8자 이상이어야 합니다"
+      "passwordMinLength8": "비밀번호는 최소 8자 이상이어야 합니다",
+      "orContinueWith": "또는 다음으로 계속",
+      "continueWithGoogle": "Google로 계속하기",
+      "continueWithApple": "Apple로 계속하기"
     },
     "registerPage": {
       "createAccount": "계정 만들기",
