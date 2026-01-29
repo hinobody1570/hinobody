@@ -252,12 +252,12 @@ const CreatePost = () => {
         {/* Header */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t("title")}</h1>
-          <button
+          {/* <button
             type="button"
             className="text-sm text-gray-600 hover:text-gray-800 font-semibold cursor-pointer w-fit touch-manipulation"
           >
             {t("drafts")}
-          </button>
+          </button> */}
         </div>
 
         {/* Main Card */}
@@ -371,7 +371,7 @@ const CreatePost = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
-              <button
+              {/* <button
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={isPosting || !selectedCommunity}
@@ -382,18 +382,18 @@ const CreatePost = () => {
                 }`}
               >
                 {isPosting ? t("saving") : t("saveDraft")}
-              </button>
+              </button> */}
               <button
                 type="button"
                 onClick={handlePost}
                 disabled={!title.trim() || isPosting || !selectedCommunity}
-                className={`w-full sm:w-auto min-h-[44px] sm:min-h-0 px-8 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full sm:w-auto min-h-[44px] cursor-pointer sm:min-h-0 px-8 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
                   title.trim() && !isPosting && selectedCommunity
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
-                {isPosting ? "Posting..." : t("post")}
+                {isPosting ? t("posting") : t("post")}
               </button>
             </div>
           </div>

@@ -186,7 +186,7 @@ const EyeMaskingForm = () => {
 
               if (attempts >= maxAttempts && video.videoWidth === 0) {
                 console.error("❌ Video never became ready after 5 seconds");
-                alert("Camera video is not loading. Please try closing and reopening the camera.");
+                alert(t("cameraVideoNotLoading"));
               }
             }
           }, 100);
@@ -222,7 +222,7 @@ const EyeMaskingForm = () => {
   const capturePhoto = () => {
     if (!videoRef.current || !cameraCanvasRef.current) {
       console.error("❌ Video or canvas ref not available");
-      alert("Camera not ready. Please wait a moment and try again.");
+      alert(t("cameraNotReady"));
       return;
     }
 
@@ -232,14 +232,14 @@ const EyeMaskingForm = () => {
     // Check if video is ready
     if (video.readyState !== video.HAVE_ENOUGH_DATA) {
       console.error("❌ Video not ready. ReadyState:", video.readyState);
-      alert("Video not ready. Please wait a moment and try again.");
+      alert(t("videoNotReady"));
       return;
     }
 
     // Check if video has valid dimensions
     if (!video.videoWidth || !video.videoHeight || video.videoWidth === 0 || video.videoHeight === 0) {
       console.error("❌ Video dimensions invalid:", video.videoWidth, video.videoHeight);
-      alert("Video dimensions not available. Please wait a moment and try again.");
+      alert(t("videoDimensionsNotAvailable"));
       return;
     }
 
@@ -250,7 +250,7 @@ const EyeMaskingForm = () => {
 
     if (!ctx) {
       console.error("❌ Could not get canvas context");
-      alert("Error capturing photo. Please try again.");
+      alert(t("errorCapturingPhoto"));
       return;
     }
 
@@ -264,7 +264,7 @@ const EyeMaskingForm = () => {
       (blob) => {
         if (!blob) {
           console.error("❌ Failed to create blob from canvas");
-          alert("Error creating image. Please try again.");
+          alert(t("errorCreatingImage"));
           return;
         }
 
@@ -301,7 +301,7 @@ const EyeMaskingForm = () => {
         };
         reader.onerror = (error) => {
           console.error("❌ Error reading file:", error);
-          alert("Error processing captured image. Please try again.");
+          alert(t("errorProcessingImage"));
           closeCamera();
         };
         reader.readAsDataURL(file);
@@ -391,7 +391,7 @@ const EyeMaskingForm = () => {
   // Automatic eye detection and masking
   const detectAndMaskEyes = async () => {
     if (!model || !model.loaded || !canvasRef.current || !imagePreview) {
-      alert("Please wait for the model to load and select an image.");
+      alert(t("pleaseWaitForModel"));
       return;
     }
 
@@ -547,8 +547,8 @@ const EyeMaskingForm = () => {
       if (newMasks.length === 0) {
         console.warn("⚠️ No valid masks created after validation.");
         const errorMsg = debugInfo.detectionError
-          ? `Detection Failed:\n\n${debugInfo.detectionError}\n\nPlease use an image with a clear human face, or use Manual Masking mode instead.`
-          : "No eyes detected. You can use manual masking instead.";
+          ? t("detectionFailedUseManual", { details: debugInfo.detectionError })
+          : t("noEyesDetectedUseManual");
         alert(errorMsg);
         setDebugInfo((prev: any) => ({ ...prev, validationFailed: true }));
         setMasks([]); // Ensure no masks are set
@@ -567,7 +567,7 @@ const EyeMaskingForm = () => {
     } catch (error: any) {
       console.error("❌ Error detecting eyes:", error);
       setDebugInfo((prev: any) => ({ ...prev, detectionError: error.message }));
-      alert("Error detecting eyes. Please try manual masking.");
+      alert(t("errorDetectingEyes"));
     } finally {
       setIsProcessing(false);
     }
@@ -990,12 +990,12 @@ const EyeMaskingForm = () => {
     }
 
     if (!isAuthenticated) {
-      alert("Please login to upload images");
+      alert(t("pleaseLoginToUploadImages"));
       return;
     }
 
     setIsProcessing(true);
-    setUploadStatus("Processing...");
+    setUploadStatus(t("processingStatus"));
 
     try {
       let filesToUpload: File[] = [];
@@ -1003,7 +1003,7 @@ const EyeMaskingForm = () => {
 
       // Check if we have cropped masks - if yes, upload all cropped masks
       if (croppedMasks && croppedMasks.length > 0) {
-        setUploadStatus(`Preparing ${croppedMasks.length} cropped image(s)...`);
+        setUploadStatus(t("preparingCroppedImages", { count: croppedMasks.length }));
 
         // Convert all cropped masks to Files
         for (let i = 0; i < croppedMasks.length; i++) {
@@ -1026,11 +1026,11 @@ const EyeMaskingForm = () => {
         }
 
         if (filesToUpload.length === 0) {
-          throw new Error("No valid cropped masks to upload");
+          throw new Error(t("noValidCroppedMasks"));
         }
       } else {
         // Fallback: Upload the main masked image from canvas
-        setUploadStatus("Creating masked image from canvas...");
+        setUploadStatus(t("creatingMaskedImageStatus"));
 
         const maskedBlob = await getMaskedImageBlob();
         if (!maskedBlob) {
@@ -1052,12 +1052,12 @@ const EyeMaskingForm = () => {
       }
 
       // Upload all files to S3 using bulk upload API
-      setUploadStatus(`Uploading ${filesToUpload.length} image(s) to S3...`);
+      setUploadStatus(t("uploadingToS3Status", { count: filesToUpload.length }));
 
       const uploadResults = await s3Api.uploadFiles(filesToUpload, "uploads/contractor");
 
       if (!uploadResults || uploadResults.length === 0) {
-        throw new Error("Failed to upload images to S3");
+        throw new Error(t("failedToUploadToS3"));
       }
 
       if (uploadResults.length !== filesToUpload.length) {
@@ -1071,11 +1071,11 @@ const EyeMaskingForm = () => {
       }
 
       // Save all image URLs to database
-      setUploadStatus("Saving to database...");
+      setUploadStatus(t("savingToDatabaseStatus"));
 
       const savedImages = await eyeMaskedImagesApi.createBulk(imageDataArray);
 
-      setUploadStatus(`Success! ${savedImages.length} image(s) uploaded and saved.`);
+      setUploadStatus(t("successUploadedCount", { count: savedImages.length }));
       setDebugInfo((prev: any) => ({
         ...prev,
         uploadedCount: savedImages.length,
