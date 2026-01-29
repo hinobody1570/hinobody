@@ -4,6 +4,18 @@
     "welcome": "HiNobodyへようこそ",
     "description": "Next.js + NestJS with TypeScript"
   },
+  "timeAgo": {
+    "secAgo": "{count}秒前",
+    "secsAgo": "{count}秒前",
+    "minAgo": "{count}分前",
+    "minsAgo": "{count}分前",
+    "hrAgo": "{count}時間前",
+    "hrsAgo": "{count}時間前",
+    "dayAgo": "{count}日前",
+    "daysAgo": "{count}日前",
+    "weekAgo": "{count}週間前",
+    "weeksAgo": "{count}週間前"
+  },
   "toast": {
     "success": "成功",
     "error": "エラー",

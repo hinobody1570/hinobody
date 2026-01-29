@@ -12,7 +12,7 @@ import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { useAuth } from '@/contexts/AuthContext';
 import Loading from '@/components/reuseComponents/Loading';
 
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId,
@@ -20,7 +20,7 @@ const transformPost = (post: Post): any => {
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -34,6 +34,7 @@ export default function BoardProfilePage() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations('boardProfile');
+  const tTime = useTranslations('timeAgo');
   const { user } = useAuth();
   const boardId = params?.boardId as string;
   
@@ -88,7 +89,7 @@ export default function BoardProfilePage() {
           page: 1,
           limit: 20,
         });
-        const transformedPosts = response.data.map(transformPost);
+        const transformedPosts = response.data.map((p) => transformPost(p, tTime));
         setPosts(transformedPosts);
       } catch (err: any) {
         console.error('Error fetching board posts:', err);
@@ -164,7 +165,7 @@ export default function BoardProfilePage() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500">
                   <span>{t('category')}: {board.category?.name || '-'}</span>
                   <span>{t('visibility')}: {board.visibilityAccess}</span>
-                  <span>{t('created')}: {formatTimestamp(board.createdAt)}</span>
+                  <span>{t('created')}: {formatTimestamp(board.createdAt, tTime)}</span>
                 </div>
               </div>
             </div>

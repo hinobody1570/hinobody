@@ -13,19 +13,24 @@ import { formatTimestamp } from '@/utils/helperFunction';
 
 
 // Transform API comment to Comment component format
-const transformComment = (comment: CommentType, postAuthorId?: string, t?: any): any => {
+const transformComment = (
+  comment: CommentType,
+  postAuthorId?: string,
+  t?: any,
+  tTime?: (key: string, values?: Record<string, number | string>) => string
+): any => {
   return {
     id: comment.id,
     username: comment.author?.nickname || (t ? t('anonymous') : 'Anonymous'),
     avatar: DP, // Default avatar
     badge: comment.authorId === postAuthorId ? 'OP' : undefined,
-    timestamp: formatTimestamp(comment.createdAt),
+    timestamp: formatTimestamp(comment.createdAt, tTime),
     text: comment.body,
     upvotes: comment.upvoteCount || 0,
     downvotes: comment.downvoteCount || 0,
     edited: comment.updatedAt !== comment.createdAt,
-    editedTime: comment.updatedAt !== comment.createdAt ? formatTimestamp(comment.updatedAt) : undefined,
-    replies: comment.replies ? comment.replies.map((reply) => transformComment(reply, postAuthorId, t)) : [],
+    editedTime: comment.updatedAt !== comment.createdAt ? formatTimestamp(comment.updatedAt, tTime) : undefined,
+    replies: comment.replies ? comment.replies.map((reply) => transformComment(reply, postAuthorId, t, tTime)) : [],
   };
 };
 
@@ -40,6 +45,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
   const t = useTranslations('comments');
+  const tTime = useTranslations('timeAgo');
   const [sortBy, setSortBy] = useState(t('best'));
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +84,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       }
       setError(null);
       const response = await commentsApi.getByPost(postId, page, 20, search);
-      const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId, t));
+      const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId, t, tTime));
       
       if (append) {
         setComments((prev) => [...prev, ...transformedComments]);
@@ -95,7 +101,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [postId, postAuthorId, t]);
+  }, [postId, postAuthorId, t, tTime]);
 
   // Handle search with debounce
   useEffect(() => {

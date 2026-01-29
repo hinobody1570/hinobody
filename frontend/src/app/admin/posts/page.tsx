@@ -17,6 +17,7 @@ type ActionType = "delete" | "activate" | "deactivate" | null;
 
 export default function AdminPostsPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -176,7 +177,7 @@ export default function AdminPostsPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "actions",

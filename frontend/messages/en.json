@@ -4,6 +4,18 @@
     "welcome": "Welcome to HiNobody",
     "description": "Next.js + NestJS with TypeScript"
   },
+  "timeAgo": {
+    "secAgo": "{count} sec. ago",
+    "secsAgo": "{count} secs. ago",
+    "minAgo": "{count} min. ago",
+    "minsAgo": "{count} mins. ago",
+    "hrAgo": "{count} hr. ago",
+    "hrsAgo": "{count} hrs. ago",
+    "dayAgo": "{count} day ago",
+    "daysAgo": "{count} days ago",
+    "weekAgo": "{count} week ago",
+    "weeksAgo": "{count} weeks ago"
+  },
   "toast": {
     "success": "Success",
     "error": "Error",

@@ -4,6 +4,18 @@
     "welcome": "HiNobody에 오신 것을 환영합니다",
     "description": "Next.js + NestJS with TypeScript"
   },
+  "timeAgo": {
+    "secAgo": "{count}초 전",
+    "secsAgo": "{count}초 전",
+    "minAgo": "{count}분 전",
+    "minsAgo": "{count}분 전",
+    "hrAgo": "{count}시간 전",
+    "hrsAgo": "{count}시간 전",
+    "dayAgo": "{count}일 전",
+    "daysAgo": "{count}일 전",
+    "weekAgo": "{count}주 전",
+    "weeksAgo": "{count}주 전"
+  },
   "toast": {
     "success": "성공",
     "error": "오류",

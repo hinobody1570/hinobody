@@ -33,6 +33,7 @@ export function UserProfileHeader({
   currentUser,
 }: UserProfileHeaderProps) {
   const t = useTranslations('userProfile');
+  const tTime = useTranslations('timeAgo');
   const [isEditing, setIsEditing] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -179,7 +180,7 @@ export function UserProfileHeader({
           </div>
           <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base truncate">{user.email}</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500">
-            <span>{t('memberSince')}: {formatTimestamp(user.createdAt)}</span>
+            <span>{t('memberSince')}: {formatTimestamp(user.createdAt, tTime)}</span>
             <span className="capitalize">{user.role}</span>
             <span className="uppercase">{user.language}</span>
           </div>

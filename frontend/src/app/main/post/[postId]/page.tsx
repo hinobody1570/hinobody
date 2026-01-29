@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import Loading from '@/components/reuseComponents/Loading';
 
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId,
@@ -19,7 +19,7 @@ const transformPost = (post: Post): any => {
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -33,6 +33,7 @@ export default function PostDetailPage() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations('postDetail');
+  const tTime = useTranslations('timeAgo');
   const postId = params?.postId as string;
   
   const [post, setPost] = useState<any | null>(null);
@@ -45,7 +46,7 @@ export default function PostDetailPage() {
         setLoading(true);
         setError(null);
         const postData = await postsApi.getById(postId);
-        const transformedPost = transformPost(postData);
+        const transformedPost = transformPost(postData, tTime);
         setPost(transformedPost);
       } catch (err: any) {
         console.error('Error fetching post:', err);
@@ -58,7 +59,7 @@ export default function PostDetailPage() {
     if (postId) {
       fetchPost();
     }
-  }, [postId]);
+  }, [postId, tTime]);
 
   if (loading) {
     return (

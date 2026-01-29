@@ -21,6 +21,7 @@ export function PendingRequestsSection({
   onReject,
 }: PendingRequestsSectionProps) {
   const t = useTranslations('userProfile');
+  const tTime = useTranslations('timeAgo');
 
   return (
     <div className="mb-4 sm:mb-6">
@@ -73,7 +74,7 @@ export function PendingRequestsSection({
                         <p className="text-xs text-gray-500 mb-1 sm:mb-2 line-clamp-2">{request.board.description}</p>
                       )}
                       <p className="text-xs text-gray-400">
-                        {t('requestedAt')}: {formatTimestamp(request.createdAt)}
+                        {t('requestedAt')}: {formatTimestamp(request.createdAt, tTime)}
                       </p>
                     </div>
                   </div>

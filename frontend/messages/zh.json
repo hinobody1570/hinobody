@@ -4,6 +4,18 @@
     "welcome": "欢迎来到 HiNobody",
     "description": "Next.js + NestJS with TypeScript"
   },
+  "timeAgo": {
+    "secAgo": "{count} 秒前",
+    "secsAgo": "{count} 秒前",
+    "minAgo": "{count} 分钟前",
+    "minsAgo": "{count} 分钟前",
+    "hrAgo": "{count} 小时前",
+    "hrsAgo": "{count} 小时前",
+    "dayAgo": "{count} 天前",
+    "daysAgo": "{count} 天前",
+    "weekAgo": "{count} 周前",
+    "weeksAgo": "{count} 周前"
+  },
   "toast": {
     "success": "成功",
     "error": "错误",

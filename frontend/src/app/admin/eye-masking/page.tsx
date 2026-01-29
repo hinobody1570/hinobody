@@ -14,6 +14,7 @@ import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 export default function AdminEyeMaskingPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const { showSuccess, showError } = useToast();
   const [images, setImages] = useState<EyeMaskedImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,7 +127,7 @@ export default function AdminEyeMaskingPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "actions",

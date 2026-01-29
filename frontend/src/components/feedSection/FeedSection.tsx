@@ -11,7 +11,7 @@ import DP from "./../../../public/assets/images/avatar_default_4.png";
 import { formatTimestamp } from "@/utils/helperFunction";
 
 // Transform API post to PostCard format
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId, // Add boardId for membership checks
@@ -19,7 +19,7 @@ const transformPost = (post: Post): any => {
     community: post.board?.name ? `r/${post.board.name}/${post.author?.nickname}` : "r/community",
     communityAvatar: DP, // Default avatar
     verified: false, // Can be enhanced later based on board settings
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -30,12 +30,12 @@ const transformPost = (post: Post): any => {
 };
 
 // Transform API post to RecentPostCard format
-const transformRecentPost = (post: Post): any => {
+const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     avatar: DP, // Default avatar
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     upvotes: post.upvoteCount || 0,
     comments: post.commentCount || 0,
@@ -44,6 +44,7 @@ const transformRecentPost = (post: Post): any => {
 
 export const RedditFeed = () => {
   const t = useTranslations('feed');
+  const tTime = useTranslations('timeAgo');
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -83,7 +84,7 @@ export const RedditFeed = () => {
           page: 1,
           limit: 4,
         });
-        const transformedRecentPosts = response.data.map(transformRecentPost);
+        const transformedRecentPosts = response.data.map((p) => transformRecentPost(p, tTime));
         setRecentPosts(transformedRecentPosts);
       } catch (err: any) {
         console.error('Error fetching recent posts:', err);
@@ -116,7 +117,7 @@ export const RedditFeed = () => {
         limit: 20,
         boardId: boardId || undefined,
       });
-      const transformedPosts = response.data.map(transformPost);
+      const transformedPosts = response.data.map((p) => transformPost(p, tTime));
       
       if (append) {
         setPosts((prev) => [...prev, ...transformedPosts]);

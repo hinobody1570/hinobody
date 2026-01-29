@@ -19,6 +19,7 @@ export function CommunityBoardsSection({
   loading,
 }: CommunityBoardsSectionProps) {
   const t = useTranslations('userProfile');
+  const tTime = useTranslations('timeAgo');
   const router = useRouter();
 
   return (
@@ -60,7 +61,7 @@ export function CommunityBoardsSection({
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500">
                         <span>{t('category')}: {board.category?.name || '-'}</span>
                         <span>•</span>
-                        <span>{formatTimestamp(board.createdAt)}</span>
+                        <span>{formatTimestamp(board.createdAt, tTime)}</span>
                       </div>
                     </div>
                   ))}
@@ -95,7 +96,7 @@ export function CommunityBoardsSection({
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500">
                         <span>{t('category')}: {board.category?.name || '-'}</span>
                         <span>•</span>
-                        <span>{formatTimestamp(board.createdAt)}</span>
+                        <span>{formatTimestamp(board.createdAt, tTime)}</span>
                       </div>
                     </div>
                   ))}

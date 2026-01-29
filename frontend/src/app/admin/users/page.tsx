@@ -20,6 +20,7 @@ type ActionType = "block" | "unblock" | "delete" | null;
 
 export default function AdminUsersPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [users, setUsers] = useState<User[]>([]);
@@ -207,7 +208,7 @@ export default function AdminUsersPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "actions",

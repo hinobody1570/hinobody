@@ -16,6 +16,7 @@ type ActionType = "delete" | "activate" | "deactivate" | null;
 
 export default function AdminBoardCategoriesPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const { showSuccess, showError } = useToast();
   const [categories, setCategories] = useState<BoardCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -196,12 +197,12 @@ export default function AdminBoardCategoriesPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "updatedAt",
       header: t("updatedAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "actions",

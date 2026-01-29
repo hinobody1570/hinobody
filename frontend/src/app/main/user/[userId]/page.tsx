@@ -16,7 +16,7 @@ import { PendingRequestsSection } from '@/components/userProfile/PendingRequests
 import { UserPostsSection } from '@/components/userProfile/UserPostsSection';
 import Loading from '@/components/reuseComponents/Loading';
 
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId,
@@ -24,7 +24,7 @@ const transformPost = (post: Post): any => {
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -39,6 +39,7 @@ export default function UserProfilePage() {
   const router = useRouter();
   const { user: currentUser } = useAuth();
   const t = useTranslations('userProfile');
+  const tTime = useTranslations('timeAgo');
   // Get userId from URL params - this allows viewing any user's profile
   // When viewing own profile: userId === currentUser.id
   // When viewing other user's profile: userId !== currentUser.id
@@ -96,7 +97,7 @@ export default function UserProfilePage() {
           page: 1,
           limit: 20,
         });
-        const transformedPosts = response.data.map(transformPost);
+        const transformedPosts = response.data.map((p) => transformPost(p, tTime));
         setPosts(transformedPosts);
       } catch (err: any) {
         console.error('Error fetching user posts:', err);

@@ -17,6 +17,7 @@ type ActionType = "delete" | "activate" | "deactivate" | null;
 
 export default function AdminBoardsPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [boards, setBoards] = useState<Board[]>([]);
@@ -175,7 +176,7 @@ export default function AdminBoardsPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "actions",

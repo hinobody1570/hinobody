@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import Loading from "@/components/reuseComponents/Loading";
 
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId,
@@ -19,7 +19,7 @@ const transformPost = (post: Post): any => {
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -33,6 +33,7 @@ export default function AdminBoardDetailPage() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const boardId = params?.boardId as string;
 
   const [board, setBoard] = useState<Board | null | any>(null);
@@ -67,7 +68,7 @@ export default function AdminBoardDetailPage() {
       try {
         setLoadingPosts(true);
         const response = await postsApi.getAll({ boardId, page: 1, limit: 10 });
-        const transformedPosts = response.data.map(transformPost);
+        const transformedPosts = response.data.map((p) => transformPost(p, tTime));
         setPosts(transformedPosts);
       } catch (err: any) {
         console.error("Error fetching posts:", err);
@@ -127,7 +128,7 @@ export default function AdminBoardDetailPage() {
                 </span>
               </span>
               <span>
-                <strong>{t("createdAt")}:</strong> {formatTimestamp(board.createdAt)}
+                <strong>{t("createdAt")}:</strong> {formatTimestamp(board.createdAt, tTime)}
               </span>
             </div>
           </div>
@@ -143,7 +144,7 @@ export default function AdminBoardDetailPage() {
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">{t("updatedAt")}</div>
-              <div className="font-semibold text-gray-900">{formatTimestamp(board.updatedAt)}</div>
+              <div className="font-semibold text-gray-900">{formatTimestamp(board.updatedAt, tTime)}</div>
             </div>
           </div>
         </div>
