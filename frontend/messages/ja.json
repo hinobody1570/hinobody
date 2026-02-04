@@ -412,6 +412,10 @@
   },
   "sidebar": {
     "home": "ホーム",
+    "news": "ニュース",
+    "reviews": "レビュー",
+    "recommend": "おすすめ",
+    "freeBoard": "フリーボード",
     "popular": "人気",
     "explore": "探索",
     "all": "すべて",

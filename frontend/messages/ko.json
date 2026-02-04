@@ -412,6 +412,10 @@
   },
   "sidebar": {
     "home": "홈",
+    "news": "뉴스",
+    "reviews": "리뷰",
+    "recommend": "추천",
+    "freeBoard": "자유 게시판",
     "popular": "인기",
     "explore": "탐색",
     "all": "전체",

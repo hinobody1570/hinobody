@@ -412,6 +412,10 @@
   },
   "sidebar": {
     "home": "Home",
+    "news": "News",
+    "reviews": "Reviews",
+    "recommend": "Recommend",
+    "freeBoard": "Free Board",
     "popular": "Popular",
     "explore": "Explore",
     "all": "All",

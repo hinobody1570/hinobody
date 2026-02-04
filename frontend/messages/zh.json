@@ -412,6 +412,10 @@
   },
   "sidebar": {
     "home": "首页",
+    "news": "新闻",
+    "reviews": "评测",
+    "recommend": "推荐",
+    "freeBoard": "自由板块",
     "popular": "热门",
     "explore": "探索",
     "all": "全部",

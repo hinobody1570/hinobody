@@ -18,6 +18,10 @@ import { VscBook } from "react-icons/vsc";
 import { CollapsibleSection } from "../reuseComponents/CollapseItems";
 import { MenuItem } from "../reuseComponents/MenuItem";
 import StartCommunityPopup from "../modals/StartCommunityPopup";
+import { IoNewspaperOutline } from "react-icons/io5";
+import { VscPreview } from "react-icons/vsc";
+import { MdOutlineRecommend } from "react-icons/md";
+
 
 /* ---------------- DATA CONFIG ---------------- */
 
@@ -35,6 +39,11 @@ const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
+    { icon: IoNewspaperOutline, label: t("news"), navigate: "" },
+    { icon: VscPreview, label: t("reviews"), navigate: "" },
+    { icon: MdOutlineRecommend, label: t("recommend"), navigate: "" },
+    { icon: FaPlus, label: t("freeBoard"), navigate: "" },
+
     // { icon: CgArrowTopRightO, label: t("popular"), navigate: "" },
     // { icon: PiCirclesThree, label: t("explore"), navigate: "" },
     // { icon: BiBarChartSquare, label: t("all"), navigate: "" },
