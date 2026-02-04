@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import Comment from './Comment';
 import { commentsApi, Comment as CommentType, Language } from '@/lib/api';
@@ -47,7 +47,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
   const t = useTranslations('comments');
   const tTime = useTranslations('timeAgo');
   const [sortBy, setSortBy] = useState(t('best'));
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,14 +84,13 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       }
       setError(null);
       const response = await commentsApi.getByPost(postId, page, 20, search);
-      const transformedComments = response.data.map((comment) => transformComment(comment, postAuthorId, t, tTime));
-      
+
       if (append) {
-        setComments((prev) => [...prev, ...transformedComments]);
+        setComments((prev) => [...prev, ...response.data]);
       } else {
-        setComments(transformedComments);
+        setComments(response.data);
       }
-      
+
       setCurrentPage(page);
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
@@ -101,7 +100,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [postId, postAuthorId, t, tTime]);
+  }, [postId, postAuthorId, t]);
 
   // Handle search with debounce
   useEffect(() => {
@@ -148,6 +147,12 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       observer.disconnect();
     };
   }, [observerTarget, hasMore, loadingMore, loading, loadMoreComments]);
+
+  // Transform comments for display - re-runs when locale changes so timestamps update
+  const displayComments = useMemo(
+    () => comments.map((c) => transformComment(c, postAuthorId, t, tTime)),
+    [comments, postAuthorId, t, tTime, locale]
+  );
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -254,7 +259,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       )}
 
       {/* Comments List */}
-      {!loading && !error && comments.length === 0 && (
+      {!loading && !error && displayComments.length === 0 && (
         <div className="flex items-center justify-center py-6 sm:py-8">
           <div className="text-gray-500 text-sm sm:text-base text-center px-2">
             {isSearching || searchQuery ? t('noCommentsFound') : t('noCommentsYet')}
@@ -264,7 +269,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
 
       {!loading && !error && (
         <div className="space-y-3 sm:space-y-4">
-          {comments.map((comment) => (
+          {displayComments.map((comment) => (
             <Comment 
               key={comment.id} 
               comment={comment}
@@ -286,7 +291,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
           )}
 
           {/* End of comments message - only show when not searching */}
-          {!searchQuery && !hasMore && comments.length > 0 && (
+          {!searchQuery && !hasMore && displayComments.length > 0 && (
             <div className="flex items-center justify-center py-3 sm:py-4">
               <div className="text-gray-500 text-sm sm:text-base">{t('noMoreComments')}</div>
             </div>

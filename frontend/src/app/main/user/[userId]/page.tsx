@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage, boardsApi, Board, BoardMembership, blocksApi } from '@/lib/api';
@@ -40,13 +41,14 @@ export default function UserProfilePage() {
   const { user: currentUser } = useAuth();
   const t = useTranslations('userProfile');
   const tTime = useTranslations('timeAgo');
+  const { locale } = useLanguage();
   // Get userId from URL params - this allows viewing any user's profile
   // When viewing own profile: userId === currentUser.id
   // When viewing other user's profile: userId !== currentUser.id
   const userId = params?.userId as string;
   
   const [user, setUser] = useState<User | null>(null);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [eyeMaskedImages, setEyeMaskedImages] = useState<EyeMaskedImage[]>([]);
   const [createdBoards, setCreatedBoards] = useState<Board[]>([]);
   const [memberBoards, setMemberBoards] = useState<Board[]>([]);
@@ -97,8 +99,7 @@ export default function UserProfilePage() {
           page: 1,
           limit: 20,
         });
-        const transformedPosts = response.data.map((p) => transformPost(p, tTime));
-        setPosts(transformedPosts);
+        setPosts(response.data);
       } catch (err: any) {
         console.error('Error fetching user posts:', err);
       } finally {
@@ -110,6 +111,11 @@ export default function UserProfilePage() {
       fetchUserPosts();
     }
   }, [userId]);
+
+  const displayPosts = useMemo(
+    () => posts.map((p) => transformPost(p, tTime)),
+    [posts, tTime, locale]
+  );
 
   useEffect(() => {
     const fetchEyeMaskedImages = async () => {
@@ -325,7 +331,7 @@ export default function UserProfilePage() {
 
         {/* User Posts */}
         <UserPostsSection
-          posts={posts}
+          posts={displayPosts}
           loading={loadingPosts}
         />
       </div>

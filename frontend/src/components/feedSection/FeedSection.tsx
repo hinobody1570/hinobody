@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { CiCalendar } from "react-icons/ci";
 import { IoChevronDown } from "react-icons/io5";
 import { PostCard } from "../reuseComponents/PostCard";
@@ -45,7 +46,8 @@ const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<st
 export const RedditFeed = () => {
   const t = useTranslations('feed');
   const tTime = useTranslations('timeAgo');
-  const [posts, setPosts] = useState<any[]>([]);
+  const { locale } = useLanguage();
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,10 +56,9 @@ export const RedditFeed = () => {
   const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
-  const [selectedBoardName, setSelectedBoardName] = useState<string>(t('allBoards'));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [showRecentPosts, setShowRecentPosts] = useState(true);
   const [loadingRecentPosts, setLoadingRecentPosts] = useState(true);
 
@@ -84,8 +85,7 @@ export const RedditFeed = () => {
           page: 1,
           limit: 4,
         });
-        const transformedRecentPosts = response.data.map((p) => transformRecentPost(p, tTime));
-        setRecentPosts(transformedRecentPosts);
+        setRecentPosts(response.data);
       } catch (err: any) {
         console.error('Error fetching recent posts:', err);
       } finally {
@@ -117,12 +117,11 @@ export const RedditFeed = () => {
         limit: 20,
         boardId: boardId || undefined,
       });
-      const transformedPosts = response.data.map((p) => transformPost(p, tTime));
-      
+
       if (append) {
-        setPosts((prev) => [...prev, ...transformedPosts]);
+        setPosts((prev) => [...prev, ...response.data]);
       } else {
-        setPosts(transformedPosts);
+        setPosts(response.data);
       }
       
       setCurrentPage(page);
@@ -135,6 +134,16 @@ export const RedditFeed = () => {
       setLoadingMore(false);
     }
   }, []);
+
+  // Transform posts for display - re-runs when locale changes so timestamps update
+  const displayPosts = useMemo(
+    () => posts.map((p) => transformPost(p, tTime)),
+    [posts, tTime, locale]
+  );
+  const displayRecentPosts = useMemo(
+    () => recentPosts.map((p) => transformRecentPost(p, tTime)),
+    [recentPosts, tTime, locale]
+  );
 
   // Initial load and when board filter changes
   useEffect(() => {
@@ -149,15 +158,13 @@ export const RedditFeed = () => {
 
   // Handle board selection
   const handleBoardSelect = (board: Board | null) => {
-    if (board) {
-      setSelectedBoardId(board.id);
-      setSelectedBoardName(`r/${board.name}`);
-    } else {
-      setSelectedBoardId(null);
-      setSelectedBoardName(t('best'));
-    }
+    setSelectedBoardId(board?.id ?? null);
     setIsDropdownOpen(false);
   };
+
+  // Derive display name - updates when locale changes
+  const selectedBoard = selectedBoardId ? boards.find((b) => b.id === selectedBoardId) : null;
+  const selectedBoardDisplayName = selectedBoard ? `r/${selectedBoard.name}` : t('best');
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -206,7 +213,7 @@ export const RedditFeed = () => {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
                 >
-                  <span className="text-sm font-semibold">{selectedBoardName}</span>
+                  <span className="text-sm font-semibold">{selectedBoardDisplayName}</span>
                   <IoChevronDown size={16} className={isDropdownOpen ? 'transform rotate-180' : ''} />
                 </button>
                 
@@ -269,7 +276,7 @@ export const RedditFeed = () => {
 
             {!loading && !error && (
               <>
-                {posts.map((post) => (
+                {displayPosts.map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
                 
@@ -285,7 +292,7 @@ export const RedditFeed = () => {
                 )}
                 
                 {/* End of feed message */}
-                {!hasMore && posts.length > 0 && (
+                {!hasMore && displayPosts.length > 0 && (
                   <div className="flex items-center justify-center py-8">
                     <div className="text-gray-500">{t('noMorePostsToLoad')}</div>
                   </div>
@@ -312,9 +319,9 @@ export const RedditFeed = () => {
                   <div className="flex items-center justify-center py-8">
                     <div className="text-gray-500 text-sm">{t('loadingPosts')}</div>
                   </div>
-                ) : recentPosts.length > 0 ? (
+                ) : displayRecentPosts.length > 0 ? (
                   <div className="space-y-2">
-                    {recentPosts.map((post) => (
+                    {displayRecentPosts.map((post) => (
                       <RecentPostCard key={post.id} post={post} />
                     ))}
                   </div>

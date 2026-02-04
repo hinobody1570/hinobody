@@ -7,7 +7,8 @@ import { ROUTE_PATHS } from "@/routes/paths";
 import { formatTimestamp } from "@/utils/helperFunction";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import Loading from "@/components/reuseComponents/Loading";
 
@@ -34,10 +35,11 @@ export default function AdminBoardDetailPage() {
   const router = useRouter();
   const t = useTranslations("admin");
   const tTime = useTranslations("timeAgo");
+  const { locale } = useLanguage();
   const boardId = params?.boardId as string;
 
   const [board, setBoard] = useState<Board | null | any>(null);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,8 +70,7 @@ export default function AdminBoardDetailPage() {
       try {
         setLoadingPosts(true);
         const response = await postsApi.getAll({ boardId, page: 1, limit: 10 });
-        const transformedPosts = response.data.map((p) => transformPost(p, tTime));
-        setPosts(transformedPosts);
+        setPosts(response.data);
       } catch (err: any) {
         console.error("Error fetching posts:", err);
       } finally {
@@ -79,6 +80,11 @@ export default function AdminBoardDetailPage() {
 
     fetchPosts();
   }, [boardId]);
+
+  const displayPosts = useMemo(
+    () => posts.map((p) => transformPost(p, tTime)),
+    [posts, tTime, locale]
+  );
 
   if (loading) {
     return (
@@ -136,7 +142,7 @@ export default function AdminBoardDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">{t("totalPosts")}</div>
-              <div className="text-2xl font-bold text-gray-900">{posts.length}</div>
+              <div className="text-2xl font-bold text-gray-900">{displayPosts.length}</div>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">{t("boardID")}</div>
@@ -154,11 +160,11 @@ export default function AdminBoardDetailPage() {
           <h3 className="text-xl font-bold text-gray-900 mb-4">{t("boardPosts")}</h3>
           {loadingPosts ? (
             <div className="text-center py-8 text-gray-500">{t("loading")}</div>
-          ) : posts.length === 0 ? (
+          ) : displayPosts.length === 0 ? (
             <div className="text-center py-8 text-gray-500">{t("noPosts")}</div>
           ) : (
             <div className="space-y-4">
-              {posts.map((post) => (
+              {displayPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>

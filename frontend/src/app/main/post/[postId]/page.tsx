@@ -7,7 +7,8 @@ import { ROUTE_PATHS } from '@/routes/paths';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import Loading from '@/components/reuseComponents/Loading';
 
@@ -34,9 +35,10 @@ export default function PostDetailPage() {
   const router = useRouter();
   const t = useTranslations('postDetail');
   const tTime = useTranslations('timeAgo');
+  const { locale } = useLanguage();
   const postId = params?.postId as string;
-  
-  const [post, setPost] = useState<any | null>(null);
+
+  const [rawPost, setRawPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,8 +48,7 @@ export default function PostDetailPage() {
         setLoading(true);
         setError(null);
         const postData = await postsApi.getById(postId);
-        const transformedPost = transformPost(postData, tTime);
-        setPost(transformedPost);
+        setRawPost(postData);
       } catch (err: any) {
         console.error('Error fetching post:', err);
         setError(err.message || t('postNotFound'));
@@ -59,7 +60,12 @@ export default function PostDetailPage() {
     if (postId) {
       fetchPost();
     }
-  }, [postId, tTime]);
+  }, [postId]);
+
+  const post = useMemo(
+    () => (rawPost ? transformPost(rawPost, tTime) : null),
+    [rawPost, tTime, locale]
+  );
 
   if (loading) {
     return (

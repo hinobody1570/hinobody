@@ -8,7 +8,8 @@ import { formatTimestamp } from "@/utils/helperFunction";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { FaCheckCircle, FaEnvelope, FaGlobe, FaImage, FaImages, FaShieldAlt, FaTimesCircle } from "react-icons/fa";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import Loading from "@/components/reuseComponents/Loading";
@@ -36,10 +37,11 @@ export default function AdminUserDetailPage() {
   const router = useRouter();
   const t = useTranslations("admin");
   const tTime = useTranslations("timeAgo");
+  const { locale } = useLanguage();
   const userId = params?.userId as string;
 
   const [user, setUser] = useState<User | null>(null);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [boards, setBoards] = useState<Board[]>([]);
   const [eyeMaskedImages, setEyeMaskedImages] = useState<EyeMaskedImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,8 +76,7 @@ export default function AdminUserDetailPage() {
       try {
         setLoadingPosts(true);
         const response = await postsApi.getAll({ authorId: userId, page: 1, limit: 10 });
-        const transformedPosts = response.data.map((p) => transformPost(p, tTime));
-        setPosts(transformedPosts);
+        setPosts(response.data);
       } catch (err: any) {
         console.error("Error fetching posts:", err);
       } finally {
@@ -85,6 +86,11 @@ export default function AdminUserDetailPage() {
 
     fetchPosts();
   }, [userId]);
+
+  const displayPosts = useMemo(
+    () => posts.map((p) => transformPost(p, tTime)),
+    [posts, tTime, locale]
+  );
 
   useEffect(() => {
     if (!userId) return;
@@ -238,7 +244,7 @@ export default function AdminUserDetailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-gray-600 mb-1">{t("totalPosts")}</div>
-                <div className="text-3xl font-bold text-gray-900">{posts.length}</div>
+                <div className="text-3xl font-bold text-gray-900">{displayPosts.length}</div>
               </div>
               <div className="bg-blue-100 rounded-full p-3">
                 <FaImage className="text-blue-600" size={24} />
@@ -279,11 +285,11 @@ export default function AdminUserDetailPage() {
           </h3>
           {loadingPosts ? (
             <div className="text-center py-8 text-gray-500">{t("loading")}</div>
-          ) : posts.length === 0 ? (
+          ) : displayPosts.length === 0 ? (
             <div className="text-center py-8 text-gray-500">{t("noPosts")}</div>
           ) : (
             <div className="space-y-4">
-              {posts.map((post) => (
+              {displayPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>

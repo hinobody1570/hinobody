@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { boardsApi, Board, postsApi, Post } from '@/lib/api';
@@ -35,11 +36,12 @@ export default function BoardProfilePage() {
   const router = useRouter();
   const t = useTranslations('boardProfile');
   const tTime = useTranslations('timeAgo');
+  const { locale } = useLanguage();
   const { user } = useAuth();
   const boardId = params?.boardId as string;
   
   const [board, setBoard] = useState<Board | null | any>(null);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,8 +91,7 @@ export default function BoardProfilePage() {
           page: 1,
           limit: 20,
         });
-        const transformedPosts = response.data.map((p) => transformPost(p, tTime));
-        setPosts(transformedPosts);
+        setPosts(response.data);
       } catch (err: any) {
         console.error('Error fetching board posts:', err);
       } finally {
@@ -102,6 +103,11 @@ export default function BoardProfilePage() {
       fetchBoardPosts();
     }
   }, [boardId]);
+
+  const displayPosts = useMemo(
+    () => posts.map((p) => transformPost(p, tTime)),
+    [posts, tTime, locale]
+  );
 
   const handleJoinLeave = async () => {
     if (!user) {
@@ -185,15 +191,15 @@ export default function BoardProfilePage() {
 
         {/* Board Posts */}
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{t('posts')} ({posts.length})</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{t('posts')} ({displayPosts.length})</h2>
           
           {loadingPosts ? (
             <div className="flex items-center justify-center py-8 sm:py-12">
               <div className="text-gray-500 text-sm sm:text-base">{t('loadingPosts')}</div>
             </div>
-          ) : posts.length > 0 ? (
+          ) : displayPosts.length > 0 ? (
             <div className="space-y-3 sm:space-y-4">
-              {posts.map((post) => (
+              {displayPosts.map((post) => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>
