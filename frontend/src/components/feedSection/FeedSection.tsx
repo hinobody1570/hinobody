@@ -7,7 +7,7 @@ import { CiCalendar } from "react-icons/ci";
 import { IoChevronDown } from "react-icons/io5";
 import { PostCard } from "../reuseComponents/PostCard";
 import { RecentPostCard } from "../reuseComponents/RecentPostCard";
-import { postsApi, Post, boardsApi, Board } from "@/lib/api";
+import { postsApi, Post, PostSortBy } from "@/lib/api";
 import DP from "./../../../public/assets/images/avatar_default_4.png";
 import { formatTimestamp } from "@/utils/helperFunction";
 
@@ -54,27 +54,12 @@ export const RedditFeed = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
+  const [selectedSortBy, setSelectedSortBy] = useState<PostSortBy>('newest');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [showRecentPosts, setShowRecentPosts] = useState(true);
   const [loadingRecentPosts, setLoadingRecentPosts] = useState(true);
-
-  // Fetch boards on mount
-  useEffect(() => {
-    const fetchBoards = async () => {
-      try {
-        const response = await boardsApi.getAll(1, 100); // Get first 100 boards
-        setBoards(response.data);
-      } catch (err: any) {
-        console.error('Error fetching boards:', err);
-      }
-    };
-
-    fetchBoards();
-  }, []);
 
   // Fetch recent posts (last 4)
   useEffect(() => {
@@ -103,8 +88,8 @@ export const RedditFeed = () => {
     setShowRecentPosts(false);
   };
 
-  // Fetch posts with board filter
-  const fetchPosts = useCallback(async (page: number = 1, boardId?: string | null, append: boolean = false) => {
+  // Fetch posts with sort filter
+  const fetchPosts = useCallback(async (page: number = 1, sortBy: PostSortBy = 'newest', append: boolean = false) => {
     try {
       if (append) {
         setLoadingMore(true);
@@ -115,7 +100,7 @@ export const RedditFeed = () => {
       const response = await postsApi.getAll({
         page,
         limit: 20,
-        boardId: boardId || undefined,
+        sortBy,
       });
 
       if (append) {
@@ -123,7 +108,7 @@ export const RedditFeed = () => {
       } else {
         setPosts(response.data);
       }
-      
+
       setCurrentPage(page);
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
@@ -145,26 +130,30 @@ export const RedditFeed = () => {
     [recentPosts, tTime, locale]
   );
 
-  // Initial load and when board filter changes
+  // Initial load and when sort filter changes
   useEffect(() => {
-    fetchPosts(1, selectedBoardId, false);
-  }, [selectedBoardId, fetchPosts]);
+    fetchPosts(1, selectedSortBy, false);
+  }, [selectedSortBy, fetchPosts]);
 
   // Load more posts
   const loadMorePosts = useCallback(async () => {
     if (loadingMore || !hasMore) return;
-    await fetchPosts(currentPage + 1, selectedBoardId, true);
-  }, [currentPage, loadingMore, hasMore, selectedBoardId, fetchPosts]);
+    await fetchPosts(currentPage + 1, selectedSortBy, true);
+  }, [currentPage, loadingMore, hasMore, selectedSortBy, fetchPosts]);
 
-  // Handle board selection
-  const handleBoardSelect = (board: Board | null) => {
-    setSelectedBoardId(board?.id ?? null);
+  // Handle sort selection
+  const handleSortSelect = (sortBy: PostSortBy) => {
+    setSelectedSortBy(sortBy);
     setIsDropdownOpen(false);
   };
 
   // Derive display name - updates when locale changes
-  const selectedBoard = selectedBoardId ? boards.find((b) => b.id === selectedBoardId) : null;
-  const selectedBoardDisplayName = selectedBoard ? `r/${selectedBoard.name}` : t('best');
+  const sortDisplayNames: Record<PostSortBy, string> = {
+    newest: t('newest'),
+    mostLiked: t('mostLiked'),
+    trending: t('trending'),
+  };
+  const selectedSortDisplayName = sortDisplayNames[selectedSortBy];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -213,32 +202,23 @@ export const RedditFeed = () => {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
                 >
-                  <span className="text-sm font-semibold">{selectedBoardDisplayName}</span>
+                  <span className="text-sm font-semibold">{selectedSortDisplayName}</span>
                   <IoChevronDown size={16} className={isDropdownOpen ? 'transform rotate-180' : ''} />
                 </button>
                 
-                {/* Dropdown Menu */}
+                {/* Sort Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
                     <div className="p-2">
-                      <button
-                        onClick={() => handleBoardSelect(null)}
-                        className={`w-full text-left px-3 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer ${
-                          selectedBoardId === null ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
-                        }`}
-                      >
-                        {t('allBoards')}
-                      </button>
-                      <div className="border-t border-gray-200 my-1"></div>
-                      {boards.map((board) => (
+                      {(['newest', 'mostLiked', 'trending'] as PostSortBy[]).map((sort) => (
                         <button
-                          key={board.id}
-                          onClick={() => handleBoardSelect(board)}
+                          key={sort}
+                          onClick={() => handleSortSelect(sort)}
                           className={`w-full text-left px-3 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer ${
-                            selectedBoardId === board.id ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
+                            selectedSortBy === sort ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
                           }`}
                         >
-                          r/{board.name}
+                          {sortDisplayNames[sort]}
                         </button>
                       ))}
                     </div>

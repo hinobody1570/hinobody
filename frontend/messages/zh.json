@@ -392,6 +392,9 @@
   "feed": {
     "best": "最佳",
     "allBoards": "所有看板",
+    "mostLiked": "最多点赞",
+    "newest": "最新",
+    "trending": "热门",
     "recentPosts": "最近帖子",
     "clear": "清除",
     "redditRules": "Reddit 规则",

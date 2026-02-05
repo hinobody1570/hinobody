@@ -426,12 +426,15 @@ export interface PostsResponse {
   };
 }
 
+export type PostSortBy = 'newest' | 'mostLiked' | 'trending';
+
 export interface QueryPostsParams {
   page?: number;
   limit?: number;
   boardId?: string;
   authorId?: string;
   search?: string;
+  sortBy?: PostSortBy;
 }
 
 export const postsApi = {
@@ -441,7 +444,7 @@ export const postsApi = {
     return response.data;
   },
   getAll: async (params: QueryPostsParams = {}): Promise<PostsResponse> => {
-    const { page = 1, limit = 20, boardId, authorId, search } = params;
+    const { page = 1, limit = 20, boardId, authorId, search, sortBy } = params;
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -454,6 +457,9 @@ export const postsApi = {
     }
     if (search) {
       queryParams.append('search', search);
+    }
+    if (sortBy) {
+      queryParams.append('sortBy', sortBy);
     }
     const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
     // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }

@@ -1,6 +1,8 @@
-import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
+import { IsOptional, IsString, IsInt, Min, Max, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+
+export type PostSortBy = 'newest' | 'mostLiked' | 'trending';
 
 export class QueryPostsDto {
   @ApiPropertyOptional({
@@ -50,4 +52,13 @@ export class QueryPostsDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiPropertyOptional({
+    example: 'newest',
+    description: 'Sort order: newest, mostLiked (highest upvotes), trending (engagement score)',
+    enum: ['newest', 'mostLiked', 'trending'],
+  })
+  @IsOptional()
+  @IsIn(['newest', 'mostLiked', 'trending'])
+  sortBy?: PostSortBy = 'newest';
 }

@@ -8,7 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { BoardMemberService } from '../board-member/board-member.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { QueryPostsDto } from './dto/query-posts.dto';
+import { QueryPostsDto, PostSortBy } from './dto/query-posts.dto';
 import { Post, Prisma } from '@prisma/client';
 
 @Injectable()
@@ -86,8 +86,84 @@ export class PostService {
     return post;
   }
 
+  private async enrichPostsWithFilteredCommentCounts(
+    posts: any[],
+    blockedUserIds: string[],
+  ): Promise<any[]> {
+    const postIds = posts.map((p) => p.id);
+    const counts = await this.prisma.comment.groupBy({
+      by: ['postId'],
+      where: {
+        postId: { in: postIds },
+        isActive: true,
+        isDeleted: false,
+        authorId: { notIn: blockedUserIds },
+      },
+      _count: { id: true },
+    });
+    const countMap = new Map(counts.map((c) => [c.postId, c._count.id]));
+    return posts.map((post) => {
+      const commentCount = countMap.get(post.id) ?? 0;
+      return {
+        ...post,
+        commentCount,
+        _count: { ...post._count, comments: commentCount },
+      };
+    });
+  }
+
+  private getOrderBy(sortBy: PostSortBy = 'newest'): Prisma.PostOrderByWithRelationInput | Prisma.PostOrderByWithRelationInput[] {
+    switch (sortBy) {
+      case 'newest':
+      default:
+        return { createdAt: 'desc' };
+    }
+  }
+
+  /**
+   * Fetch post IDs in correct order for mostLiked (net likes) or trending (engagement).
+   * Uses raw SQL because Prisma orderBy cannot express (upvote_count - downvote_count).
+   */
+  private async getOrderedPostIds(
+    params: { boardId?: string; authorId?: string; blockedUserIds: string[]; search?: string },
+    sortBy: 'mostLiked' | 'trending',
+    limit: number,
+    skip: number,
+  ): Promise<string[]> {
+    const conditions: Prisma.Sql[] = [
+      Prisma.sql`"isActive" = true`,
+      Prisma.sql`"isDeleted" = false`,
+    ];
+    if (params.boardId) {
+      conditions.push(Prisma.sql`"boardId" = ${params.boardId}`);
+    }
+    if (params.authorId) {
+      conditions.push(Prisma.sql`"authorId" = ${params.authorId}`);
+    } else if (params.blockedUserIds.length > 0) {
+      conditions.push(Prisma.sql`"authorId" NOT IN (${Prisma.join(params.blockedUserIds)})`);
+    }
+    if (params.search) {
+      const pattern = `%${params.search}%`;
+      conditions.push(
+        Prisma.sql`("title" ILIKE ${pattern} OR "body" ILIKE ${pattern})`,
+      );
+    }
+    const whereSql = Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`;
+    const orderBy =
+      sortBy === 'mostLiked'
+        ? Prisma.sql`ORDER BY ("upvoteCount" - "downvoteCount") DESC, "createdAt" DESC`
+        : Prisma.sql`ORDER BY ("upvoteCount" - "downvoteCount" + "commentCount") DESC, "createdAt" DESC`;
+    const rows = await this.prisma.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "posts"
+      ${whereSql}
+      ${orderBy}
+      LIMIT ${limit} OFFSET ${skip}
+    `;
+    return rows.map((r) => r.id);
+  }
+
   async findAll(query: QueryPostsDto, userId?: string) {
-    const { boardId, authorId, page = 1, limit = 20, search } = query;
+    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest' } = query;
     const skip = (page - 1) * limit;
 
     // Get blocked user IDs if userId is provided
@@ -123,74 +199,71 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
-      // Exclude posts from blocked users (only if authorId is not specified)
       ...(!authorId && blockedUserIds.length > 0 && {
-        authorId: {
-          notIn: blockedUserIds,
-        },
+        authorId: { notIn: blockedUserIds },
       }),
     };
 
-    const [posts, total] = await Promise.all([
-      this.prisma.post.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          author: {
-            select: {
-              id: true,
-              nickname: true,
-              language: true,
-            },
-          },
-          board: true,
-          images: {
-            take: 1, // First image as thumbnail
-          },
-          _count: {
-            select: {
-              votes: true,
-            },
-          },
-        },
-      }),
-      this.prisma.post.count({ where }),
-    ]);
+    let posts: any[];
+    let total: number;
 
-    // Calculate comment counts excluding blocked users
-    const postsWithFilteredCounts = await Promise.all(
-      posts.map(async (post) => {
-        const commentCount = blockedUserIds.length > 0
-          ? await this.prisma.comment.count({
-            where: {
-              postId: post.id,
-              isActive: true,
-              isDeleted: false,
-              authorId: {
-                notIn: blockedUserIds,
-              },
-            },
-          })
-          : await this.prisma.comment.count({
-            where: {
-              postId: post.id,
-              isActive: true,
-              isDeleted: false,
-            },
-          });
-
-        return {
-          ...post,
-          commentCount: commentCount, // Update the commentCount field
-          _count: {
-            ...post._count,
-            comments: commentCount,
+    if (sortBy === 'mostLiked' || sortBy === 'trending') {
+      // Use raw SQL for accurate (upvote_count - downvote_count) ordering
+      const [orderedIds, totalCount] = await Promise.all([
+        this.getOrderedPostIds(
+          { boardId, authorId, blockedUserIds, search: undefined },
+          sortBy,
+          limit,
+          skip,
+        ),
+        this.prisma.post.count({ where }),
+      ]);
+      total = totalCount;
+      if (orderedIds.length === 0) {
+        posts = [];
+      } else {
+        const fetched = await this.prisma.post.findMany({
+          where: { id: { in: orderedIds } },
+          include: {
+            author: { select: { id: true, nickname: true, language: true } },
+            board: true,
+            images: { take: 1 },
+            _count: { select: { votes: true, comments: true } },
           },
-        };
-      })
-    );
+        });
+        // Preserve order from getOrderedPostIds (findMany does not guarantee order)
+        const orderMap = new Map(orderedIds.map((id, i) => [id, i]));
+        posts = fetched.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
+      }
+    } else {
+      // newest: use Prisma orderBy
+      const [fetched, totalCount] = await Promise.all([
+        this.prisma.post.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: this.getOrderBy(sortBy),
+          include: {
+            author: { select: { id: true, nickname: true, language: true } },
+            board: true,
+            images: { take: 1 },
+            _count: { select: { votes: true, comments: true } },
+          },
+        }),
+        this.prisma.post.count({ where }),
+      ]);
+      posts = fetched;
+      total = totalCount;
+    }
+
+    const postsWithFilteredCounts =
+      blockedUserIds.length === 0
+        ? posts.map((post) => ({
+            ...post,
+            commentCount: post._count.comments,
+            _count: { ...post._count, comments: post._count.comments },
+          }))
+        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds);
 
     return {
       data: postsWithFilteredCounts,
@@ -204,7 +277,7 @@ export class PostService {
   }
 
   private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = []) {
-    const { boardId, authorId, page = 1, limit = 20, search } = query;
+    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest' } = query;
     const skip = (page - 1) * limit;
 
     // If authorId is specified and that author is blocked, return empty results
@@ -220,96 +293,78 @@ export class PostService {
       };
     }
 
-    // Use simple Prisma search instead of FTS to avoid requiring search_vector column
     const where: Prisma.PostWhereInput = {
       isActive: true,
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
-      // Exclude posts from blocked users (only if authorId is not specified)
       ...(!authorId && blockedUserIds.length > 0 && {
-        authorId: {
-          notIn: blockedUserIds,
-        },
+        authorId: { notIn: blockedUserIds },
       }),
       OR: search
         ? [
-          {
-            title: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            body: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
+          { title: { contains: search, mode: 'insensitive' } },
+          { body: { contains: search, mode: 'insensitive' } },
         ]
         : undefined,
     };
 
-    const [posts, total] = await Promise.all([
-      this.prisma.post.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          author: {
-            select: {
-              id: true,
-              nickname: true,
-              language: true,
-            },
+    let posts: any[];
+    let total: number;
+    if (sortBy === 'mostLiked' || sortBy === 'trending') {
+      const [orderedIds, totalCount] = await Promise.all([
+        this.getOrderedPostIds(
+          { boardId, authorId, blockedUserIds, search },
+          sortBy,
+          limit,
+          skip,
+        ),
+        this.prisma.post.count({ where }),
+      ]);
+      total = totalCount;
+      if (orderedIds.length === 0) {
+        posts = [];
+      } else {
+        const fetched = await this.prisma.post.findMany({
+          where: { id: { in: orderedIds } },
+          include: {
+            author: { select: { id: true, nickname: true, language: true } },
+            board: true,
+            images: { take: 1 },
+            _count: { select: { votes: true, comments: true } },
           },
-          board: true,
-          images: {
-            take: 1,
+        });
+        const orderMap = new Map(orderedIds.map((id, i) => [id, i]));
+        posts = fetched.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
+      }
+    } else {
+      const [fetched, totalCount] = await Promise.all([
+        this.prisma.post.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: this.getOrderBy(sortBy),
+          include: {
+            author: { select: { id: true, nickname: true, language: true } },
+            board: true,
+            images: { take: 1 },
+            _count: { select: { votes: true, comments: true } },
           },
-          _count: {
-            select: {
-              votes: true,
-            },
-          },
-        },
-      }),
-      this.prisma.post.count({ where }),
-    ]);
+        }),
+        this.prisma.post.count({ where }),
+      ]);
+      posts = fetched;
+      total = totalCount;
+    }
 
-    // Calculate comment counts excluding blocked users
-    const postsWithFilteredCounts = await Promise.all(
-      posts.map(async (post) => {
-        const commentCount = blockedUserIds.length > 0
-          ? await this.prisma.comment.count({
-            where: {
-              postId: post.id,
-              isActive: true,
-              isDeleted: false,
-              authorId: {
-                notIn: blockedUserIds,
-              },
-            },
-          })
-          : await this.prisma.comment.count({
-            where: {
-              postId: post.id,
-              isActive: true,
-              isDeleted: false,
-            },
-          });
-
-        return {
-          ...post,
-          commentCount: commentCount, // Update the commentCount field
-          _count: {
-            ...post._count,
-            comments: commentCount,
-          },
-        };
-      })
-    );
+    const postsWithFilteredCounts =
+      blockedUserIds.length === 0
+        ? posts.map((post) => ({
+            ...post,
+            commentCount: post._count.comments,
+            _count: { ...post._count, comments: post._count.comments },
+          }))
+        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds);
 
     return {
       data: postsWithFilteredCounts,

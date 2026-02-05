@@ -392,6 +392,9 @@
   "feed": {
     "best": "베스트",
     "allBoards": "모든 보드",
+    "mostLiked": "가장 좋아요",
+    "newest": "최신순",
+    "trending": "트렌딩",
     "recentPosts": "최근 게시물",
     "clear": "지우기",
     "redditRules": "Reddit 규칙",

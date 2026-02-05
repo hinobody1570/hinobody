@@ -392,6 +392,9 @@
   "feed": {
     "best": "ベスト",
     "allBoards": "すべてのボード",
+    "mostLiked": "最もいいね",
+    "newest": "新着",
+    "trending": "トレンド",
     "recentPosts": "最近の投稿",
     "clear": "クリア",
     "redditRules": "Redditルール",

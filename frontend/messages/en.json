@@ -392,6 +392,9 @@
   "feed": {
     "best": "Best",
     "allBoards": "All Boards",
+    "mostLiked": "Most liked",
+    "newest": "Newest",
+    "trending": "Trending",
     "recentPosts": "Recent Posts",
     "clear": "Clear",
     "redditRules": "Reddit Rules",
