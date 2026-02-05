@@ -279,7 +279,7 @@ const CreatePost = () => {
                     <span className="text-white text-xs font-bold">r</span>
                   </div>
                   <span className="text-sm font-semibold text-gray-700 truncate min-w-0">
-                    {selectedCommunity ? `r/${selectedCommunity.name}` : t("selectCommunity")}
+                    {selectedCommunity ? `r/${selectedCommunity.name}` : t("selectMenu")}
                   </span>
                   <BiChevronDown size={16} className="text-gray-600 flex-shrink-0" />
                 </button>
@@ -325,7 +325,7 @@ const CreatePost = () => {
                       ))
                     ) : (
                       <div className="p-4 text-center text-gray-500 text-sm">
-                        {searchQuery ? "No boards found" : "No boards available"}
+                        {searchQuery ? t("noBoardsFound") : t("noBoardsAvailable")}
                       </div>
                     )}
                   </div>

@@ -660,7 +660,9 @@
     "title": "Create post",
     "drafts": "Drafts",
     "selectCommunity": "Select a community",
+    "selectMenu": "Select Menu",
     "noBoardsAvailable": "No boards available",
+    "noBoardsFound": "No boards found",
     "tabs": {
       "text": "Text",
       "images": "Images & Video",

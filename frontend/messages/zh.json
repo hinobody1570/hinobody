@@ -659,7 +659,9 @@
     "title": "创建帖子",
     "drafts": "草稿",
     "selectCommunity": "选择社区",
+    "selectMenu": "选择社区",
     "noBoardsAvailable": "暂无可用板块",
+    "noBoardsFound": "未找到板块",
     "tabs": {
       "text": "文本",
       "images": "图片和视频",

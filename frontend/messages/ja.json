@@ -659,7 +659,9 @@
     "title": "投稿を作成",
     "drafts": "下書き",
     "selectCommunity": "コミュニティを選択",
+    "selectMenu": "コミュニティを選択",
     "noBoardsAvailable": "利用可能なボードがありません",
+    "noBoardsFound": "ボードが見つかりません",
     "tabs": {
       "text": "テキスト",
       "images": "画像と動画",
