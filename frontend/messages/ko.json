@@ -323,6 +323,7 @@
     "boardDetails": "보드 상세 정보",
     "backToPosts": "게시물 목록으로",
     "backToBoards": "보드 목록으로",
+    "createCommunity": "커뮤니티 만들기",
     "postNotFound": "게시물을 찾을 수 없습니다",
     "boardNotFound": "보드를 찾을 수 없습니다",
     "errorLoadingPost": "게시물 로드 오류",
@@ -658,6 +659,7 @@
     "title": "게시물 작성",
     "drafts": "초안",
     "selectCommunity": "커뮤니티 선택",
+    "noBoardsAvailable": "사용 가능한 보드가 없습니다",
     "tabs": {
       "text": "텍스트",
       "images": "이미지 및 동영상",

@@ -323,6 +323,7 @@
     "boardDetails": "Board Details",
     "backToPosts": "Back to Posts",
     "backToBoards": "Back to Boards",
+    "createCommunity": "Create Community",
     "postNotFound": "Post not found",
     "boardNotFound": "Board not found",
     "errorLoadingPost": "Error loading post",
@@ -659,6 +660,7 @@
     "title": "Create post",
     "drafts": "Drafts",
     "selectCommunity": "Select a community",
+    "noBoardsAvailable": "No boards available",
     "tabs": {
       "text": "Text",
       "images": "Images & Video",

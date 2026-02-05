@@ -47,7 +47,7 @@ const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
     // { icon: CgArrowTopRightO, label: t("popular"), navigate: "" },
     // { icon: PiCirclesThree, label: t("explore"), navigate: "" },
     // { icon: BiBarChartSquare, label: t("all"), navigate: "" },
-    { icon: FaPlus, label: t("startCommunity"), navigate: "" },
+    // { icon: FaPlus, label: t("startCommunity"), navigate: "" },
   ];
 
   // const GAMES_MENU = [

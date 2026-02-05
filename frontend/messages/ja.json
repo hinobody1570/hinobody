@@ -323,6 +323,7 @@
     "boardDetails": "ボード詳細",
     "backToPosts": "投稿一覧に戻る",
     "backToBoards": "ボード一覧に戻る",
+    "createCommunity": "コミュニティを作成",
     "postNotFound": "投稿が見つかりません",
     "boardNotFound": "ボードが見つかりません",
     "errorLoadingPost": "投稿の読み込みエラー",
@@ -658,6 +659,7 @@
     "title": "投稿を作成",
     "drafts": "下書き",
     "selectCommunity": "コミュニティを選択",
+    "noBoardsAvailable": "利用可能なボードがありません",
     "tabs": {
       "text": "テキスト",
       "images": "画像と動画",

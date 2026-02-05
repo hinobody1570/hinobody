@@ -323,6 +323,7 @@
     "boardDetails": "看板详情",
     "backToPosts": "返回帖子列表",
     "backToBoards": "返回看板列表",
+    "createCommunity": "创建社区",
     "postNotFound": "未找到帖子",
     "boardNotFound": "未找到看板",
     "errorLoadingPost": "加载帖子时出错",
@@ -658,6 +659,7 @@
     "title": "创建帖子",
     "drafts": "草稿",
     "selectCommunity": "选择社区",
+    "noBoardsAvailable": "暂无可用板块",
     "tabs": {
       "text": "文本",
       "images": "图片和视频",
