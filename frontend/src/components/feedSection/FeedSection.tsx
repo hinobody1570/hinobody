@@ -1,26 +1,26 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { CiCalendar } from "react-icons/ci";
 import { IoChevronDown } from "react-icons/io5";
 import { PostCard } from "../reuseComponents/PostCard";
 import { RecentPostCard } from "../reuseComponents/RecentPostCard";
-import { postsApi, Post, boardsApi, Board } from "@/lib/api";
+import { postsApi, Post, PostSortBy } from "@/lib/api";
 import DP from "./../../../public/assets/images/avatar_default_4.png";
 import { formatTimestamp } from "@/utils/helperFunction";
 
-
 // Transform API post to PostCard format
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId, // Add boardId for membership checks
     authorId: post.authorId, // Add authorId for comment OP badge
-    community: post.board?.name ? `r/${post.board.name}/${post.author?.nickname}` : "r/community",
+    community: post.board?.name ? `r/${post.board.name}/${post.author?.nickname}` : post.postCategory ? post.postCategory : "r/community",
     communityAvatar: DP, // Default avatar
     verified: false, // Can be enhanced later based on board settings
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -31,12 +31,12 @@ const transformPost = (post: Post): any => {
 };
 
 // Transform API post to RecentPostCard format
-const transformRecentPost = (post: Post): any => {
+const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
-    community: post.board?.name ? `r/${post.board.name}` : "r/community",
+    community: post.board?.name ? `r/${post.board.name}` : post.postCategory || "r/community",
     avatar: DP, // Default avatar
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     upvotes: post.upvoteCount || 0,
     comments: post.commentCount || 0,
@@ -45,35 +45,21 @@ const transformRecentPost = (post: Post): any => {
 
 export const RedditFeed = () => {
   const t = useTranslations('feed');
-  const [posts, setPosts] = useState<any[]>([]);
+  const tTime = useTranslations('timeAgo');
+  const { locale } = useLanguage();
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [selectedBoardId, setSelectedBoardId] = useState<string | null>(null);
-  const [selectedBoardName, setSelectedBoardName] = useState<string>(t('allBoards'));
+  const [selectedSortBy, setSelectedSortBy] = useState<PostSortBy>('newest');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [showRecentPosts, setShowRecentPosts] = useState(true);
   const [loadingRecentPosts, setLoadingRecentPosts] = useState(true);
-
-  // Fetch boards on mount
-  useEffect(() => {
-    const fetchBoards = async () => {
-      try {
-        const response = await boardsApi.getAll(1, 100); // Get first 100 boards
-        setBoards(response.data);
-      } catch (err: any) {
-        console.error('Error fetching boards:', err);
-      }
-    };
-
-    fetchBoards();
-  }, []);
 
   // Fetch recent posts (last 4)
   useEffect(() => {
@@ -84,8 +70,7 @@ export const RedditFeed = () => {
           page: 1,
           limit: 4,
         });
-        const transformedRecentPosts = response.data.map(transformRecentPost);
-        setRecentPosts(transformedRecentPosts);
+        setRecentPosts(response.data);
       } catch (err: any) {
         console.error('Error fetching recent posts:', err);
       } finally {
@@ -103,8 +88,8 @@ export const RedditFeed = () => {
     setShowRecentPosts(false);
   };
 
-  // Fetch posts with board filter
-  const fetchPosts = useCallback(async (page: number = 1, boardId?: string | null, append: boolean = false) => {
+  // Fetch posts with sort filter
+  const fetchPosts = useCallback(async (page: number = 1, sortBy: PostSortBy = 'newest', append: boolean = false) => {
     try {
       if (append) {
         setLoadingMore(true);
@@ -115,16 +100,15 @@ export const RedditFeed = () => {
       const response = await postsApi.getAll({
         page,
         limit: 20,
-        boardId: boardId || undefined,
+        sortBy,
       });
-      const transformedPosts = response.data.map(transformPost);
-      
+
       if (append) {
-        setPosts((prev) => [...prev, ...transformedPosts]);
+        setPosts((prev) => [...prev, ...response.data]);
       } else {
-        setPosts(transformedPosts);
+        setPosts(response.data);
       }
-      
+
       setCurrentPage(page);
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
@@ -136,28 +120,40 @@ export const RedditFeed = () => {
     }
   }, []);
 
-  // Initial load and when board filter changes
+  // Transform posts for display - re-runs when locale changes so timestamps update
+  const displayPosts = useMemo(
+    () => posts.map((p) => transformPost(p, tTime)),
+    [posts, tTime, locale]
+  );
+  const displayRecentPosts = useMemo(
+    () => recentPosts.map((p) => transformRecentPost(p, tTime)),
+    [recentPosts, tTime, locale]
+  );
+
+  // Initial load and when sort filter changes
   useEffect(() => {
-    fetchPosts(1, selectedBoardId, false);
-  }, [selectedBoardId, fetchPosts]);
+    fetchPosts(1, selectedSortBy, false);
+  }, [selectedSortBy, fetchPosts]);
 
   // Load more posts
   const loadMorePosts = useCallback(async () => {
     if (loadingMore || !hasMore) return;
-    await fetchPosts(currentPage + 1, selectedBoardId, true);
-  }, [currentPage, loadingMore, hasMore, selectedBoardId, fetchPosts]);
+    await fetchPosts(currentPage + 1, selectedSortBy, true);
+  }, [currentPage, loadingMore, hasMore, selectedSortBy, fetchPosts]);
 
-  // Handle board selection
-  const handleBoardSelect = (board: Board | null) => {
-    if (board) {
-      setSelectedBoardId(board.id);
-      setSelectedBoardName(`r/${board.name}`);
-    } else {
-      setSelectedBoardId(null);
-      setSelectedBoardName(t('best'));
-    }
+  // Handle sort selection
+  const handleSortSelect = (sortBy: PostSortBy) => {
+    setSelectedSortBy(sortBy);
     setIsDropdownOpen(false);
   };
+
+  // Derive display name - updates when locale changes
+  const sortDisplayNames: Record<PostSortBy, string> = {
+    newest: t('newest'),
+    mostLiked: t('mostLiked'),
+    trending: t('trending'),
+  };
+  const selectedSortDisplayName = sortDisplayNames[selectedSortBy];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -206,32 +202,23 @@ export const RedditFeed = () => {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
                 >
-                  <span className="text-sm font-semibold">{selectedBoardName}</span>
+                  <span className="text-sm font-semibold">{selectedSortDisplayName}</span>
                   <IoChevronDown size={16} className={isDropdownOpen ? 'transform rotate-180' : ''} />
                 </button>
                 
-                {/* Dropdown Menu */}
+                {/* Sort Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
                     <div className="p-2">
-                      <button
-                        onClick={() => handleBoardSelect(null)}
-                        className={`w-full text-left px-3 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer ${
-                          selectedBoardId === null ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
-                        }`}
-                      >
-                        {t('allBoards')}
-                      </button>
-                      <div className="border-t border-gray-200 my-1"></div>
-                      {boards.map((board) => (
+                      {(['newest', 'mostLiked', 'trending'] as PostSortBy[]).map((sort) => (
                         <button
-                          key={board.id}
-                          onClick={() => handleBoardSelect(board)}
+                          key={sort}
+                          onClick={() => handleSortSelect(sort)}
                           className={`w-full text-left px-3 py-2 rounded hover:bg-gray-100 transition-colors cursor-pointer ${
-                            selectedBoardId === board.id ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
+                            selectedSortBy === sort ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
                           }`}
                         >
-                          r/{board.name}
+                          {sortDisplayNames[sort]}
                         </button>
                       ))}
                     </div>
@@ -269,7 +256,7 @@ export const RedditFeed = () => {
 
             {!loading && !error && (
               <>
-                {posts.map((post) => (
+                {displayPosts.map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
                 
@@ -285,7 +272,7 @@ export const RedditFeed = () => {
                 )}
                 
                 {/* End of feed message */}
-                {!hasMore && posts.length > 0 && (
+                {!hasMore && displayPosts.length > 0 && (
                   <div className="flex items-center justify-center py-8">
                     <div className="text-gray-500">{t('noMorePostsToLoad')}</div>
                   </div>
@@ -312,9 +299,9 @@ export const RedditFeed = () => {
                   <div className="flex items-center justify-center py-8">
                     <div className="text-gray-500 text-sm">{t('loadingPosts')}</div>
                   </div>
-                ) : recentPosts.length > 0 ? (
+                ) : displayRecentPosts.length > 0 ? (
                   <div className="space-y-2">
-                    {recentPosts.map((post) => (
+                    {displayRecentPosts.map((post) => (
                       <RecentPostCard key={post.id} post={post} />
                     ))}
                   </div>

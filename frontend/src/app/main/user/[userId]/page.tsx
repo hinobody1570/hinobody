@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage, boardsApi, Board, BoardMembership, blocksApi } from '@/lib/api';
@@ -16,7 +17,7 @@ import { PendingRequestsSection } from '@/components/userProfile/PendingRequests
 import { UserPostsSection } from '@/components/userProfile/UserPostsSection';
 import Loading from '@/components/reuseComponents/Loading';
 
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId,
@@ -24,7 +25,7 @@ const transformPost = (post: Post): any => {
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -39,13 +40,15 @@ export default function UserProfilePage() {
   const router = useRouter();
   const { user: currentUser } = useAuth();
   const t = useTranslations('userProfile');
+  const tTime = useTranslations('timeAgo');
+  const { locale } = useLanguage();
   // Get userId from URL params - this allows viewing any user's profile
   // When viewing own profile: userId === currentUser.id
   // When viewing other user's profile: userId !== currentUser.id
   const userId = params?.userId as string;
   
   const [user, setUser] = useState<User | null>(null);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [eyeMaskedImages, setEyeMaskedImages] = useState<EyeMaskedImage[]>([]);
   const [createdBoards, setCreatedBoards] = useState<Board[]>([]);
   const [memberBoards, setMemberBoards] = useState<Board[]>([]);
@@ -96,8 +99,7 @@ export default function UserProfilePage() {
           page: 1,
           limit: 20,
         });
-        const transformedPosts = response.data.map(transformPost);
-        setPosts(transformedPosts);
+        setPosts(response.data);
       } catch (err: any) {
         console.error('Error fetching user posts:', err);
       } finally {
@@ -109,6 +111,11 @@ export default function UserProfilePage() {
       fetchUserPosts();
     }
   }, [userId]);
+
+  const displayPosts = useMemo(
+    () => posts.map((p) => transformPost(p, tTime)),
+    [posts, tTime, locale]
+  );
 
   useEffect(() => {
     const fetchEyeMaskedImages = async () => {
@@ -254,12 +261,12 @@ export default function UserProfilePage() {
 
   if (error || !user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error || t('userNotFound')}</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-6">
+        <div className="text-center max-w-md w-full">
+          <p className="text-red-600 mb-4 text-sm sm:text-base">{error || t('userNotFound')}</p>
           <button
             onClick={() => router.push(ROUTE_PATHS.HOME)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+            className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer touch-manipulation"
           >
             {t('backToHome')}
           </button>
@@ -270,7 +277,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
         {/* User Header */}
         {user && (
           <UserProfileHeader
@@ -324,7 +331,7 @@ export default function UserProfilePage() {
 
         {/* User Posts */}
         <UserPostsSection
-          posts={posts}
+          posts={displayPosts}
           loading={loadingPosts}
         />
       </div>

@@ -271,8 +271,8 @@ const StartCommunityPopup = ({ isOpen, onClose }: StartCommunityPopupProps) => {
           {/* Progress Indicator */}
           <div className="px-6 py-4">
             <div className="flex items-center gap-3 align-center">
-              {[1, 2, 3].map((s) => (
-                <div className={`w-4 h-4 rounded-full ${step >= s ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"}`}></div>
+              {[1, 2, 3].map((s,index) => (
+                <div key={index} className={`w-4 h-4 rounded-full ${step >= s ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"}`}></div>
               ))}
             </div>
           </div>

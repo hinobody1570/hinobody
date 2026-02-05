@@ -11,7 +11,12 @@ interface SidebarItem {
   path: string;
 }
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("admin");
@@ -56,48 +61,70 @@ export function AdminSidebar() {
 
   const handleNavigation = (path: string) => {
     router.push(path);
+    onClose();
   };
 
   return (
-    <div className="w-64 bg-blue-700 text-white h-screen fixed left-0 top-0 flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-blue-600">
-        <h1 className="text-2xl font-bold">{t("adminPanel")}</h1>
-      </div>
+    <>
+      {/* Mobile backdrop */}
+      <div
+        className={`lg:hidden fixed inset-0 bg-black/40 z-40 transition-opacity ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-      {/* Menu Items */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.path;
-            return (
-              <li key={item.path}>
-                <button
-                  onClick={() => handleNavigation(item.path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                    isActive ? "bg-blue-800 text-white" : "text-blue-100 hover:bg-blue-600"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      {/* Sidebar */}
+      <aside
+        className={[
+          "bg-blue-700 text-white h-screen fixed left-0 top-0 flex flex-col z-50 w-64",
+          "transition-transform duration-200 ease-out",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:translate-x-0",
+        ].join(" ")}
+        aria-label={t("adminPanel")}
+      >
+        {/* Logo */}
+        <div className="p-6 border-b border-blue-600">
+          <h1 className="text-2xl font-bold">{t("adminPanel")}</h1>
+        </div>
 
-      {/* Back to Home */}
-      <div className="p-4 border-t border-blue-600">
-        <button
-          onClick={() => router.push(ROUTE_PATHS.HOME)}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-blue-100 hover:bg-blue-600 transition-colors cursor-pointer"
-        >
-          <FaHome className="w-5 h-5" />
-          <span className="font-medium">{t("backToHome")}</span>
-        </button>
-      </div>
-    </div>
+        {/* Menu Items */}
+        <nav className="flex-1 p-4 overflow-y-auto">
+          <ul className="space-y-2">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.path;
+              return (
+                <li key={item.path}>
+                  <button
+                    onClick={() => handleNavigation(item.path)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
+                      isActive ? "bg-blue-800 text-white" : "text-blue-100 hover:bg-blue-600"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="font-medium">{item.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* Back to Home */}
+        <div className="p-4 border-t border-blue-600">
+          <button
+            onClick={() => {
+              router.push(ROUTE_PATHS.HOME);
+              onClose();
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-blue-100 hover:bg-blue-600 transition-colors cursor-pointer"
+          >
+            <FaHome className="w-5 h-5" />
+            <span className="font-medium">{t("backToHome")}</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

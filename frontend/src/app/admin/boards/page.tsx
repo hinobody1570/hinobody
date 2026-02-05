@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/admin/DataTable";
 import { boardsApi, Board } from "@/lib/api";
 import { formatTimestamp } from "@/utils/helperFunction";
 import { useToast } from "@/contexts/ToastContext";
-import { FaBan, FaCheck, FaTrash, FaEye } from "react-icons/fa";
+import { FaBan, FaCheck, FaPlus, FaTrash, FaEye } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
+import StartCommunityPopup from "@/components/modals/StartCommunityPopup";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Loading from "@/components/reuseComponents/Loading";
 import ErrorSection from "@/components/reuseComponents/ErrorSection";
@@ -17,6 +18,7 @@ type ActionType = "delete" | "activate" | "deactivate" | null;
 
 export default function AdminBoardsPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [boards, setBoards] = useState<Board[]>([]);
@@ -34,9 +36,9 @@ export default function AdminBoardsPage() {
     boardId: null,
     boardName: null,
   });
+  const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchBoards = async () => {
+  const fetchBoards = useCallback(async () => {
       try {
         setLoading(true);
         setError(null);
@@ -48,10 +50,11 @@ export default function AdminBoardsPage() {
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchBoards();
   }, []);
+
+  useEffect(() => {
+    fetchBoards();
+  }, [fetchBoards]);
 
   const openConfirmationModal = (action: ActionType, boardId: string, boardName: string) => {
     setConfirmationModal({
@@ -175,7 +178,7 @@ export default function AdminBoardsPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "actions",
@@ -234,7 +237,16 @@ export default function AdminBoardsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">{t("boards")}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">{t("boards")}</h1>
+        <button
+          onClick={() => setIsCommunityPopupOpen(true)}
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer shrink-0"
+        >
+          <FaPlus size={18} />
+          {t("createCommunity")}
+        </button>
+      </div>
       <DataTable columns={columns} data={boards} />
 
       <ConfirmationModal
@@ -246,6 +258,14 @@ export default function AdminBoardsPage() {
         confirmText={modalContent.confirmText}
         confirmButtonColor={modalContent.confirmButtonColor}
         isLoading={actionLoading === confirmationModal.boardId}
+      />
+
+      <StartCommunityPopup
+        isOpen={isCommunityPopupOpen}
+        onClose={() => {
+          setIsCommunityPopupOpen(false);
+          fetchBoards();
+        }}
       />
     </div>
   );

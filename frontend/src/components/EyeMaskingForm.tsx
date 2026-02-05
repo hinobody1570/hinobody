@@ -5,13 +5,22 @@ import { useTranslations } from "next-intl";
 import imageCompression from "browser-image-compression";
 import "./EyeMaskingForm.css";
 import ButtonLoader from "./reuseComponents/ButtonLoader";
-import { s3Api, eyeMaskedImagesApi } from "@/lib/api";
+import { s3Api, eyeMaskedImagesApi, imagesApi } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Dynamic import for face-api.js to avoid SSR issues
 let faceapi: any = null;
 
-const EyeMaskingForm = () => {
+interface EyeMaskingFormProps {
+  /** When provided, creates Image records for post and calls with IDs instead of saving to eye masked images */
+  onPostImagesReady?: (imageIds: string[]) => void;
+  /** Compact mode for use in modal (hides title, smaller layout) */
+  compact?: boolean;
+  /** When set, triggers upload or camera on mount (for use when opened from post create) */
+  initialAction?: "upload" | "camera" | null;
+}
+
+const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = null }: EyeMaskingFormProps) => {
   const t = useTranslations("eyeMasking");
   const { isAuthenticated } = useAuth();
   const [imageFile, setImageFile] = useState<any>(null);
@@ -35,6 +44,19 @@ const EyeMaskingForm = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [streamRef, setStreamRef] = useState<MediaStream | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+
+  // Trigger initial action when opened from post create card
+  useEffect(() => {
+    if (!initialAction) return;
+    const timer = setTimeout(() => {
+      if (initialAction === "upload" && fileInputRef.current) {
+        fileInputRef.current.click();
+      } else if (initialAction === "camera") {
+        openCamera();
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [initialAction]);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -186,7 +208,7 @@ const EyeMaskingForm = () => {
 
               if (attempts >= maxAttempts && video.videoWidth === 0) {
                 console.error("❌ Video never became ready after 5 seconds");
-                alert("Camera video is not loading. Please try closing and reopening the camera.");
+                alert(t("cameraVideoNotLoading"));
               }
             }
           }, 100);
@@ -222,7 +244,7 @@ const EyeMaskingForm = () => {
   const capturePhoto = () => {
     if (!videoRef.current || !cameraCanvasRef.current) {
       console.error("❌ Video or canvas ref not available");
-      alert("Camera not ready. Please wait a moment and try again.");
+      alert(t("cameraNotReady"));
       return;
     }
 
@@ -232,14 +254,14 @@ const EyeMaskingForm = () => {
     // Check if video is ready
     if (video.readyState !== video.HAVE_ENOUGH_DATA) {
       console.error("❌ Video not ready. ReadyState:", video.readyState);
-      alert("Video not ready. Please wait a moment and try again.");
+      alert(t("videoNotReady"));
       return;
     }
 
     // Check if video has valid dimensions
     if (!video.videoWidth || !video.videoHeight || video.videoWidth === 0 || video.videoHeight === 0) {
       console.error("❌ Video dimensions invalid:", video.videoWidth, video.videoHeight);
-      alert("Video dimensions not available. Please wait a moment and try again.");
+      alert(t("videoDimensionsNotAvailable"));
       return;
     }
 
@@ -250,7 +272,7 @@ const EyeMaskingForm = () => {
 
     if (!ctx) {
       console.error("❌ Could not get canvas context");
-      alert("Error capturing photo. Please try again.");
+      alert(t("errorCapturingPhoto"));
       return;
     }
 
@@ -264,7 +286,7 @@ const EyeMaskingForm = () => {
       (blob) => {
         if (!blob) {
           console.error("❌ Failed to create blob from canvas");
-          alert("Error creating image. Please try again.");
+          alert(t("errorCreatingImage"));
           return;
         }
 
@@ -301,7 +323,7 @@ const EyeMaskingForm = () => {
         };
         reader.onerror = (error) => {
           console.error("❌ Error reading file:", error);
-          alert("Error processing captured image. Please try again.");
+          alert(t("errorProcessingImage"));
           closeCamera();
         };
         reader.readAsDataURL(file);
@@ -391,7 +413,7 @@ const EyeMaskingForm = () => {
   // Automatic eye detection and masking
   const detectAndMaskEyes = async () => {
     if (!model || !model.loaded || !canvasRef.current || !imagePreview) {
-      alert("Please wait for the model to load and select an image.");
+      alert(t("pleaseWaitForModel"));
       return;
     }
 
@@ -547,8 +569,8 @@ const EyeMaskingForm = () => {
       if (newMasks.length === 0) {
         console.warn("⚠️ No valid masks created after validation.");
         const errorMsg = debugInfo.detectionError
-          ? `Detection Failed:\n\n${debugInfo.detectionError}\n\nPlease use an image with a clear human face, or use Manual Masking mode instead.`
-          : "No eyes detected. You can use manual masking instead.";
+          ? t("detectionFailedUseManual", { details: debugInfo.detectionError })
+          : t("noEyesDetectedUseManual");
         alert(errorMsg);
         setDebugInfo((prev: any) => ({ ...prev, validationFailed: true }));
         setMasks([]); // Ensure no masks are set
@@ -567,7 +589,7 @@ const EyeMaskingForm = () => {
     } catch (error: any) {
       console.error("❌ Error detecting eyes:", error);
       setDebugInfo((prev: any) => ({ ...prev, detectionError: error.message }));
-      alert("Error detecting eyes. Please try manual masking.");
+      alert(t("errorDetectingEyes"));
     } finally {
       setIsProcessing(false);
     }
@@ -990,12 +1012,12 @@ const EyeMaskingForm = () => {
     }
 
     if (!isAuthenticated) {
-      alert("Please login to upload images");
+      alert(t("pleaseLoginToUploadImages"));
       return;
     }
 
     setIsProcessing(true);
-    setUploadStatus("Processing...");
+    setUploadStatus(t("processingStatus"));
 
     try {
       let filesToUpload: File[] = [];
@@ -1003,7 +1025,7 @@ const EyeMaskingForm = () => {
 
       // Check if we have cropped masks - if yes, upload all cropped masks
       if (croppedMasks && croppedMasks.length > 0) {
-        setUploadStatus(`Preparing ${croppedMasks.length} cropped image(s)...`);
+        setUploadStatus(t("preparingCroppedImages", { count: croppedMasks.length }));
 
         // Convert all cropped masks to Files
         for (let i = 0; i < croppedMasks.length; i++) {
@@ -1026,11 +1048,11 @@ const EyeMaskingForm = () => {
         }
 
         if (filesToUpload.length === 0) {
-          throw new Error("No valid cropped masks to upload");
+          throw new Error(t("noValidCroppedMasks"));
         }
       } else {
         // Fallback: Upload the main masked image from canvas
-        setUploadStatus("Creating masked image from canvas...");
+        setUploadStatus(t("creatingMaskedImageStatus"));
 
         const maskedBlob = await getMaskedImageBlob();
         if (!maskedBlob) {
@@ -1052,12 +1074,12 @@ const EyeMaskingForm = () => {
       }
 
       // Upload all files to S3 using bulk upload API
-      setUploadStatus(`Uploading ${filesToUpload.length} image(s) to S3...`);
+      setUploadStatus(t("uploadingToS3Status", { count: filesToUpload.length }));
 
       const uploadResults = await s3Api.uploadFiles(filesToUpload, "uploads/contractor");
 
       if (!uploadResults || uploadResults.length === 0) {
-        throw new Error("Failed to upload images to S3");
+        throw new Error(t("failedToUploadToS3"));
       }
 
       if (uploadResults.length !== filesToUpload.length) {
@@ -1071,11 +1093,32 @@ const EyeMaskingForm = () => {
       }
 
       // Save all image URLs to database
-      setUploadStatus("Saving to database...");
+      setUploadStatus(t("savingToDatabaseStatus"));
 
-      const savedImages = await eyeMaskedImagesApi.createBulk(imageDataArray);
+      let savedImages: { id: string }[];
 
-      setUploadStatus(`Success! ${savedImages.length} image(s) uploaded and saved.`);
+      if (onPostImagesReady) {
+        // Create Image records for post attachment
+        const imageIds: string[] = [];
+        for (let i = 0; i < uploadResults.length && i < imageDataArray.length; i++) {
+          const img = imageDataArray[i];
+          const created = await imagesApi.create({
+            url: img.url,
+            key: img.key,
+            size: img.size,
+            mimeType: img.mimeType,
+            width: img.width,
+            height: img.height,
+          });
+          imageIds.push(created.id);
+        }
+        savedImages = imageIds.map((id) => ({ id }));
+        onPostImagesReady(imageIds);
+      } else {
+        savedImages = await eyeMaskedImagesApi.createBulk(imageDataArray);
+      }
+
+      setUploadStatus(t("successUploadedCount", { count: savedImages.length }));
       setDebugInfo((prev: any) => ({
         ...prev,
         uploadedCount: savedImages.length,
@@ -1132,13 +1175,13 @@ const EyeMaskingForm = () => {
   };
 
   return (
-    <div className="eye-masking-form-container">
-      <h1>{t("title")}</h1>
+    <div className={`eye-masking-form-container ${compact ? "eye-masking-form-compact" : ""}`}>
+      {!compact && <h1>{t("title")}</h1>}
 
       <form onSubmit={handleSubmit} className="masking-form">
         <div className="form-group">
           <label htmlFor="image-upload">{t("selectImage")}</label>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+          <div className="upload-actions">
             <input
               id="image-upload"
               type="file"
@@ -1152,7 +1195,6 @@ const EyeMaskingForm = () => {
               onClick={openCamera}
               disabled={isProcessing || isCameraOpen}
               className="btn btn-secondary cursor-pointer"
-              style={{ padding: "8px 16px" }}
             >
               {t("takePhoto")}
             </button>
@@ -1161,33 +1203,14 @@ const EyeMaskingForm = () => {
 
         {/* Camera Preview */}
         {isCameraOpen && (
-          <div
-            style={{
-              marginBottom: "20px",
-              padding: "20px",
-              border: "2px solid #ddd",
-              borderRadius: "8px",
-              backgroundColor: "#f9f9f9",
-            }}
-          >
-            <div style={{ position: "relative", display: "inline-block", width: "100%", maxWidth: "100%" }}>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                style={{
-                  width: "100%",
-                  maxWidth: "100%",
-                  borderRadius: "8px",
-                  transform: "scaleX(-1)", // Mirror the video
-                }}
-              />
+          <div className="camera-preview">
+            <div className="camera-preview-inner">
+              <video ref={videoRef} autoPlay playsInline muted />
               <canvas ref={cameraCanvasRef} style={{ display: "none" }} />
             </div>
-            <div style={{ marginTop: "15px", display: "flex", gap: "10px", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
-              {!isVideoReady && <p style={{ color: "#666", marginBottom: "10px" }}>Loading camera...</p>}
-              <div style={{ display: "flex", gap: "10px" }}>
+            <div className="camera-actions">
+              {!isVideoReady && <p className="camera-loading">Loading camera...</p>}
+              <div className="camera-actions-buttons">
                 <button type="button" onClick={capturePhoto} className="btn btn-primary cursor-pointer" disabled={isProcessing || !isVideoReady}>
                   {t("capturePhoto")}
                 </button>
@@ -1213,13 +1236,7 @@ const EyeMaskingForm = () => {
             </div>
 
             <div className="canvas-container">
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  display: "inline-block",
-                }}
-              >
+              <div className="canvas-container-inner">
                 <canvas
                   ref={canvasRef}
                   className="masking-canvas"
@@ -1228,14 +1245,13 @@ const EyeMaskingForm = () => {
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
                   style={{
-                    maxWidth: "100%",
-                    height: "auto",
                     cursor: mode === "manual" ? "crosshair" : "default",
                   }}
                 />
 
                 {isProcessing && (
                   <div
+                    className="canvas-overlay"
                     style={{
                       position: "absolute",
                       inset: 0,

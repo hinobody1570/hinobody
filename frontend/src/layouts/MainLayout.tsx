@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import RedditSidebar from "@/components/sidebar/Sidebar";
 import { RedditHeader } from "@/components/topHeader/TopHeader";
 
@@ -14,8 +15,27 @@ interface MainLayoutProps {
  * - Top Header (fixed at top)
  * - Sidebar (left side)
  * - Main Content Area (changes based on route)
+ *
+ * On mobile: when sidebar is open, main content is hidden (only top bar + sidebar visible).
  */
 export default function MainLayout({ children }: MainLayoutProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const setMobile = () => setIsMobile(mq.matches);
+    setMobile();
+    mq.addEventListener("change", setMobile);
+    return () => mq.removeEventListener("change", setMobile);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    if (mq.matches) setIsOpen(true);
+  }, []);
+
+  const hideMain = isMobile && isOpen;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -26,13 +46,15 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <div className="flex">
         {/* Sidebar - fixed height, sticky position */}
         <div className="h-screen sticky top-16">
-          {" "}
-          {/* top-16 = header height */}
-          <RedditSidebar />
+          <RedditSidebar isOpen={isOpen} onToggle={() => setIsOpen((prev) => !prev)} />
         </div>
 
-        {/* Main Content */}
-        <main className="flex-1 px-6 py-4 overflow-y-auto max-h-screen">{children}</main>
+        {/* Main Content - hidden on mobile when sidebar is open */}
+        <main
+          className={`flex-1 px-6 py-4 overflow-y-auto max-h-screen ${hideMain ? "hidden" : ""}`}
+        >
+          {children}
+        </main>
       </div>
     </div>
   );

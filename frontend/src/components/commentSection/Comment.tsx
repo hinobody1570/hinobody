@@ -308,6 +308,18 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                   <span>{t('reply')}</span>
                 </button>
 
+                {/* Award Button */}
+                {/* <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
+                  <BiAward size={16} />
+                  <span>{t('award')}</span>
+                </button> */}
+
+                {/* Share Button */}
+                {/* <button className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded transition-colors cursor-pointer">
+                  <CiShare2 size={16} />
+                  <span>{t('share')}</span>
+                </button> */}
+
                 {/* Awards Display */}
                 {comment.awards > 0 && (
                   <div className="flex items-center gap-1 flex-shrink-0">

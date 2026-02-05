@@ -14,6 +14,7 @@ import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 export default function AdminReportsPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const tToast = useTranslations("toast");
   const { showSuccess, showError } = useToast();
   const [reports, setReports] = useState<Report[]>([]);
@@ -186,7 +187,7 @@ export default function AdminReportsPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
     {
       key: "actions",

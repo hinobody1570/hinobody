@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 
 export default function AdminBlocksPage() {
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export default function AdminBlocksPage() {
     {
       key: "createdAt",
       header: t("createdAt"),
-      render: (value: string) => formatTimestamp(value),
+      render: (value: string) => formatTimestamp(value, tTime),
     },
   ];
 

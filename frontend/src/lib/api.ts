@@ -371,11 +371,14 @@ export const boardCategoriesApi = {
 // Posts API endpoints
 export type Language = 'EN' | 'KO' | 'ZH' | 'JA';
 
+export type PostCategory = 'News' | 'Reviews' | 'Recommend' | 'Free Board';
+
 export interface CreatePostDto {
   title: string;
   body: string;
   originalLanguage: Language;
-  boardId: string;
+  boardId?: string;
+  category?: PostCategory;
   imageIds?: string[];
   tags?: string[];
   isActive?: boolean; // false for draft, true (default) for published
@@ -387,7 +390,8 @@ export interface Post {
   body: string;
   originalLanguage: Language;
   authorId: string;
-  boardId: string;
+  boardId?: string | null;
+  postCategory?: string | null;
   isActive: boolean;
   isDeleted: boolean;
   upvoteCount: number;
@@ -426,12 +430,15 @@ export interface PostsResponse {
   };
 }
 
+export type PostSortBy = 'newest' | 'mostLiked' | 'trending';
+
 export interface QueryPostsParams {
   page?: number;
   limit?: number;
   boardId?: string;
   authorId?: string;
   search?: string;
+  sortBy?: PostSortBy;
 }
 
 export const postsApi = {
@@ -441,7 +448,7 @@ export const postsApi = {
     return response.data;
   },
   getAll: async (params: QueryPostsParams = {}): Promise<PostsResponse> => {
-    const { page = 1, limit = 20, boardId, authorId, search } = params;
+    const { page = 1, limit = 20, boardId, authorId, search, sortBy } = params;
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -454,6 +461,9 @@ export const postsApi = {
     }
     if (search) {
       queryParams.append('search', search);
+    }
+    if (sortBy) {
+      queryParams.append('sortBy', sortBy);
     }
     const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
     // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
@@ -612,6 +622,22 @@ export interface EyeMaskedImage {
     email: string;
   };
 }
+
+export interface CreateImageDto {
+  url: string;
+  key: string;
+  size?: number;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+}
+
+export const imagesApi = {
+  create: async (dto: CreateImageDto): Promise<{ id: string }> => {
+    const response = await api.post<ApiResponse<{ id: string }>>(API_END_POINT.IMAGES, dto);
+    return { id: (response.data as { id: string }).id };
+  },
+};
 
 export interface CreateEyeMaskedImageDto {
   url: string;

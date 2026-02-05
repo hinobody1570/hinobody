@@ -12,7 +12,7 @@ import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Loading from "@/components/reuseComponents/Loading";
 
-const transformPost = (post: Post): any => {
+const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
     id: post.id,
     boardId: post.boardId,
@@ -20,7 +20,7 @@ const transformPost = (post: Post): any => {
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
-    timestamp: formatTimestamp(post.createdAt),
+    timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
     image: post.images && post.images.length > 0 ? post.images[0].url : null,
     upvotes: post.upvoteCount || 0,
@@ -34,6 +34,7 @@ export default function AdminPostDetailPage() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations("admin");
+  const tTime = useTranslations("timeAgo");
   const postId = params?.postId as string;
 
   const [post, setPost] = useState<Post | null>(null);
@@ -79,7 +80,7 @@ export default function AdminPostDetailPage() {
     );
   }
 
-  const transformedPost = transformPost(post);
+  const transformedPost = transformPost(post, tTime);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -101,7 +102,7 @@ export default function AdminPostDetailPage() {
                 <span className={post.isActive ? "text-green-600" : "text-red-600"}>{post.isActive ? t("active") : t("inactive")}</span>
               </span>
               <span>
-                <strong>{t("createdAt")}:</strong> {formatTimestamp(post.createdAt)}
+                <strong>{t("createdAt")}:</strong> {formatTimestamp(post.createdAt, tTime)}
               </span>
             </div>
           </div>

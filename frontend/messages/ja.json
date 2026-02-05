@@ -4,6 +4,18 @@
     "welcome": "HiNobodyへようこそ",
     "description": "Next.js + NestJS with TypeScript"
   },
+  "timeAgo": {
+    "secAgo": "{count}秒前",
+    "secsAgo": "{count}秒前",
+    "minAgo": "{count}分前",
+    "minsAgo": "{count}分前",
+    "hrAgo": "{count}時間前",
+    "hrsAgo": "{count}時間前",
+    "dayAgo": "{count}日前",
+    "daysAgo": "{count}日前",
+    "weekAgo": "{count}週間前",
+    "weeksAgo": "{count}週間前"
+  },
   "toast": {
     "success": "成功",
     "error": "エラー",
@@ -38,7 +50,7 @@
     "manual": "手動",
     "uploadMaskedImage": "マスク画像をアップロード",
     "loadingTool": "目のマスキングツールを読み込み中...",
-    "selectImage": "画像を選択:",
+    "selectImage": "画像を選択",
     "takePhoto": "カメラから写真を撮る",
     "cameraAccess": "カメラアクセス",
     "cameraPermissionDenied": "カメラの許可が拒否されました。この機能を使用するには、カメラへのアクセスを許可してください。",
@@ -91,7 +103,26 @@
     "pleaseDetectEyes": "まず\"目を検出してマスク\"ボタンをクリックして目を検出してください。",
     "pleaseCreateMask": "画像上でドラッグして、少なくとも1つのマスクを作成してください。",
     "failedToCreateMaskedImage": "マスク画像の作成に失敗しました",
-    "awsBucketNotConfigured": "AWS S3バケット名が設定されていません。VITE_AWS_S3_BUCKET環境変数を設定してください。"
+    "awsBucketNotConfigured": "AWS S3バケット名が設定されていません。VITE_AWS_S3_BUCKET環境変数を設定してください。",
+    "cameraVideoNotLoading": "カメラ映像が読み込まれていません。カメラを閉じて再度開いてください。",
+    "cameraNotReady": "カメラの準備ができていません。しばらく待ってから再度お試しください。",
+    "videoNotReady": "ビデオの準備ができていません。しばらく待ってから再度お試しください。",
+    "videoDimensionsNotAvailable": "ビデオのサイズが取得できません。しばらく待ってから再度お試しください。",
+    "errorCapturingPhoto": "写真の撮影に失敗しました。再度お試しください。",
+    "errorCreatingImage": "画像の作成に失敗しました。再度お試しください。",
+    "errorProcessingImage": "撮影した画像の処理に失敗しました。再度お試しください。",
+    "errorDetectingEyes": "目の検出に失敗しました。手動マスキングをお試しください。",
+    "pleaseLoginToUploadImages": "画像をアップロードするにはログインしてください",
+    "noEyesDetectedUseManual": "目が検出されませんでした。手動マスキングをご利用ください。",
+    "detectionFailedUseManual": "検出失敗:\n\n{details}\n\nはっきりした人の顔が写った画像をご使用いただくか、手動マスキングモードをご利用ください。",
+    "processingStatus": "処理中...",
+    "preparingCroppedImages": "{count}件の切り取り画像を準備中...",
+    "creatingMaskedImageStatus": "キャンバスからマスク画像を作成中...",
+    "uploadingToS3Status": "{count}件の画像をS3にアップロード中...",
+    "savingToDatabaseStatus": "データベースに保存中...",
+    "noValidCroppedMasks": "アップロードする有効な切り取りマスクがありません",
+    "failedToUploadToS3": "S3への画像アップロードに失敗しました",
+    "successUploadedCount": "成功！{count}件の画像をアップロードして保存しました。"
   },
   "language": {
     "switch": "言語を切り替え",
@@ -102,6 +133,7 @@
   },
   "header": {
     "findAnything": "何でも検索",
+    "write": "投稿する",
     "create": "作成",
     "ask": "質問",
     "eyeMask": "目マスク"
@@ -190,6 +222,7 @@
     "adminPanelTitle": "HiNobody 管理",
     "admin": "管理者",
     "administrator": "管理者",
+    "menu": "メニュー",
     "id": "ID",
     "avatar": "アバター",
     "nickname": "ニックネーム",
@@ -221,6 +254,7 @@
     "previous": "前へ",
     "next": "次へ",
     "actions": "操作",
+    "provider": "プロバイダー",
     "block": "ブロック",
     "unblock": "ブロック解除",
     "delete": "削除",
@@ -250,6 +284,7 @@
     "eyeMaskedImages": "目マスキング画像",
     "userPosts": "ユーザーの投稿",
     "userBoards": "ユーザーのボード",
+    "noPosts": "まだ投稿がありません",
     "noBoards": "ボードが見つかりません",
     "noEyeMaskedImages": "目マスキング画像が見つかりません",
     "noDescription": "説明なし",
@@ -288,6 +323,7 @@
     "boardDetails": "ボード詳細",
     "backToPosts": "投稿一覧に戻る",
     "backToBoards": "ボード一覧に戻る",
+    "createCommunity": "コミュニティを作成",
     "postNotFound": "投稿が見つかりません",
     "boardNotFound": "ボードが見つかりません",
     "errorLoadingPost": "投稿の読み込みエラー",
@@ -357,6 +393,9 @@
   "feed": {
     "best": "ベスト",
     "allBoards": "すべてのボード",
+    "mostLiked": "最もいいね",
+    "newest": "新着",
+    "trending": "トレンド",
     "recentPosts": "最近の投稿",
     "clear": "クリア",
     "redditRules": "Redditルール",
@@ -378,6 +417,10 @@
   },
   "sidebar": {
     "home": "ホーム",
+    "news": "ニュース",
+    "reviews": "レビュー",
+    "recommend": "おすすめ",
+    "freeBoard": "フリーボード",
     "popular": "人気",
     "explore": "探索",
     "all": "すべて",
@@ -437,7 +480,10 @@
       "emailRequired": "メールアドレスは必須です",
       "emailInvalid": "メールアドレスの形式が正しくありません",
       "passwordRequired": "パスワードは必須です",
-      "passwordMinLength8": "パスワードは少なくとも8文字である必要があります"
+      "passwordMinLength8": "パスワードは少なくとも8文字である必要があります",
+      "orContinueWith": "または次で続行",
+      "continueWithGoogle": "Googleで続行",
+      "continueWithApple": "Appleで続行"
     },
     "registerPage": {
       "createAccount": "アカウントを作成",
@@ -613,6 +659,13 @@
     "title": "投稿を作成",
     "drafts": "下書き",
     "selectCommunity": "コミュニティを選択",
+    "selectMenu": "コミュニティを選択",
+    "noBoardsAvailable": "利用可能なボードがありません",
+    "noBoardsFound": "ボードが見つかりません",
+    "addImages": "画像を追加",
+    "addImagesHint": "アップロードまたはカメラで目マスキング",
+    "imagesAttached": "枚の画像が添付されました",
+    "addImageWithMasking": "画像を追加（目マスキング）",
     "tabs": {
       "text": "テキスト",
       "images": "画像と動画",
@@ -637,9 +690,18 @@
       "readRules": "コミュニティのルールを読んでください"
     },
     "characters": "文字",
+    "posting": "投稿中...",
     "titleRequired": "タイトルは必須です",
     "bodyRequired": "本文内容は必須です",
-    "communityRequired": "コミュニティを選択してください",
+    "communityRequired": "コミュニティまたはカテゴリを選択してください",
+    "categoriesLabel": "カテゴリ",
+    "communitiesLabel": "コミュニティ",
+    "categories": {
+      "news": "ニュース",
+      "reviews": "レビュー",
+      "recommend": "おすすめ",
+      "freeBoard": "フリーボード"
+    },
     "draftEmpty": "下書きには少なくともタイトルまたは本文が必要です",
     "untitledDraft": "タイトルなしの下書き",
     "saving": "保存中..."

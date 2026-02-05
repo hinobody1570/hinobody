@@ -8,25 +8,37 @@ import { Tab } from "@/components/reuseComponents/Tabs";
 import TagsInput from "@/components/reuseComponents/TagsInput";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/contexts/ToastContext";
-import { Board, boardsApi, Language, postsApi } from "@/lib/api";
+import { Board, boardsApi, Language, PostCategory, postsApi } from "@/lib/api";
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiChevronDown, BiSearch } from "react-icons/bi";
+import PostImageUploadCard from "@/components/createPost/PostImageUploadCard";
+
+const POST_CATEGORIES: { value: PostCategory; labelKey: string }[] = [
+  { value: "News", labelKey: "categories.news" },
+  { value: "Reviews", labelKey: "categories.reviews" },
+  { value: "Recommend", labelKey: "categories.recommend" },
+  { value: "Free Board", labelKey: "categories.freeBoard" },
+];
 
 // Main Create Post Component
+const VALID_CATEGORIES: PostCategory[] = ["News", "Reviews", "Recommend", "Free Board"];
+
 const CreatePost = () => {
   const t = useTranslations("createPost");
   const tToast = useTranslations("toast");
   const { locale } = useLanguage();
   const { showSuccess, showError } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const communityRef = useRef<HTMLDivElement | null>(null);
   const [activeTab, setActiveTab] = useState("text");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState<Board | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<PostCategory | null>(null);
   const [showCommunity, setShowCommunity] = useState(false);
   const [boards, setBoards] = useState<Board[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,13 +48,23 @@ const CreatePost = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [showJoinPopup, setShowJoinPopup] = useState(false);
   const [boardToJoin, setBoardToJoin] = useState<Board | null>(null);
+  const [postImageIds, setPostImageIds] = useState<string[]>([]);
+
+  // Pre-select category from URL when navigating from sidebar (e.g. ?category=News)
+  useEffect(() => {
+    const categoryParam = searchParams?.get("category");
+    if (categoryParam && VALID_CATEGORIES.includes(categoryParam as PostCategory)) {
+      setSelectedCategory(categoryParam as PostCategory);
+      setSelectedCommunity(null);
+    }
+  }, [searchParams]);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
     const localeMap: Record<string, Language> = {
       en: 'EN',
       ko: 'KO',
-      zh: 'ZH',
+      zh: 'ZH', 
       ja: 'JA',
     };
     return localeMap[locale] || 'EN';
@@ -67,23 +89,24 @@ const CreatePost = () => {
       return;
     }
 
-    if (!selectedCommunity) {
+    const hasSelection = selectedCommunity || selectedCategory;
+    if (!hasSelection) {
       showError(t("communityRequired"));
       return;
     }
 
-    // Check membership before posting
-    try {
-      const membership = await boardsApi.getMembershipStatus(selectedCommunity.id);
-      if (!membership || membership.status !== "APPROVED") {
-        // Show popup to join board
-        setBoardToJoin(selectedCommunity);
-        setShowJoinPopup(true);
-        return;
+    // Check membership before posting (only when posting to a community)
+    if (selectedCommunity) {
+      try {
+        const membership = await boardsApi.getMembershipStatus(selectedCommunity.id);
+        if (!membership || membership.status !== "APPROVED") {
+          setBoardToJoin(selectedCommunity);
+          setShowJoinPopup(true);
+          return;
+        }
+      } catch (error: any) {
+        console.warn("Could not check membership status:", error);
       }
-    } catch (error: any) {
-      // If membership check fails, still try to post and let backend handle it
-      console.warn("Could not check membership status:", error);
     }
 
     setIsPosting(true);
@@ -92,9 +115,9 @@ const CreatePost = () => {
         title: title.trim(),
         body: body.trim(),
         originalLanguage: getLanguage(),
-        boardId: selectedCommunity.id,
+        ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
         tags: tags.length > 0 ? tags : undefined,
-        // imageIds can be added later when image upload is implemented
+        imageIds: postImageIds.length > 0 ? postImageIds : undefined,
       };
       await postsApi.create(postData);
       
@@ -105,16 +128,17 @@ const CreatePost = () => {
       setTitle("");
       setBody("");
       setSelectedCommunity(null);
+      setSelectedCategory(null);
       setTags([]);
+      setPostImageIds([]);
       
-      // Optionally navigate to the post or feed
       router.push(ROUTE_PATHS.HOME);
     } catch (error: any) {
       console.error("Error creating post:", error);
       const errorMessage = error?.message || tToast("postError") || "Failed to create post. Please try again.";
       
       // Check if error is about membership and show popup
-      if (errorMessage.includes("join") || errorMessage.includes("member") || errorMessage.includes("pending")) {
+      if (selectedCommunity && (errorMessage.includes("join") || errorMessage.includes("member") || errorMessage.includes("pending"))) {
         setBoardToJoin(selectedCommunity);
         setShowJoinPopup(true);
       } else {
@@ -132,7 +156,8 @@ const CreatePost = () => {
       return;
     }
 
-    if (!selectedCommunity) {
+    const hasSelection = selectedCommunity || selectedCategory;
+    if (!hasSelection) {
       showError(t("communityRequired"));
       return;
     }
@@ -143,7 +168,7 @@ const CreatePost = () => {
         title: title.trim() || t("untitledDraft"),
         body: body.trim() || "",
         originalLanguage: getLanguage(),
-        boardId: selectedCommunity.id,
+        ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
         tags: tags.length > 0 ? tags : undefined,
         isActive: false, // Save as draft
         // imageIds can be added later when image upload is implemented
@@ -157,6 +182,7 @@ const CreatePost = () => {
       setTitle("");
       setBody("");
       setSelectedCommunity(null);
+      setSelectedCategory(null);
       setTags([]);
     } catch (error: any) {
       console.error("Error saving draft:", error);
@@ -198,9 +224,17 @@ const CreatePost = () => {
     }
   }, [showCommunity, searchQuery, fetchBoards]);
 
-  // Handle board selection
+  const handleSelectCategory = (category: PostCategory) => {
+    setSelectedCategory(category);
+    setSelectedCommunity(null);
+    setShowCommunity(false);
+    setShowDropdown(false);
+    setSearchQuery("");
+  };
+
   const handleSelectBoard = async (board: Board) => {
     setSelectedCommunity(board);
+    setSelectedCategory(null);
     setShowCommunity(false);
     setShowDropdown(false);
     setSearchQuery("");
@@ -247,41 +281,53 @@ const CreatePost = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
+      <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">{t("title")}</h1>
-          <button className="text-sm text-gray-600 hover:text-gray-800 font-semibold cursor-pointer">{t("drafts")}</button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t("title")}</h1>
+          {/* <button
+            type="button"
+            className="text-sm text-gray-600 hover:text-gray-800 font-semibold cursor-pointer w-fit touch-manipulation"
+          >
+            {t("drafts")}
+          </button> */}
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           {/* Community Selector */}
           <div ref={communityRef}>
             {!showCommunity && (
-              <div className="p-6 pb-4">
+              <div className="p-3 sm:p-4 md:p-6 pb-2 sm:pb-4">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowCommunity(true);
                     setShowDropdown(true);
                     fetchBoards("");
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+                  className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start px-4 py-2.5 sm:py-2 min-h-[44px] sm:min-h-0 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer touch-manipulation"
                 >
-                  <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">r</span>
                   </div>
-                  <span className="text-sm font-semibold text-gray-700">
-                    {selectedCommunity ? `r/${selectedCommunity.name}` : t("selectCommunity")}
+                  <span className="text-sm font-semibold text-gray-700 truncate min-w-0">
+                    {selectedCommunity
+                      ? `r/${selectedCommunity.name}`
+                      : selectedCategory
+                        ? selectedCategory
+                        : t("selectMenu")}
                   </span>
-                  <BiChevronDown size={16} className="text-gray-600" />
+                  <BiChevronDown size={16} className="text-gray-600 flex-shrink-0" />
                 </button>
               </div>
             )}
             {showCommunity && (
-              <div className="relative flex-1 max-w-md m-4">
-                <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10" />
+              <div className="relative w-full max-w-full sm:max-w-md m-3 sm:m-4">
+                <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10 flex-shrink-0" />
                 <input
                   type="text"
                   placeholder={t("selectCommunity")}
@@ -291,45 +337,70 @@ const CreatePost = () => {
                     setShowDropdown(true);
                   }}
                   onFocus={() => setShowDropdown(true)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-2 bg-gray-50 border border-gray-300 rounded-full text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
                 />
-                
-                {/* Dropdown with boards */}
+                {/* Dropdown: Categories + Communities */}
                 {showDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50">
-                    {isLoadingBoards ? (
-                      <Loading />
-                    ) : boards.length > 0 ? (
-                      boards.map((board) => (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[min(320px,60vh)] overflow-y-auto z-50">
+                    {/* Categories section - always visible */}
+                    <div className="border-b border-gray-100 px-2 py-1">
+                      <p className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        {t("categoriesLabel")}
+                      </p>
+                      {POST_CATEGORIES.map(({ value, labelKey }) => (
                         <button
-                          key={board.id}
-                          onClick={() => handleSelectBoard(board)}
-                          className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer"
+                          key={value}
+                          type="button"
+                          onClick={() => handleSelectCategory(value)}
+                          className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer rounded-lg touch-manipulation"
                         >
-                          <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-white text-xs font-bold">r</span>
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-blue-600 text-xs font-bold">#</span>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900">r/{board.name}</p>
-                            {board.description && (
-                              <p className="text-xs text-gray-500 truncate">{board.description}</p>
-                            )}
-                          </div>
+                          <p className="text-sm font-semibold text-gray-900">{t(labelKey)}</p>
                         </button>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-gray-500 text-sm">
-                        {searchQuery ? "No boards found" : "No boards available"}
-                      </div>
-                    )}
+                      ))}
+                    </div>
+                    {/* Communities section */}
+                    <div className="px-2 py-1">
+                      <p className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        {t("communitiesLabel")}
+                      </p>
+                      {isLoadingBoards ? (
+                        <Loading />
+                      ) : boards.length > 0 ? (
+                        boards.map((board) => (
+                          <button
+                            key={board.id}
+                            type="button"
+                            onClick={() => handleSelectBoard(board)}
+                            className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer rounded-lg min-h-[44px] sm:min-h-0 touch-manipulation"
+                          >
+                            <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-white text-xs font-bold">r</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 truncate">r/{board.name}</p>
+                              {board.description && (
+                                <p className="text-xs text-gray-500 truncate">{board.description}</p>
+                              )}
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="p-4 text-center text-gray-500 text-sm">
+                          {searchQuery ? t("noBoardsFound") : t("noBoardsAvailable")}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
             )}
           </div>
           {/* Tabs */}
-          <div className="px-6 border-b border-gray-200">
-            <div className="flex gap-12">
+          <div className="px-3 sm:px-4 md:px-6 border-b border-gray-200 overflow-x-auto">
+            <div className="flex flex-nowrap gap-4 sm:gap-8 md:gap-12 min-w-min">
               {tabs.map((tab) => (
                 <Tab key={tab.id} label={tab.label} active={activeTab === tab.id} onClick={() => !tab.disabled && setActiveTab(tab.id)} />
               ))}
@@ -337,16 +408,16 @@ const CreatePost = () => {
           </div>
 
           {/* Form Content */}
-          <div className="p-6">
+          <div className="p-3 sm:p-4 md:p-6">
             {/* Title Input */}
-            <div className="mb-4">
+            <div className="mb-3 sm:mb-4">
               <input
                 type="text"
                 placeholder={t("titlePlaceholder")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={300}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400"
+                className="w-full min-w-0 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400 text-base sm:text-inherit"
               />
               <div className="text-right mt-1">
                 <span className="text-xs text-gray-500">
@@ -358,34 +429,36 @@ const CreatePost = () => {
             {/* Tags Input */}
             <TagsInput tags={tags} onChange={setTags} />
 
-            {/* Rich Text Editor */}
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
+            {/* Rich Text Editor - toolbar scrolls horizontally on small screens */}
+            <div className="border border-gray-300 rounded-lg overflow-x-auto overflow-y-hidden">
               <RichTextEditor value={body} onChange={(text: any) => setBody(text) }/>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 mt-6">
-              <button
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+              {/* <button
+                type="button"
                 onClick={handleSaveDraft}
                 disabled={isPosting || !selectedCommunity}
-                className={`px-6 py-2 text-sm font-semibold rounded-full transition-colors ${
+                className={`w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
                   !isPosting && selectedCommunity
                     ? "text-gray-700 hover:bg-gray-100"
                     : "text-gray-400 cursor-not-allowed"
                 }`}
               >
                 {isPosting ? t("saving") : t("saveDraft")}
-              </button>
+              </button> */}
               <button
+                type="button"
                 onClick={handlePost}
-                disabled={!title.trim() || isPosting || !selectedCommunity}
-                className={`px-8 py-2 text-sm font-semibold rounded-full transition-colors ${
-                  title.trim() && !isPosting && selectedCommunity
+                disabled={!title.trim() || isPosting || !(selectedCommunity || selectedCategory)}
+                className={`w-full sm:w-auto min-h-[44px] cursor-pointer sm:min-h-0 px-8 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
+                  title.trim() && !isPosting && (selectedCommunity || selectedCategory)
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
-                {isPosting ? "Posting..." : t("post")}
+                {isPosting ? t("posting") : t("post")}
               </button>
             </div>
           </div>
@@ -393,6 +466,17 @@ const CreatePost = () => {
 
         {/* Guidelines Card */}
         <PostingGuide />
+        </div>
+
+        {/* Right sidebar - Image upload card */}
+        <div className="lg:w-80 flex-shrink-0 mt-[55px]">
+          <div className="lg:sticky lg:top-4">
+            <PostImageUploadCard
+              imageIds={postImageIds}
+              onImagesReady={setPostImageIds}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Join Board Popup */}

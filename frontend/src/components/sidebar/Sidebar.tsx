@@ -18,23 +18,36 @@ import { VscBook } from "react-icons/vsc";
 import { CollapsibleSection } from "../reuseComponents/CollapseItems";
 import { MenuItem } from "../reuseComponents/MenuItem";
 import StartCommunityPopup from "../modals/StartCommunityPopup";
+import { IoNewspaperOutline } from "react-icons/io5";
+import { VscPreview } from "react-icons/vsc";
+import { MdOutlineRecommend } from "react-icons/md";
+
 
 /* ---------------- DATA CONFIG ---------------- */
 
 /* ---------------- COMPONENT ---------------- */
 
-const RedditSidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
+interface RedditSidebarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
   const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
   const t = useTranslations("sidebar");
   const router = useRouter();
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
+    { icon: IoNewspaperOutline, label: t("news"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=News` },
+    { icon: VscPreview, label: t("reviews"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Reviews` },
+    { icon: MdOutlineRecommend, label: t("recommend"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Recommend` },
+    { icon: FaPlus, label: t("freeBoard"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Free Board` },
+
     // { icon: CgArrowTopRightO, label: t("popular"), navigate: "" },
     // { icon: PiCirclesThree, label: t("explore"), navigate: "" },
     // { icon: BiBarChartSquare, label: t("all"), navigate: "" },
-    { icon: FaPlus, label: t("startCommunity"), navigate: "" },
+    // { icon: FaPlus, label: t("startCommunity"), navigate: "" },
   ];
 
   // const GAMES_MENU = [
@@ -121,7 +134,7 @@ const RedditSidebar = () => {
 
       {/* Toggle Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={onToggle}
         className={`fixed cursor-pointer top-24 ${
           isOpen ? "left-63" : "left-3"
         } z-50 p-2 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors`}
@@ -130,10 +143,7 @@ const RedditSidebar = () => {
       </button>
 
       {/* Start Community Popup */}
-      <StartCommunityPopup
-        isOpen={isCommunityPopupOpen}
-        onClose={() => setIsCommunityPopupOpen(false)}
-      />
+      <StartCommunityPopup isOpen={isCommunityPopupOpen} onClose={() => setIsCommunityPopupOpen(false)} />
     </div>
   );
 };

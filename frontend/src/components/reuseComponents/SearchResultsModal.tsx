@@ -30,6 +30,7 @@ interface SearchResultsModalProps {
 
 export const SearchResultsModal = ({ results, searchQuery, onClose }: SearchResultsModalProps) => {
   const t = useTranslations('search');
+  const tTime = useTranslations('timeAgo');
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'all' | 'users' | 'posts' | 'boards'>('all');
 
@@ -150,7 +151,7 @@ export const SearchResultsModal = ({ results, searchQuery, onClose }: SearchResu
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs text-gray-500">r/{post.board?.name || 'community'}</span>
                       <span className="text-xs text-gray-400">•</span>
-                      <span className="text-xs text-gray-500">{formatTimestamp(post.createdAt)}</span>
+                      <span className="text-xs text-gray-500">{formatTimestamp(post.createdAt, tTime)}</span>
                     </div>
                     <p className="font-semibold text-gray-900 text-sm">{post.title}</p>
                     {post.body && (
