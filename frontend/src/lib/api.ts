@@ -623,6 +623,22 @@ export interface EyeMaskedImage {
   };
 }
 
+export interface CreateImageDto {
+  url: string;
+  key: string;
+  size?: number;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+}
+
+export const imagesApi = {
+  create: async (dto: CreateImageDto): Promise<{ id: string }> => {
+    const response = await api.post<ApiResponse<{ id: string }>>(API_END_POINT.IMAGES, dto);
+    return { id: (response.data as { id: string }).id };
+  },
+};
+
 export interface CreateEyeMaskedImageDto {
   url: string;
   key: string;

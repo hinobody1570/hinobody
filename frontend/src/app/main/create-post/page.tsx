@@ -14,6 +14,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiChevronDown, BiSearch } from "react-icons/bi";
+import PostImageUploadCard from "@/components/createPost/PostImageUploadCard";
 
 const POST_CATEGORIES: { value: PostCategory; labelKey: string }[] = [
   { value: "News", labelKey: "categories.news" },
@@ -44,6 +45,7 @@ const CreatePost = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [showJoinPopup, setShowJoinPopup] = useState(false);
   const [boardToJoin, setBoardToJoin] = useState<Board | null>(null);
+  const [postImageIds, setPostImageIds] = useState<string[]>([]);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -103,6 +105,7 @@ const CreatePost = () => {
         originalLanguage: getLanguage(),
         ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
         tags: tags.length > 0 ? tags : undefined,
+        imageIds: postImageIds.length > 0 ? postImageIds : undefined,
       };
       await postsApi.create(postData);
       
@@ -115,6 +118,7 @@ const CreatePost = () => {
       setSelectedCommunity(null);
       setSelectedCategory(null);
       setTags([]);
+      setPostImageIds([]);
       
       router.push(ROUTE_PATHS.HOME);
     } catch (error: any) {
@@ -266,7 +270,9 @@ const CreatePost = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
-      <div className="max-w-4xl mx-auto w-full">
+      <div className="max-w-5xl mx-auto w-full flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
         {/* Header */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t("title")}</h1>
@@ -448,6 +454,17 @@ const CreatePost = () => {
 
         {/* Guidelines Card */}
         <PostingGuide />
+        </div>
+
+        {/* Right sidebar - Image upload card */}
+        <div className="lg:w-80 flex-shrink-0 mt-[55px]">
+          <div className="lg:sticky lg:top-4">
+            <PostImageUploadCard
+              imageIds={postImageIds}
+              onImagesReady={setPostImageIds}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Join Board Popup */}

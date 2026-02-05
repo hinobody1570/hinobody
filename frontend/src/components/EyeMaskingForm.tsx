@@ -5,13 +5,22 @@ import { useTranslations } from "next-intl";
 import imageCompression from "browser-image-compression";
 import "./EyeMaskingForm.css";
 import ButtonLoader from "./reuseComponents/ButtonLoader";
-import { s3Api, eyeMaskedImagesApi } from "@/lib/api";
+import { s3Api, eyeMaskedImagesApi, imagesApi } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Dynamic import for face-api.js to avoid SSR issues
 let faceapi: any = null;
 
-const EyeMaskingForm = () => {
+interface EyeMaskingFormProps {
+  /** When provided, creates Image records for post and calls with IDs instead of saving to eye masked images */
+  onPostImagesReady?: (imageIds: string[]) => void;
+  /** Compact mode for use in modal (hides title, smaller layout) */
+  compact?: boolean;
+  /** When set, triggers upload or camera on mount (for use when opened from post create) */
+  initialAction?: "upload" | "camera" | null;
+}
+
+const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = null }: EyeMaskingFormProps) => {
   const t = useTranslations("eyeMasking");
   const { isAuthenticated } = useAuth();
   const [imageFile, setImageFile] = useState<any>(null);
@@ -35,6 +44,19 @@ const EyeMaskingForm = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [streamRef, setStreamRef] = useState<MediaStream | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+
+  // Trigger initial action when opened from post create card
+  useEffect(() => {
+    if (!initialAction) return;
+    const timer = setTimeout(() => {
+      if (initialAction === "upload" && fileInputRef.current) {
+        fileInputRef.current.click();
+      } else if (initialAction === "camera") {
+        openCamera();
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [initialAction]);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -1073,7 +1095,28 @@ const EyeMaskingForm = () => {
       // Save all image URLs to database
       setUploadStatus(t("savingToDatabaseStatus"));
 
-      const savedImages = await eyeMaskedImagesApi.createBulk(imageDataArray);
+      let savedImages: { id: string }[];
+
+      if (onPostImagesReady) {
+        // Create Image records for post attachment
+        const imageIds: string[] = [];
+        for (let i = 0; i < uploadResults.length && i < imageDataArray.length; i++) {
+          const img = imageDataArray[i];
+          const created = await imagesApi.create({
+            url: img.url,
+            key: img.key,
+            size: img.size,
+            mimeType: img.mimeType,
+            width: img.width,
+            height: img.height,
+          });
+          imageIds.push(created.id);
+        }
+        savedImages = imageIds.map((id) => ({ id }));
+        onPostImagesReady(imageIds);
+      } else {
+        savedImages = await eyeMaskedImagesApi.createBulk(imageDataArray);
+      }
 
       setUploadStatus(t("successUploadedCount", { count: savedImages.length }));
       setDebugInfo((prev: any) => ({
@@ -1132,8 +1175,8 @@ const EyeMaskingForm = () => {
   };
 
   return (
-    <div className="eye-masking-form-container">
-      <h1>{t("title")}</h1>
+    <div className={`eye-masking-form-container ${compact ? "eye-masking-form-compact" : ""}`}>
+      {!compact && <h1>{t("title")}</h1>}
 
       <form onSubmit={handleSubmit} className="masking-form">
         <div className="form-group">

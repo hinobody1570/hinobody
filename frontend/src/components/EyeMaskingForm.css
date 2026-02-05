@@ -8,6 +8,12 @@
     sans-serif;
 }
 
+.eye-masking-form-compact {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .eye-masking-form-container h1 {
   text-align: center;
   color: #333;

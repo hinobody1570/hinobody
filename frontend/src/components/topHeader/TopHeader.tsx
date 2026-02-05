@@ -32,7 +32,7 @@ export const RedditHeader = () => {
     // { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
     { icon: VscDiffAdded, label: t("write"), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
     // { icon: BsBell, onClick: () => console.log("Notifications") },
-    { icon: LuCamera, label: t("eyeMask"), onClick: () => router.push(ROUTE_PATHS.EYE_MASKING) },
+    // { icon: LuCamera, label: t("eyeMask"), onClick: () => router.push(ROUTE_PATHS.EYE_MASKING) },
   ];
 
   useEffect(() => {
