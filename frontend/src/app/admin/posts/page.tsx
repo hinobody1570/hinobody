@@ -158,6 +158,11 @@ export default function AdminPostsPage() {
       render: (_: any, row: Post) => row.board?.name || "-",
     },
     {
+      key: "postCategory",
+      header: t("category"),
+      render: (_: any, row: Post) => row.postCategory || "-",
+    },
+    {
       key: "upvoteCount",
       header: t("upvotes"),
     },

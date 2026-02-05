@@ -689,7 +689,15 @@
     "posting": "发布中...",
     "titleRequired": "标题是必填项",
     "bodyRequired": "正文内容是必填项",
-    "communityRequired": "请选择一个社区",
+    "communityRequired": "请选择社区或类别",
+    "categoriesLabel": "类别",
+    "communitiesLabel": "社区",
+    "categories": {
+      "news": "新闻",
+      "reviews": "评论",
+      "recommend": "推荐",
+      "freeBoard": "自由板块"
+    },
     "draftEmpty": "草稿必须至少包含标题或正文",
     "untitledDraft": "未命名草稿",
     "saving": "保存中..."

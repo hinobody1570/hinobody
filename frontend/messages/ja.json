@@ -689,7 +689,15 @@
     "posting": "投稿中...",
     "titleRequired": "タイトルは必須です",
     "bodyRequired": "本文内容は必須です",
-    "communityRequired": "コミュニティを選択してください",
+    "communityRequired": "コミュニティまたはカテゴリを選択してください",
+    "categoriesLabel": "カテゴリ",
+    "communitiesLabel": "コミュニティ",
+    "categories": {
+      "news": "ニュース",
+      "reviews": "レビュー",
+      "recommend": "おすすめ",
+      "freeBoard": "フリーボード"
+    },
     "draftEmpty": "下書きには少なくともタイトルまたは本文が必要です",
     "untitledDraft": "タイトルなしの下書き",
     "saving": "保存中..."

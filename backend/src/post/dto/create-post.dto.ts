@@ -38,13 +38,21 @@ export class CreatePostDto {
   @IsEnum(Language)
   originalLanguage: Language;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'board_123456',
-    description: 'ID of the board this post belongs to',
+    description: 'ID of the board this post belongs to (optional if category is provided)',
   })
   @IsString()
-  @IsNotEmpty()
-  boardId: string;
+  @IsOptional()
+  boardId?: string;
+
+  @ApiPropertyOptional({
+    example: 'News',
+    description: 'Post category: News, Reviews, Recommend, or Free Board (optional if boardId is provided)',
+  })
+  @IsString()
+  @IsOptional()
+  category?: string;
 
   @ApiPropertyOptional({
     example: ['image_abc123', 'image_def456'],

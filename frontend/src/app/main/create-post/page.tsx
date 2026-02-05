@@ -8,12 +8,19 @@ import { Tab } from "@/components/reuseComponents/Tabs";
 import TagsInput from "@/components/reuseComponents/TagsInput";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/contexts/ToastContext";
-import { Board, boardsApi, Language, postsApi } from "@/lib/api";
+import { Board, boardsApi, Language, PostCategory, postsApi } from "@/lib/api";
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiChevronDown, BiSearch } from "react-icons/bi";
+
+const POST_CATEGORIES: { value: PostCategory; labelKey: string }[] = [
+  { value: "News", labelKey: "categories.news" },
+  { value: "Reviews", labelKey: "categories.reviews" },
+  { value: "Recommend", labelKey: "categories.recommend" },
+  { value: "Free Board", labelKey: "categories.freeBoard" },
+];
 
 // Main Create Post Component
 const CreatePost = () => {
@@ -27,6 +34,7 @@ const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState<Board | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<PostCategory | null>(null);
   const [showCommunity, setShowCommunity] = useState(false);
   const [boards, setBoards] = useState<Board[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,23 +75,24 @@ const CreatePost = () => {
       return;
     }
 
-    if (!selectedCommunity) {
+    const hasSelection = selectedCommunity || selectedCategory;
+    if (!hasSelection) {
       showError(t("communityRequired"));
       return;
     }
 
-    // Check membership before posting
-    try {
-      const membership = await boardsApi.getMembershipStatus(selectedCommunity.id);
-      if (!membership || membership.status !== "APPROVED") {
-        // Show popup to join board
-        setBoardToJoin(selectedCommunity);
-        setShowJoinPopup(true);
-        return;
+    // Check membership before posting (only when posting to a community)
+    if (selectedCommunity) {
+      try {
+        const membership = await boardsApi.getMembershipStatus(selectedCommunity.id);
+        if (!membership || membership.status !== "APPROVED") {
+          setBoardToJoin(selectedCommunity);
+          setShowJoinPopup(true);
+          return;
+        }
+      } catch (error: any) {
+        console.warn("Could not check membership status:", error);
       }
-    } catch (error: any) {
-      // If membership check fails, still try to post and let backend handle it
-      console.warn("Could not check membership status:", error);
     }
 
     setIsPosting(true);
@@ -92,9 +101,8 @@ const CreatePost = () => {
         title: title.trim(),
         body: body.trim(),
         originalLanguage: getLanguage(),
-        boardId: selectedCommunity.id,
+        ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
         tags: tags.length > 0 ? tags : undefined,
-        // imageIds can be added later when image upload is implemented
       };
       await postsApi.create(postData);
       
@@ -105,16 +113,16 @@ const CreatePost = () => {
       setTitle("");
       setBody("");
       setSelectedCommunity(null);
+      setSelectedCategory(null);
       setTags([]);
       
-      // Optionally navigate to the post or feed
       router.push(ROUTE_PATHS.HOME);
     } catch (error: any) {
       console.error("Error creating post:", error);
       const errorMessage = error?.message || tToast("postError") || "Failed to create post. Please try again.";
       
       // Check if error is about membership and show popup
-      if (errorMessage.includes("join") || errorMessage.includes("member") || errorMessage.includes("pending")) {
+      if (selectedCommunity && (errorMessage.includes("join") || errorMessage.includes("member") || errorMessage.includes("pending"))) {
         setBoardToJoin(selectedCommunity);
         setShowJoinPopup(true);
       } else {
@@ -132,7 +140,8 @@ const CreatePost = () => {
       return;
     }
 
-    if (!selectedCommunity) {
+    const hasSelection = selectedCommunity || selectedCategory;
+    if (!hasSelection) {
       showError(t("communityRequired"));
       return;
     }
@@ -143,7 +152,7 @@ const CreatePost = () => {
         title: title.trim() || t("untitledDraft"),
         body: body.trim() || "",
         originalLanguage: getLanguage(),
-        boardId: selectedCommunity.id,
+        ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
         tags: tags.length > 0 ? tags : undefined,
         isActive: false, // Save as draft
         // imageIds can be added later when image upload is implemented
@@ -157,6 +166,7 @@ const CreatePost = () => {
       setTitle("");
       setBody("");
       setSelectedCommunity(null);
+      setSelectedCategory(null);
       setTags([]);
     } catch (error: any) {
       console.error("Error saving draft:", error);
@@ -198,9 +208,17 @@ const CreatePost = () => {
     }
   }, [showCommunity, searchQuery, fetchBoards]);
 
-  // Handle board selection
+  const handleSelectCategory = (category: PostCategory) => {
+    setSelectedCategory(category);
+    setSelectedCommunity(null);
+    setShowCommunity(false);
+    setShowDropdown(false);
+    setSearchQuery("");
+  };
+
   const handleSelectBoard = async (board: Board) => {
     setSelectedCommunity(board);
+    setSelectedCategory(null);
     setShowCommunity(false);
     setShowDropdown(false);
     setSearchQuery("");
@@ -279,7 +297,11 @@ const CreatePost = () => {
                     <span className="text-white text-xs font-bold">r</span>
                   </div>
                   <span className="text-sm font-semibold text-gray-700 truncate min-w-0">
-                    {selectedCommunity ? `r/${selectedCommunity.name}` : t("selectMenu")}
+                    {selectedCommunity
+                      ? `r/${selectedCommunity.name}`
+                      : selectedCategory
+                        ? selectedCategory
+                        : t("selectMenu")}
                   </span>
                   <BiChevronDown size={16} className="text-gray-600 flex-shrink-0" />
                 </button>
@@ -299,35 +321,60 @@ const CreatePost = () => {
                   onFocus={() => setShowDropdown(true)}
                   className="w-full pl-10 pr-4 py-2.5 sm:py-2 bg-gray-50 border border-gray-300 rounded-full text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
                 />
-                {/* Dropdown with boards */}
+                {/* Dropdown: Categories + Communities */}
                 {showDropdown && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[min(320px,60vh)] overflow-y-auto z-50">
-                    {isLoadingBoards ? (
-                      <Loading />
-                    ) : boards.length > 0 ? (
-                      boards.map((board) => (
+                    {/* Categories section - always visible */}
+                    <div className="border-b border-gray-100 px-2 py-1">
+                      <p className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        {t("categoriesLabel")}
+                      </p>
+                      {POST_CATEGORIES.map(({ value, labelKey }) => (
                         <button
-                          key={board.id}
+                          key={value}
                           type="button"
-                          onClick={() => handleSelectBoard(board)}
-                          className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer min-h-[44px] sm:min-h-0 touch-manipulation"
+                          onClick={() => handleSelectCategory(value)}
+                          className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer rounded-lg touch-manipulation"
                         >
-                          <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-white text-xs font-bold">r</span>
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-blue-600 text-xs font-bold">#</span>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">r/{board.name}</p>
-                            {board.description && (
-                              <p className="text-xs text-gray-500 truncate">{board.description}</p>
-                            )}
-                          </div>
+                          <p className="text-sm font-semibold text-gray-900">{t(labelKey)}</p>
                         </button>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-gray-500 text-sm">
-                        {searchQuery ? t("noBoardsFound") : t("noBoardsAvailable")}
-                      </div>
-                    )}
+                      ))}
+                    </div>
+                    {/* Communities section */}
+                    <div className="px-2 py-1">
+                      <p className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        {t("communitiesLabel")}
+                      </p>
+                      {isLoadingBoards ? (
+                        <Loading />
+                      ) : boards.length > 0 ? (
+                        boards.map((board) => (
+                          <button
+                            key={board.id}
+                            type="button"
+                            onClick={() => handleSelectBoard(board)}
+                            className="w-full px-4 py-2.5 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left cursor-pointer rounded-lg min-h-[44px] sm:min-h-0 touch-manipulation"
+                          >
+                            <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-white text-xs font-bold">r</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 truncate">r/{board.name}</p>
+                              {board.description && (
+                                <p className="text-xs text-gray-500 truncate">{board.description}</p>
+                              )}
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="p-4 text-center text-gray-500 text-sm">
+                          {searchQuery ? t("noBoardsFound") : t("noBoardsAvailable")}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -386,9 +433,9 @@ const CreatePost = () => {
               <button
                 type="button"
                 onClick={handlePost}
-                disabled={!title.trim() || isPosting || !selectedCommunity}
+                disabled={!title.trim() || isPosting || !(selectedCommunity || selectedCategory)}
                 className={`w-full sm:w-auto min-h-[44px] cursor-pointer sm:min-h-0 px-8 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
-                  title.trim() && !isPosting && selectedCommunity
+                  title.trim() && !isPosting && (selectedCommunity || selectedCategory)
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}

@@ -690,7 +690,15 @@
     "posting": "Posting...",
     "titleRequired": "Title is required",
     "bodyRequired": "Body content is required",
-    "communityRequired": "Please select a community",
+    "communityRequired": "Please select a community or category",
+    "categoriesLabel": "Categories",
+    "communitiesLabel": "Communities",
+    "categories": {
+      "news": "News",
+      "reviews": "Reviews",
+      "recommend": "Recommend",
+      "freeBoard": "Free Board"
+    },
     "draftEmpty": "Draft must have at least a title or body",
     "untitledDraft": "Untitled Draft",
     "saving": "Saving..."

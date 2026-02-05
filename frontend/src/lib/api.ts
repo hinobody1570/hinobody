@@ -371,11 +371,14 @@ export const boardCategoriesApi = {
 // Posts API endpoints
 export type Language = 'EN' | 'KO' | 'ZH' | 'JA';
 
+export type PostCategory = 'News' | 'Reviews' | 'Recommend' | 'Free Board';
+
 export interface CreatePostDto {
   title: string;
   body: string;
   originalLanguage: Language;
-  boardId: string;
+  boardId?: string;
+  category?: PostCategory;
   imageIds?: string[];
   tags?: string[];
   isActive?: boolean; // false for draft, true (default) for published
@@ -387,7 +390,8 @@ export interface Post {
   body: string;
   originalLanguage: Language;
   authorId: string;
-  boardId: string;
+  boardId?: string | null;
+  postCategory?: string | null;
   isActive: boolean;
   isDeleted: boolean;
   upvoteCount: number;

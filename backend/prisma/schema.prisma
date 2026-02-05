@@ -81,7 +81,8 @@ model Post {
   body             String
   originalLanguage Language
   authorId         String
-  boardId          String
+  boardId          String?
+  postCategory     String?
   isActive         Boolean   @default(true)
   isDeleted        Boolean   @default(false)
   upvoteCount      Int       @default(0)
@@ -94,7 +95,7 @@ model Post {
   comments         Comment[]
   images           Image[]
   author           User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  board            Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  board            Board?    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   reports          Report[]  @relation("ReportedPosts")
   votes            Vote[]
 

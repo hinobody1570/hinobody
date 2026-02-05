@@ -689,7 +689,15 @@
     "posting": "게시 중...",
     "titleRequired": "제목은 필수입니다",
     "bodyRequired": "본문 내용은 필수입니다",
-    "communityRequired": "커뮤니티를 선택해주세요",
+    "communityRequired": "커뮤니티 또는 카테고리를 선택해주세요",
+    "categoriesLabel": "카테고리",
+    "communitiesLabel": "커뮤니티",
+    "categories": {
+      "news": "뉴스",
+      "reviews": "리뷰",
+      "recommend": "추천",
+      "freeBoard": "자유 게시판"
+    },
     "draftEmpty": "초안에는 최소한 제목 또는 본문이 있어야 합니다",
     "untitledDraft": "제목 없는 초안",
     "saving": "저장 중..."

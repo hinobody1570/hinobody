@@ -18,34 +18,54 @@ export class PostService {
     private boardMemberService: BoardMemberService,
   ) { }
 
-  async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
-    // Verify board exists
-    const board = await this.prisma.board.findUnique({
-      where: { id: createPostDto.boardId },
-    });
+  private readonly VALID_CATEGORIES = ['News', 'Reviews', 'Recommend', 'Free Board'];
 
-    if (!board) {
-      throw new NotFoundException('Board not found');
+  async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
+    const hasBoard = !!createPostDto.boardId;
+    const hasCategory = !!createPostDto.category;
+
+    if (!hasBoard && !hasCategory) {
+      throw new BadRequestException('Either boardId or category must be provided');
     }
 
-    // If isActive is not provided, default to true (published)
-    // If isActive is false, it's a draft and we skip membership check
-    const isDraft = createPostDto.isActive === false;
+    if (hasBoard && hasCategory) {
+      throw new BadRequestException('Provide either boardId or category, not both');
+    }
 
-    // Only check membership if posting (not saving as draft)
-    if (!isDraft) {
-      // Check if user is an approved member of the board
-      const isMember = await this.boardMemberService.isMember(createPostDto.boardId, userId);
-      if (!isMember) {
-        const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId, userId);
+    // If boardId is provided: verify board exists and check membership
+    if (hasBoard) {
+      const board = await this.prisma.board.findUnique({
+        where: { id: createPostDto.boardId },
+      });
 
-        if (!membership) {
-          throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
-        } else if (membership.status === 'PENDING') {
-          throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
-        } else if (membership.status === 'REJECTED') {
-          throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+      if (!board) {
+        throw new NotFoundException('Board not found');
+      }
+
+      const isDraft = createPostDto.isActive === false;
+
+      if (!isDraft) {
+        const isMember = await this.boardMemberService.isMember(createPostDto.boardId!, userId);
+        if (!isMember) {
+          const membership = await this.boardMemberService.getMembershipStatus(createPostDto.boardId!, userId);
+
+          if (!membership) {
+            throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
+          } else if (membership.status === 'PENDING') {
+            throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
+          } else if (membership.status === 'REJECTED') {
+            throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+          }
         }
+      }
+    }
+
+    // If category is provided: validate it's one of the allowed values
+    if (hasCategory) {
+      if (!this.VALID_CATEGORIES.includes(createPostDto.category!)) {
+        throw new BadRequestException(
+          `Invalid category. Must be one of: ${this.VALID_CATEGORIES.join(', ')}`,
+        );
       }
     }
 
@@ -55,7 +75,8 @@ export class PostService {
         body: createPostDto.body,
         originalLanguage: createPostDto.originalLanguage,
         authorId: userId,
-        boardId: createPostDto.boardId,
+        boardId: createPostDto.boardId ?? undefined,
+        ...(createPostDto.category && { postCategory: createPostDto.category }),
         tags: createPostDto.tags || [],
         isActive: createPostDto.isActive !== undefined ? createPostDto.isActive : true,
         images: createPostDto.imageIds
