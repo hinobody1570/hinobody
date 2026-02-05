@@ -11,7 +11,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { Board, boardsApi, Language, PostCategory, postsApi } from "@/lib/api";
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiChevronDown, BiSearch } from "react-icons/bi";
 import PostImageUploadCard from "@/components/createPost/PostImageUploadCard";
@@ -24,12 +24,15 @@ const POST_CATEGORIES: { value: PostCategory; labelKey: string }[] = [
 ];
 
 // Main Create Post Component
+const VALID_CATEGORIES: PostCategory[] = ["News", "Reviews", "Recommend", "Free Board"];
+
 const CreatePost = () => {
   const t = useTranslations("createPost");
   const tToast = useTranslations("toast");
   const { locale } = useLanguage();
   const { showSuccess, showError } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const communityRef = useRef<HTMLDivElement | null>(null);
   const [activeTab, setActiveTab] = useState("text");
   const [title, setTitle] = useState("");
@@ -46,6 +49,15 @@ const CreatePost = () => {
   const [showJoinPopup, setShowJoinPopup] = useState(false);
   const [boardToJoin, setBoardToJoin] = useState<Board | null>(null);
   const [postImageIds, setPostImageIds] = useState<string[]>([]);
+
+  // Pre-select category from URL when navigating from sidebar (e.g. ?category=News)
+  useEffect(() => {
+    const categoryParam = searchParams?.get("category");
+    if (categoryParam && VALID_CATEGORIES.includes(categoryParam as PostCategory)) {
+      setSelectedCategory(categoryParam as PostCategory);
+      setSelectedCommunity(null);
+    }
+  }, [searchParams]);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
