@@ -413,7 +413,8 @@
     "noPostsAvailable": "投稿がありません",
     "noMorePostsToLoad": "これ以上読み込む投稿がありません",
     "noRecentPosts": "最近の投稿がありません",
-    "failedToLoadPosts": "投稿の読み込みに失敗しました"
+    "failedToLoadPosts": "投稿の読み込みに失敗しました",
+    "showingCategory": "表示中：{category}"
   },
   "sidebar": {
     "home": "ホーム",

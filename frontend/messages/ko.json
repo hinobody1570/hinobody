@@ -413,7 +413,8 @@
     "noPostsAvailable": "사용 가능한 게시물이 없습니다",
     "noMorePostsToLoad": "로드할 게시물이 더 이상 없습니다",
     "noRecentPosts": "최근 게시물이 없습니다",
-    "failedToLoadPosts": "게시물 로드에 실패했습니다"
+    "failedToLoadPosts": "게시물 로드에 실패했습니다",
+    "showingCategory": "표시 중: {category}"
   },
   "sidebar": {
     "home": "홈",

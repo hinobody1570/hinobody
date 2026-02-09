@@ -39,10 +39,10 @@ const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
-    { icon: IoNewspaperOutline, label: t("news"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=News` },
-    { icon: VscPreview, label: t("reviews"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Reviews` },
-    { icon: MdOutlineRecommend, label: t("recommend"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Recommend` },
-    { icon: FaPlus, label: t("freeBoard"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Free Board` },
+    { icon: IoNewspaperOutline, label: t("news"), navigate: `${ROUTE_PATHS.HOME}?category=News` },
+    { icon: VscPreview, label: t("reviews"), navigate: `${ROUTE_PATHS.HOME}?category=Reviews` },
+    { icon: MdOutlineRecommend, label: t("recommend"), navigate: `${ROUTE_PATHS.HOME}?category=Recommend` },
+    { icon: FaPlus, label: t("freeBoard"), navigate: `${ROUTE_PATHS.HOME}?category=Free Board` },
 
     // { icon: CgArrowTopRightO, label: t("popular"), navigate: "" },
     // { icon: PiCirclesThree, label: t("explore"), navigate: "" },
