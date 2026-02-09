@@ -1,21 +1,14 @@
+import { USER_ROLES } from "@/constant/constant";
+import { useAuth } from "@/contexts/AuthContext";
+import { ROUTE_PATHS } from "@/routes/paths";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegCircleUser } from "react-icons/fa6";
-import { FiEdit } from "react-icons/fi";
-import { LuFileText } from "react-icons/lu";
 import { GoTrophy } from "react-icons/go";
-import { LuDollarSign } from "react-icons/lu";
-import { GiQueenCrown } from "react-icons/gi";
-import { IoMoonOutline } from "react-icons/io5";
 import { MdLogin, MdLogout } from "react-icons/md";
-import { FaRegClock } from "react-icons/fa6";
-import { IoSettingsOutline } from "react-icons/io5";
-import { useAuth } from "@/contexts/AuthContext";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { ROUTE_PATHS } from "@/routes/paths";
-import Image from "next/image";
 import AvatarImage from "../../../public/assets/images/avatar_default_4.png";
-import { USER_ROLES } from "@/constant/constant";
 
 export default function ProfileDropdown() {
   const [darkMode, setDarkMode] = useState(false);

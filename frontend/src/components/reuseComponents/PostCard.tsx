@@ -1,20 +1,17 @@
 "use client";
 
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { FiMessageSquare, FiMoreHorizontal, FiShare2 } from "react-icons/fi";
-import { GoBell } from "react-icons/go";
-import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
-import { CommentsSection } from "../commentSection/CommentSection";
-import { DropdownMenu } from "./DropDownMenu";
-import { ReportModal } from "../modals/ReportModal";
-import { boardsApi, votesApi, reportsApi, VoteType } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
+import { boardsApi, reportsApi, votesApi } from "@/lib/api";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { FaLayerGroup } from "react-icons/fa";
-import { FiEyeOff } from "react-icons/fi";
-import { BiInfoCircle } from "react-icons/bi";
+import { FiMessageSquare } from "react-icons/fi";
+import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
+import { CommentsSection } from "../commentSection/CommentSection";
+import { ReportModal } from "../modals/ReportModal";
+import { DropdownMenu } from "./DropDownMenu";
 
 export const PostCard = ({ post }: any) => {
   const t = useTranslations("feed");

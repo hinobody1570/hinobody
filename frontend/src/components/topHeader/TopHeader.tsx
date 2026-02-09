@@ -1,13 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { BiSolidEdit } from "react-icons/bi";
-import { BsBadgeAd, BsBell } from "react-icons/bs";
-import { LuMessageCircleMore } from "react-icons/lu";
 import { VscDiffAdded } from "react-icons/vsc";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { Avatar } from "../reuseComponents/Avatar";
-import { LuCamera } from "react-icons/lu";
 import { Logo } from "../reuseComponents/Logo";
 import { IconButton } from "../reuseComponents/NavBarIconButton";
 import { SearchBar } from "../reuseComponents/SearchBar";

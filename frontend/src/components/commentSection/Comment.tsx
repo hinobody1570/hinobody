@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { BiAward, BiGlobe, BiInfoCircle, BiMessageSquare, BiSearch } from "react-icons/bi";
+import { BiAward, BiMessageSquare } from "react-icons/bi";
 import { CiShare2 } from "react-icons/ci";
-import { FiEyeOff } from "react-icons/fi";
 import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
 import { DropdownMenu } from "../reuseComponents/DropDownMenu";

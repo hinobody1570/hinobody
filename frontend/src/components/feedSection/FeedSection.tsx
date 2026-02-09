@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { CiCalendar } from "react-icons/ci";
 import { IoChevronDown } from "react-icons/io5";
 import { PostCard } from "../reuseComponents/PostCard";
 import { RecentPostCard } from "../reuseComponents/RecentPostCard";

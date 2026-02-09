@@ -92,7 +92,7 @@ const ResetPassword = () => {
       // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push(ROUTE_PATHS.DEFAULT);
-      }, 1000);
+      }, 500);
     } catch (error: any) {
       // Handle API errors
       setIsLoading(false);
