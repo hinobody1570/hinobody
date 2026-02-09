@@ -1,12 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { BsBadgeAd, BsBell } from "react-icons/bs";
-import { LuMessageCircleMore } from "react-icons/lu";
 import { VscDiffAdded } from "react-icons/vsc";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { Avatar } from "../reuseComponents/Avatar";
-import { LuCamera } from "react-icons/lu";
 import { Logo } from "../reuseComponents/Logo";
 import { IconButton } from "../reuseComponents/NavBarIconButton";
 import { SearchBar } from "../reuseComponents/SearchBar";
@@ -16,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import ProfileDropdown from "../profileDropDown/ProfileDropdown";
 import { IoIosSearch } from "react-icons/io";
+import { LiaEdit } from "react-icons/lia";
 
 export const RedditHeader = () => {
   const t = useTranslations("header");
@@ -30,7 +28,7 @@ export const RedditHeader = () => {
   const headerActions = [
     // { icon: BsBadgeAd, onClick: () => console.log("Ads") },
     // { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
-    { icon: VscDiffAdded, label: t("write"), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
+    { icon: VscDiffAdded, iconMobile: LiaEdit , label: t("write"), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
     // { icon: BsBell, onClick: () => console.log("Notifications") },
     // { icon: LuCamera, label: t("eyeMask"), onClick: () => router.push(ROUTE_PATHS.EYE_MASKING) },
   ];
@@ -86,7 +84,7 @@ export const RedditHeader = () => {
 
           {/* Header Actions - Icons only on mobile, with labels on desktop */}
           {headerActions.map((action, index) => (
-            <IconButton key={index} icon={action.icon} label={action.label} onClick={action.onClick} />
+            <IconButton iconMobile={action.iconMobile} key={index} icon={action.icon} label={action.label} onClick={action.onClick} />
           ))}
 
           {/* Avatar */}

@@ -1,20 +1,17 @@
 "use client";
 
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { FiMessageSquare, FiMoreHorizontal, FiShare2 } from "react-icons/fi";
-import { GoBell } from "react-icons/go";
-import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
-import { CommentsSection } from "../commentSection/CommentSection";
-import { DropdownMenu } from "./DropDownMenu";
-import { ReportModal } from "../modals/ReportModal";
-import { boardsApi, votesApi, reportsApi, VoteType } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
+import { boardsApi, reportsApi, votesApi } from "@/lib/api";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { FaLayerGroup } from "react-icons/fa";
-import { FiEyeOff } from "react-icons/fi";
-import { BiInfoCircle } from "react-icons/bi";
+import { FiMessageSquare } from "react-icons/fi";
+import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
+import { CommentsSection } from "../commentSection/CommentSection";
+import { ReportModal } from "../modals/ReportModal";
+import { DropdownMenu } from "./DropDownMenu";
 
 export const PostCard = ({ post }: any) => {
   const t = useTranslations("feed");
@@ -268,11 +265,11 @@ export const PostCard = ({ post }: any) => {
       </div>
 
       {/* Post Image/Content */}
-      {/* {post.image && (
+      {post.image && (
         <div className="bg-black">
-          <Image src={post?.image ?? ""} width={300} height={300} alt={post.title} className="w-full max-h-[600px] object-contain" />
+          <Image src={post?.image ?? ""} width={200} height={200} alt={post.title} className="mx-auto object-contain" />
         </div>
-      )} */}
+      )}
 
       {post?.body && <div className="px-3 pb-2" dangerouslySetInnerHTML={{ __html: post?.body }} />}
 
@@ -286,7 +283,7 @@ export const PostCard = ({ post }: any) => {
               voteState === "up" ? "text-orange-500" : "text-gray-600"
             } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <HiOutlineArrowUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
+            <HiOutlineThumbUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
           </button>
           <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">
             {upvotes - downvotes}
@@ -298,7 +295,7 @@ export const PostCard = ({ post }: any) => {
               voteState === "down" ? "text-blue-500" : "text-gray-600"
             } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <HiOutlineArrowDown size={20} fill={voteState === "down" ? "currentColor" : "none"} />
+            <HiOutlineThumbDown size={20} fill={voteState === "down" ? "currentColor" : "none"} />
           </button>
         </div>
 

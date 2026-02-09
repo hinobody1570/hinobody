@@ -4,23 +4,12 @@ import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { BiBarChartSquare } from "react-icons/bi";
-import { CgArrowTopRightO } from "react-icons/cg";
-import { FaRegUserCircle } from "react-icons/fa";
 import { FaBars, FaPlus } from "react-icons/fa6";
-import { IoIosHelpCircleOutline, IoLogoCodepen, IoMdSettings } from "react-icons/io";
-import { IoBagRemoveSharp, IoHomeOutline } from "react-icons/io5";
-import { LuSmilePlus } from "react-icons/lu";
-import { MdCampaign } from "react-icons/md";
-import { PiCirclesThree, PiClockCountdownLight } from "react-icons/pi";
-import { TbMicrophone2 } from "react-icons/tb";
-import { VscBook } from "react-icons/vsc";
-import { CollapsibleSection } from "../reuseComponents/CollapseItems";
-import { MenuItem } from "../reuseComponents/MenuItem";
-import StartCommunityPopup from "../modals/StartCommunityPopup";
-import { IoNewspaperOutline } from "react-icons/io5";
-import { VscPreview } from "react-icons/vsc";
+import { IoHomeOutline, IoNewspaperOutline } from "react-icons/io5";
 import { MdOutlineRecommend } from "react-icons/md";
+import { VscPreview } from "react-icons/vsc";
+import StartCommunityPopup from "../modals/StartCommunityPopup";
+import { MenuItem } from "../reuseComponents/MenuItem";
 
 
 /* ---------------- DATA CONFIG ---------------- */
@@ -39,10 +28,10 @@ const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
-    { icon: IoNewspaperOutline, label: t("news"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=News` },
-    { icon: VscPreview, label: t("reviews"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Reviews` },
-    { icon: MdOutlineRecommend, label: t("recommend"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Recommend` },
-    { icon: FaPlus, label: t("freeBoard"), navigate: `${ROUTE_PATHS.CREATE_POST}?category=Free Board` },
+    { icon: IoNewspaperOutline, label: t("news"), navigate: `${ROUTE_PATHS.HOME}?category=News` },
+    { icon: VscPreview, label: t("reviews"), navigate: `${ROUTE_PATHS.HOME}?category=Reviews` },
+    { icon: MdOutlineRecommend, label: t("recommend"), navigate: `${ROUTE_PATHS.HOME}?category=Recommend` },
+    { icon: FaPlus, label: t("freeBoard"), navigate: `${ROUTE_PATHS.HOME}?category=Free Board` },
 
     // { icon: CgArrowTopRightO, label: t("popular"), navigate: "" },
     // { icon: PiCirclesThree, label: t("explore"), navigate: "" },

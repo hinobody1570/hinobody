@@ -413,7 +413,8 @@
     "noPostsAvailable": "没有可用帖子",
     "noMorePostsToLoad": "没有更多帖子可加载",
     "noRecentPosts": "没有最近的帖子",
-    "failedToLoadPosts": "加载帖子失败"
+    "failedToLoadPosts": "加载帖子失败",
+    "showingCategory": "显示：{category}"
   },
   "sidebar": {
     "home": "首页",

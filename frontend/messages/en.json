@@ -413,7 +413,8 @@
     "noPostsAvailable": "No posts available",
     "noMorePostsToLoad": "No more posts to load",
     "noRecentPosts": "No recent posts",
-    "failedToLoadPosts": "Failed to load posts"
+    "failedToLoadPosts": "Failed to load posts",
+    "showingCategory": "Showing: {category}"
   },
   "sidebar": {
     "home": "Home",

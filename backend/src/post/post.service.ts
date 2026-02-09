@@ -146,7 +146,7 @@ export class PostService {
    * Uses raw SQL because Prisma orderBy cannot express (upvote_count - downvote_count).
    */
   private async getOrderedPostIds(
-    params: { boardId?: string; authorId?: string; blockedUserIds: string[]; search?: string },
+    params: { boardId?: string; authorId?: string; blockedUserIds: string[]; search?: string; category?: string },
     sortBy: 'mostLiked' | 'trending',
     limit: number,
     skip: number,
@@ -162,6 +162,9 @@ export class PostService {
       conditions.push(Prisma.sql`"authorId" = ${params.authorId}`);
     } else if (params.blockedUserIds.length > 0) {
       conditions.push(Prisma.sql`"authorId" NOT IN (${Prisma.join(params.blockedUserIds)})`);
+    }
+    if (params.category) {
+      conditions.push(Prisma.sql`"postCategory" = ${params.category}`);
     }
     if (params.search) {
       const pattern = `%${params.search}%`;
@@ -184,7 +187,7 @@ export class PostService {
   }
 
   async findAll(query: QueryPostsDto, userId?: string) {
-    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest' } = query;
+    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
 
     // Get blocked user IDs if userId is provided
@@ -220,6 +223,7 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      ...(category && { postCategory: category }),
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: { notIn: blockedUserIds },
       }),
@@ -232,7 +236,7 @@ export class PostService {
       // Use raw SQL for accurate (upvote_count - downvote_count) ordering
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, blockedUserIds, search: undefined },
+          { boardId, authorId, blockedUserIds, search: undefined, category },
           sortBy,
           limit,
           skip,
@@ -298,7 +302,7 @@ export class PostService {
   }
 
   private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = []) {
-    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest' } = query;
+    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
 
     // If authorId is specified and that author is blocked, return empty results
@@ -319,6 +323,7 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      ...(category && { postCategory: category }),
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: { notIn: blockedUserIds },
       }),
@@ -335,7 +340,7 @@ export class PostService {
     if (sortBy === 'mostLiked' || sortBy === 'trending') {
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, blockedUserIds, search },
+          { boardId, authorId, blockedUserIds, search, category },
           sortBy,
           limit,
           skip,

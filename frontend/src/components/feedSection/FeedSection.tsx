@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { CiCalendar } from "react-icons/ci";
 import { IoChevronDown } from "react-icons/io5";
 import { PostCard } from "../reuseComponents/PostCard";
 import { RecentPostCard } from "../reuseComponents/RecentPostCard";
@@ -47,6 +47,8 @@ export const RedditFeed = () => {
   const t = useTranslations('feed');
   const tTime = useTranslations('timeAgo');
   const { locale } = useLanguage();
+  const searchParams = useSearchParams();
+  const categoryFromUrl = searchParams?.get('category') ?? undefined;
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -61,7 +63,7 @@ export const RedditFeed = () => {
   const [showRecentPosts, setShowRecentPosts] = useState(true);
   const [loadingRecentPosts, setLoadingRecentPosts] = useState(true);
 
-  // Fetch recent posts (last 4)
+  // Fetch recent posts (last 4) - no category filter for recent
   useEffect(() => {
     const fetchRecentPosts = async () => {
       try {
@@ -88,8 +90,8 @@ export const RedditFeed = () => {
     setShowRecentPosts(false);
   };
 
-  // Fetch posts with sort filter
-  const fetchPosts = useCallback(async (page: number = 1, sortBy: PostSortBy = 'newest', append: boolean = false) => {
+  // Fetch posts with sort and category filter
+  const fetchPosts = useCallback(async (page: number = 1, sortBy: PostSortBy = 'newest', append: boolean = false, category?: string) => {
     try {
       if (append) {
         setLoadingMore(true);
@@ -101,6 +103,7 @@ export const RedditFeed = () => {
         page,
         limit: 20,
         sortBy,
+        ...(category && { category }),
       });
 
       if (append) {
@@ -118,7 +121,7 @@ export const RedditFeed = () => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, []);
+  }, [t]);
 
   // Transform posts for display - re-runs when locale changes so timestamps update
   const displayPosts = useMemo(
@@ -130,16 +133,16 @@ export const RedditFeed = () => {
     [recentPosts, tTime, locale]
   );
 
-  // Initial load and when sort filter changes
+  // Initial load and when sort or category changes
   useEffect(() => {
-    fetchPosts(1, selectedSortBy, false);
-  }, [selectedSortBy, fetchPosts]);
+    fetchPosts(1, selectedSortBy, false, categoryFromUrl);
+  }, [selectedSortBy, categoryFromUrl, fetchPosts]);
 
   // Load more posts
   const loadMorePosts = useCallback(async () => {
     if (loadingMore || !hasMore) return;
-    await fetchPosts(currentPage + 1, selectedSortBy, true);
-  }, [currentPage, loadingMore, hasMore, selectedSortBy, fetchPosts]);
+    await fetchPosts(currentPage + 1, selectedSortBy, true, categoryFromUrl);
+  }, [currentPage, loadingMore, hasMore, selectedSortBy, categoryFromUrl, fetchPosts]);
 
   // Handle sort selection
   const handleSortSelect = (sortBy: PostSortBy) => {
@@ -195,6 +198,12 @@ export const RedditFeed = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Feed */}
           <div className="lg:col-span-2">
+            {/* Category filter label (when viewing a category) */}
+            {categoryFromUrl && (
+              <div className="text-sm text-gray-600 mb-2">
+                {t('showingCategory', { category: categoryFromUrl })}
+              </div>
+            )}
             {/* Sort Options */}
             <div className="flex items-center gap-2 mb-4">
               <div className="relative" ref={dropdownRef}>

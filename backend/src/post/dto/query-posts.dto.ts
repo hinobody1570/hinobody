@@ -61,4 +61,14 @@ export class QueryPostsDto {
   @IsOptional()
   @IsIn(['newest', 'mostLiked', 'trending'])
   sortBy?: PostSortBy = 'newest';
+
+  @ApiPropertyOptional({
+    example: 'News',
+    description: 'Filter posts by category: News, Reviews, Recommend, Free Board',
+    enum: ['News', 'Reviews', 'Recommend', 'Free Board'],
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['News', 'Reviews', 'Recommend', 'Free Board'])
+  category?: string;
 }

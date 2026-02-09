@@ -1,13 +1,13 @@
 "use client";
 
+import { ROUTE_PATHS } from "@/routes/paths";
+import { formatTimestamp } from "@/utils/helperFunction";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-import { ROUTE_PATHS } from "@/routes/paths";
-import Image from "next/image";
 import DP from "./../../../public/assets/images/avatar_default_4.png";
-import { formatTimestamp } from "@/utils/helperFunction";
 
 interface SearchResultsModalProps {
   results: {

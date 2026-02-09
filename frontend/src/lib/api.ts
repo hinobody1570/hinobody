@@ -439,6 +439,7 @@ export interface QueryPostsParams {
   authorId?: string;
   search?: string;
   sortBy?: PostSortBy;
+  category?: string;
 }
 
 export const postsApi = {
@@ -448,7 +449,7 @@ export const postsApi = {
     return response.data;
   },
   getAll: async (params: QueryPostsParams = {}): Promise<PostsResponse> => {
-    const { page = 1, limit = 20, boardId, authorId, search, sortBy } = params;
+    const { page = 1, limit = 20, boardId, authorId, search, sortBy, category } = params;
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -464,6 +465,9 @@ export const postsApi = {
     }
     if (sortBy) {
       queryParams.append('sortBy', sortBy);
+    }
+    if (category) {
+      queryParams.append('category', category);
     }
     const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
     // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
