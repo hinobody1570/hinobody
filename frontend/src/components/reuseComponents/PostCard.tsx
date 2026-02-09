@@ -268,11 +268,11 @@ export const PostCard = ({ post }: any) => {
       </div>
 
       {/* Post Image/Content */}
-      {/* {post.image && (
+      {post.image && (
         <div className="bg-black">
-          <Image src={post?.image ?? ""} width={300} height={300} alt={post.title} className="w-full max-h-[600px] object-contain" />
+          <Image src={post?.image ?? ""} width={200} height={200} alt={post.title} className="mx-auto object-contain" />
         </div>
-      )} */}
+      )}
 
       {post?.body && <div className="px-3 pb-2" dangerouslySetInnerHTML={{ __html: post?.body }} />}
 
