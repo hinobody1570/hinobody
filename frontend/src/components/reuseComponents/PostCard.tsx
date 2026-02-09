@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { FiMessageSquare, FiMoreHorizontal, FiShare2 } from "react-icons/fi";
 import { GoBell } from "react-icons/go";
-import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
+import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
 import { CommentsSection } from "../commentSection/CommentSection";
 import { DropdownMenu } from "./DropDownMenu";
 import { ReportModal } from "../modals/ReportModal";
@@ -286,7 +286,7 @@ export const PostCard = ({ post }: any) => {
               voteState === "up" ? "text-orange-500" : "text-gray-600"
             } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <HiOutlineArrowUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
+            <HiOutlineThumbUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
           </button>
           <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">
             {upvotes - downvotes}
@@ -298,7 +298,7 @@ export const PostCard = ({ post }: any) => {
               voteState === "down" ? "text-blue-500" : "text-gray-600"
             } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <HiOutlineArrowDown size={20} fill={voteState === "down" ? "currentColor" : "none"} />
+            <HiOutlineThumbDown size={20} fill={voteState === "down" ? "currentColor" : "none"} />
           </button>
         </div>
 

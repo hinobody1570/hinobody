@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BiAward, BiGlobe, BiInfoCircle, BiMessageSquare, BiSearch } from "react-icons/bi";
 import { CiShare2 } from "react-icons/ci";
 import { FiEyeOff } from "react-icons/fi";
-import { HiOutlineArrowDown, HiOutlineArrowUp } from "react-icons/hi";
+import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
 import { DropdownMenu } from "../reuseComponents/DropDownMenu";
 import { FaLayerGroup } from "react-icons/fa";
@@ -283,7 +283,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                       voteState === "up" ? "text-orange-500" : "text-gray-500"
                     } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    <HiOutlineArrowUp size={18} fill={voteState === "up" ? "currentColor" : "none"} />
+                    <HiOutlineThumbUp size={18} fill={voteState === "up" ? "currentColor" : "none"} />
                   </button>
                   <span className="text-xs font-bold text-gray-700 min-w-[28px] sm:min-w-[30px] text-center px-0.5">
                     {upvotes - downvotes}
@@ -295,7 +295,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                       voteState === "down" ? "text-blue-500" : "text-gray-500"
                     } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    <HiOutlineArrowDown size={18} fill={voteState === "down" ? "currentColor" : "none"} />
+                    <HiOutlineThumbDown size={18} fill={voteState === "down" ? "currentColor" : "none"} />
                   </button>
                 </div>
 
