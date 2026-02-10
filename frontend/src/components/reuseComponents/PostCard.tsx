@@ -266,8 +266,8 @@ export const PostCard = ({ post }: any) => {
 
       {/* Post Image/Content */}
       {post.image && (
-        <div className="bg-black">
-          <Image src={post?.image ?? ""} width={200} height={200} alt={post.title} className="mx-auto object-contain" />
+        <div className="bg-[#f5f5f5]">
+          <Image src={post?.image ?? ""} width={400} height={400} alt={post.title} className="mx-auto object-contain" />
         </div>
       )}
 

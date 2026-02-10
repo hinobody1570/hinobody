@@ -38,7 +38,7 @@ const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState<Board | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<PostCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<PostCategory | null>("Free Board");
   const [showCommunity, setShowCommunity] = useState(false);
   const [boards, setBoards] = useState<Board[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,11 +84,6 @@ const CreatePost = () => {
       return;
     }
 
-    if (!body.trim()) {
-      showError(t("bodyRequired"));
-      return;
-    }
-
     const hasSelection = selectedCommunity || selectedCategory;
     if (!hasSelection) {
       showError(t("communityRequired"));
@@ -113,7 +108,7 @@ const CreatePost = () => {
     try {
       const postData = {
         title: title.trim(),
-        body: body.trim(),
+        ...(body.trim() && { body: body.trim() }),
         originalLanguage: getLanguage(),
         ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
         tags: tags.length > 0 ? tags : undefined,

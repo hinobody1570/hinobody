@@ -20,15 +20,13 @@ export class CreatePostDto {
   @MinLength(1)
   title: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'This is the content of the post.',
-    minLength: 1,
-    description: 'Body content of the post',
+    description: 'Body content of the post (optional)',
   })
   @IsString()
-  @IsNotEmpty()
-  @MinLength(1)
-  body: string;
+  @IsOptional()
+  body?: string;
 
   @ApiProperty({
     enum: Language,

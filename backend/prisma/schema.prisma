@@ -78,7 +78,7 @@ model BoardCategory {
 model Post {
   id               String    @id @default(cuid())
   title            String
-  body             String
+  body             String?
   originalLanguage Language
   authorId         String
   boardId          String?

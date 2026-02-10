@@ -1023,55 +1023,26 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
       let filesToUpload: File[] = [];
       let imageDataArray: any[] = [];
 
-      // Check if we have cropped masks - if yes, upload all cropped masks
-      if (croppedMasks && croppedMasks.length > 0) {
-        setUploadStatus(t("preparingCroppedImages", { count: croppedMasks.length }));
+      // Always save the full image with masking (what's shown on the canvas), not cropped regions
+      setUploadStatus(t("creatingMaskedImageStatus"));
 
-        // Convert all cropped masks to Files
-        for (let i = 0; i < croppedMasks.length; i++) {
-          const cropped = croppedMasks[i];
-          if (cropped.image && cropped.image instanceof Blob) {
-            const fileName = `masked-crop-${i + 1}-${Date.now()}-${imageFile.name}`;
-            const file = blobToFile(cropped.image, fileName);
-            filesToUpload.push(file);
-
-            // Prepare image data for database
-            imageDataArray.push({
-              url: "", // Will be filled after upload
-              key: "", // Will be filled after upload
-              size: cropped.image.size,
-              mimeType: cropped.image.type || "image/jpeg",
-              width: cropped.width,
-              height: cropped.height,
-            });
-          }
-        }
-
-        if (filesToUpload.length === 0) {
-          throw new Error(t("noValidCroppedMasks"));
-        }
-      } else {
-        // Fallback: Upload the main masked image from canvas
-        setUploadStatus(t("creatingMaskedImageStatus"));
-
-        const maskedBlob = await getMaskedImageBlob();
-        if (!maskedBlob) {
-          throw new Error(t("failedToCreateMaskedImage"));
-        }
-
-        const maskedFile = blobToFile(maskedBlob, `masked-${imageFile.name}`);
-        filesToUpload.push(maskedFile);
-
-        // Prepare image data for database
-        imageDataArray.push({
-          url: "", // Will be filled after upload
-          key: "", // Will be filled after upload
-          size: maskedBlob.size,
-          mimeType: maskedBlob.type || "image/jpeg",
-          width: imageRef.current?.width || undefined,
-          height: imageRef.current?.height || undefined,
-        });
+      const maskedBlob = await getMaskedImageBlob();
+      if (!maskedBlob) {
+        throw new Error(t("failedToCreateMaskedImage"));
       }
+
+      const maskedFile = blobToFile(maskedBlob, `masked-${imageFile.name}`);
+      filesToUpload.push(maskedFile);
+
+      // Prepare image data for database
+      imageDataArray.push({
+        url: "", // Will be filled after upload
+        key: "", // Will be filled after upload
+        size: maskedBlob.size,
+        mimeType: maskedBlob.type || "image/jpeg",
+        width: imageRef.current?.width || undefined,
+        height: imageRef.current?.height || undefined,
+      });
 
       // Upload all files to S3 using bulk upload API
       setUploadStatus(t("uploadingToS3Status", { count: filesToUpload.length }));
