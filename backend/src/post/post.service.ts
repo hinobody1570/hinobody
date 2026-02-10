@@ -72,7 +72,7 @@ export class PostService {
     const post = await this.prisma.post.create({
       data: {
         title: createPostDto.title,
-        body: createPostDto.body,
+        body: createPostDto.body?.trim() || null,
         originalLanguage: createPostDto.originalLanguage,
         authorId: userId,
         boardId: createPostDto.boardId ?? undefined,

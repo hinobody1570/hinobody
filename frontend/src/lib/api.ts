@@ -375,7 +375,7 @@ export type PostCategory = 'News' | 'Reviews' | 'Recommend' | 'Free Board';
 
 export interface CreatePostDto {
   title: string;
-  body: string;
+  body?: string;
   originalLanguage: Language;
   boardId?: string;
   category?: PostCategory;
