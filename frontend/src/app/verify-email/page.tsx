@@ -15,17 +15,17 @@ import { useTranslations } from "next-intl";
 export default function EmailVerification() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const inputRefs = useRef<any>([]);
   const { showSuccess, showError } = useToast();
   const t = useTranslations("auth.verifyEmailPage");
   const tToast = useTranslations("toast");
-  
+
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(600); // 10 minutes = 600 seconds
   const [email, setEmail] = useState<string>("");
-  const inputRefs = useRef<any>([]);
 
   // Get email from URL params or localStorage
   useEffect(() => {
@@ -107,29 +107,29 @@ export default function EmailVerification() {
     try {
       // Call the real verify email API
       const response = await authApi.verifyEmail(email, verificationCode);
-      
+
       // Success - show success message and redirect
       setIsLoading(false);
       setIsVerified(true);
-      
+
       // Clear stored email
       if (typeof window !== "undefined") {
         localStorage.removeItem("pending_verification_email");
       }
-      
+
       showSuccess(tToast("emailVerified"));
-      
+
       // Redirect to login page after 2 seconds
       setTimeout(() => {
         router.push(ROUTE_PATHS.DEFAULT);
-      }, 2000);
+      }, 1000);
     } catch (error: any) {
       // Handle API errors - stay on page
       setIsLoading(false);
       const errorMessage = error?.message || tToast("verificationFailed");
       setError(errorMessage);
       showError(errorMessage);
-      
+
       // Clear the code inputs on error
       setCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
@@ -150,7 +150,7 @@ export default function EmailVerification() {
     try {
       // Call the resend OTP API
       await authApi.resendOtp(email);
-      
+
       // Success - reset timer and code
       setResendTimer(600); // Reset to 10 minutes
       setCode(["", "", "", "", "", ""]);
@@ -228,13 +228,14 @@ export default function EmailVerification() {
             <p className="text-sm text-gray-600 mb-2">{t("didntReceiveCode")}</p>
             {resendTimer > 0 ? (
               <p className="text-sm text-gray-500">
-                {t("resendCodeIn")} <span className="font-semibold text-blue-600">
-                  {Math.floor(resendTimer / 60)}:{(resendTimer % 60).toString().padStart(2, '0')}
+                {t("resendCodeIn")}{" "}
+                <span className="font-semibold text-blue-600">
+                  {Math.floor(resendTimer / 60)}:{(resendTimer % 60).toString().padStart(2, "0")}
                 </span>
               </p>
             ) : (
-              <button 
-                onClick={handleResend} 
+              <button
+                onClick={handleResend}
                 disabled={isLoading}
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >

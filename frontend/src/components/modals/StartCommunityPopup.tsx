@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { useTranslations } from "next-intl";
-import { IoClose, IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { boardsApi, boardCategoriesApi, CreateBoardDto, BoardVisibility, BoardCategory } from "@/lib/api";
 import { useToast } from "@/contexts/ToastContext";
+import { boardCategoriesApi, BoardCategory, boardsApi, BoardVisibility, CreateBoardDto } from "@/lib/api";
+import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { IoChevronBack, IoChevronForward, IoClose } from "react-icons/io5";
 
 interface StartCommunityPopupProps {
   isOpen: boolean;

@@ -128,6 +128,7 @@ export const RedditFeed = () => {
     () => posts.map((p) => transformPost(p, tTime)),
     [posts, tTime, locale]
   );
+
   const displayRecentPosts = useMemo(
     () => recentPosts.map((p) => transformRecentPost(p, tTime)),
     [recentPosts, tTime, locale]
@@ -323,9 +324,9 @@ export const RedditFeed = () => {
                 {/* Footer Links */}
                 <div className="mt-6 pt-4 border-t border-gray-200">
                   <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-3">
-                    <a href="#" className="hover:underline">
+                    {/* <a href="#" className="hover:underline">
                       {t('redditRules')}
-                    </a>
+                    </a> */}
                     <a href="#" className="hover:underline">
                       {t('privacyPolicy')}
                     </a>

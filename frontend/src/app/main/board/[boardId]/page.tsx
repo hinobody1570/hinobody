@@ -8,7 +8,6 @@ import { boardsApi, Board, postsApi, Post } from '@/lib/api';
 import { ROUTE_PATHS } from '@/routes/paths';
 import { PostCard } from '@/components/reuseComponents/PostCard';
 import { formatTimestamp } from '@/utils/helperFunction';
-import Image from 'next/image';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { useAuth } from '@/contexts/AuthContext';
 import Loading from '@/components/reuseComponents/Loading';

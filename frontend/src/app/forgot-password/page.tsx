@@ -21,9 +21,6 @@ export default function ForgotPassword() {
   const [step, setStep] = useState("email"); // 'email', 'success', 'reset'
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordErrors, setPasswordErrors] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const validateEmail = () => {

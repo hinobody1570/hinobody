@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BiAward, BiMessageSquare } from "react-icons/bi";
-import { CiShare2 } from "react-icons/ci";
+import { BiMessageSquare } from "react-icons/bi";
 import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
 import { DropdownMenu } from "../reuseComponents/DropDownMenu";
@@ -14,7 +13,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { ReportModal } from "../modals/ReportModal";
-import AVATAR from "./../../../public/assets/images/avatar_default_4.png";
 
 interface commentType {
   comment: any;
