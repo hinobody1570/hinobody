@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FiX } from "react-icons/fi";
-import { BoardCategory, CreateBoardCategoryDto, UpdateBoardCategoryDto } from "@/lib/api";
+import { BoardCategory } from "@/lib/api";
 
 interface BoardCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // onSave: (data: CreateBoardCategoryDto | UpdateBoardCategoryDto) => Promise<void>;
   onSave: any;
   category?: BoardCategory | null;
   isLoading?: boolean;

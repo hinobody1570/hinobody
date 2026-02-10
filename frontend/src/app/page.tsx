@@ -83,7 +83,7 @@ export default function Home() {
       showSuccess(tToast("loginSuccess"));
       setIsLoading(false);
       // Redirect admin users to admin panel, others to home
-      if (loggedInUser?.role === 'ADMIN') {
+      if (loggedInUser?.role === "ADMIN") {
         router.push(ROUTE_PATHS.ADMIN_USERS);
       } else {
         router.push(ROUTE_PATHS.HOME);
@@ -111,10 +111,10 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if(isAuthenticated){
-      router.push(ROUTE_PATHS.HOME)
+    if (isAuthenticated) {
+      router.push(ROUTE_PATHS.HOME);
     }
-  },[isAuthenticated])
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">

@@ -149,49 +149,49 @@ const CreatePost = () => {
     }
   };
 
-  const handleSaveDraft = async () => {
-    // Basic validation for draft
-    if (!title.trim() && !body.trim()) {
-      showError(t("draftEmpty"));
-      return;
-    }
+  // const handleSaveDraft = async () => {
+  //   // Basic validation for draft
+  //   if (!title.trim() && !body.trim()) {
+  //     showError(t("draftEmpty"));
+  //     return;
+  //   }
 
-    const hasSelection = selectedCommunity || selectedCategory;
-    if (!hasSelection) {
-      showError(t("communityRequired"));
-      return;
-    }
+  //   const hasSelection = selectedCommunity || selectedCategory;
+  //   if (!hasSelection) {
+  //     showError(t("communityRequired"));
+  //     return;
+  //   }
 
-    setIsPosting(true);
-    try {
-      const postData = {
-        title: title.trim() || t("untitledDraft"),
-        body: body.trim() || "",
-        originalLanguage: getLanguage(),
-        ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
-        tags: tags.length > 0 ? tags : undefined,
-        isActive: false, // Save as draft
-        // imageIds can be added later when image upload is implemented
-      };
-      await postsApi.create(postData);
+  //   setIsPosting(true);
+  //   try {
+  //     const postData = {
+  //       title: title.trim() || t("untitledDraft"),
+  //       body: body.trim() || "",
+  //       originalLanguage: getLanguage(),
+  //       ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
+  //       tags: tags.length > 0 ? tags : undefined,
+  //       isActive: false, // Save as draft
+  //       // imageIds can be added later when image upload is implemented
+  //     };
+  //     await postsApi.create(postData);
       
-      // Show success message
-      showSuccess(tToast("draftSaved"));
+  //     // Show success message
+  //     showSuccess(tToast("draftSaved"));
       
-      // Reset form
-      setTitle("");
-      setBody("");
-      setSelectedCommunity(null);
-      setSelectedCategory(null);
-      setTags([]);
-    } catch (error: any) {
-      console.error("Error saving draft:", error);
-      const errorMessage = error?.message || tToast("draftError");
-      showError(errorMessage);
-    } finally {
-      setIsPosting(false);
-    }
-  };
+  //     // Reset form
+  //     setTitle("");
+  //     setBody("");
+  //     setSelectedCommunity(null);
+  //     setSelectedCategory(null);
+  //     setTags([]);
+  //   } catch (error: any) {
+  //     console.error("Error saving draft:", error);
+  //     const errorMessage = error?.message || tToast("draftError");
+  //     showError(errorMessage);
+  //   } finally {
+  //     setIsPosting(false);
+  //   }
+  // };
 
   // Fetch boards from API
   const fetchBoards = useCallback(async (search: string = "") => {
