@@ -42,11 +42,11 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       label: t("boardCategories"),
       path: ROUTE_PATHS.ADMIN_BOARD_CATEGORIES,
     },
-    {
-      icon: FaEye,
-      label: t("eyeMasking"),
-      path: ROUTE_PATHS.ADMIN_EYE_MASKING,
-    },
+    // {
+    //   icon: FaEye,
+    //   label: t("eyeMasking"),
+    //   path: ROUTE_PATHS.ADMIN_EYE_MASKING,
+    // },
     {
       icon: FaExclamationTriangle,
       label: t("reports"),
