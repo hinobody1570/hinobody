@@ -3,9 +3,11 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BoardMemberService } from '../board-member/board-member.service';
+import { S3Service } from '../s3/s3.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { QueryPostsDto, PostSortBy } from './dto/query-posts.dto';
@@ -13,9 +15,12 @@ import { Post, Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostService {
+  private readonly logger = new Logger(PostService.name);
+
   constructor(
     private prisma: PrismaService,
     private boardMemberService: BoardMemberService,
+    private s3Service: S3Service,
   ) { }
 
   private readonly VALID_CATEGORIES = ['News', 'Reviews', 'Recommend', 'Free Board'];
@@ -562,14 +567,55 @@ export class PostService {
     userId: string,
     isAdmin: boolean = false,
   ): Promise<void> {
-    const post = await this.findOne(id);
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+      include: { images: true },
+    });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${id} not found`);
+    }
 
     // Check if user is the author or admin
     if (post.authorId !== userId && !isAdmin) {
       throw new ForbiddenException('You can only delete your own posts');
     }
 
-    // Soft delete
+    // Delete post images from S3 and remove Image records
+    for (const image of post.images) {
+      try {
+        if (image.key) {
+          await this.s3Service.deleteFile(image.key);
+        }
+      } catch (err: any) {
+        this.logger.warn(
+          `Failed to delete post image from S3 (key: ${image.key}): ${err?.message || err}`,
+        );
+      }
+      try {
+        await this.prisma.image.delete({ where: { id: image.id } });
+      } catch (err: any) {
+        this.logger.warn(
+          `Failed to delete image record ${image.id}: ${err?.message || err}`,
+        );
+      }
+    }
+
+    // Delete images embedded in post body (rich text) from S3
+    if (post.body) {
+      const bodyKeys = this.s3Service.extractS3KeysFromHtml(post.body);
+      for (const key of bodyKeys) {
+        try {
+          await this.s3Service.deleteFile(key);
+        } catch (err: any) {
+          this.logger.warn(
+            `Failed to delete body image from S3 (key: ${key}): ${err?.message || err}`,
+          );
+        }
+      }
+    }
+
+    // Soft delete the post
     await this.prisma.post.update({
       where: { id },
       data: { isDeleted: true, isActive: false },

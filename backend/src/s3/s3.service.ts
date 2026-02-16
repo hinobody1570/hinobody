@@ -331,6 +331,28 @@ export class S3Service {
   }
 
   /**
+   * Extract S3 object keys from HTML content (e.g. post body) where img src points to this bucket.
+   * Used when deleting a post to also delete any embedded images from S3.
+   */
+  extractS3KeysFromHtml(html: string): string[] {
+    if (!html || !this.bucketName || !this.region) return [];
+    const prefix = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/`;
+    const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedPrefix + '([^"\'\\s<>]+)', 'gi');
+    const keys: string[] = [];
+    let m;
+    while ((m = regex.exec(html)) !== null) {
+      try {
+        const key = decodeURIComponent(m[1]);
+        if (key && !keys.includes(key)) keys.push(key);
+      } catch {
+        // ignore malformed URL
+      }
+    }
+    return keys;
+  }
+
+  /**
    * Delete a file from S3
    * @param key - The S3 key (file path) to delete
    * @returns Success message
