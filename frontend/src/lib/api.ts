@@ -437,6 +437,7 @@ export interface QueryPostsParams {
   limit?: number;
   boardId?: string;
   authorId?: string;
+  commenterId?: string;
   search?: string;
   sortBy?: PostSortBy;
   category?: string;
@@ -449,7 +450,7 @@ export const postsApi = {
     return response.data;
   },
   getAll: async (params: QueryPostsParams = {}): Promise<PostsResponse> => {
-    const { page = 1, limit = 20, boardId, authorId, search, sortBy, category } = params;
+    const { page = 1, limit = 20, boardId, authorId, commenterId, search, sortBy, category } = params;
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -459,6 +460,9 @@ export const postsApi = {
     }
     if (authorId) {
       queryParams.append('authorId', authorId);
+    }
+    if (commenterId) {
+      queryParams.append('commenterId', commenterId);
     }
     if (search) {
       queryParams.append('search', search);

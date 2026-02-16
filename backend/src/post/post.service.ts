@@ -146,7 +146,7 @@ export class PostService {
    * Uses raw SQL because Prisma orderBy cannot express (upvote_count - downvote_count).
    */
   private async getOrderedPostIds(
-    params: { boardId?: string; authorId?: string; blockedUserIds: string[]; search?: string; category?: string },
+    params: { boardId?: string; authorId?: string; commenterId?: string; blockedUserIds: string[]; search?: string; category?: string },
     sortBy: 'mostLiked' | 'trending',
     limit: number,
     skip: number,
@@ -162,6 +162,9 @@ export class PostService {
       conditions.push(Prisma.sql`"authorId" = ${params.authorId}`);
     } else if (params.blockedUserIds.length > 0) {
       conditions.push(Prisma.sql`"authorId" NOT IN (${Prisma.join(params.blockedUserIds)})`);
+    }
+    if (params.commenterId) {
+      conditions.push(Prisma.sql`EXISTS (SELECT 1 FROM "comments" c WHERE c."postId" = "posts"."id" AND c."authorId" = ${params.commenterId} AND c."isActive" = true AND c."isDeleted" = false)`);
     }
     if (params.category) {
       conditions.push(Prisma.sql`"postCategory" = ${params.category}`);
@@ -187,7 +190,7 @@ export class PostService {
   }
 
   async findAll(query: QueryPostsDto, userId?: string) {
-    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
+    const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
 
     // Get blocked user IDs if userId is provided
@@ -205,17 +208,20 @@ export class PostService {
       return this.findAllWithFTS(query, blockedUserIds);
     }
 
-    // If authorId is specified and that author is blocked, return empty results
-    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
-      return {
-        data: [],
-        meta: {
-          total: 0,
-          page,
-          limit,
-          totalPages: 0,
-        },
-      };
+    // If authorId or commenterId is specified and that user is blocked, return empty results
+    if (blockedUserIds.length > 0) {
+      if (authorId && blockedUserIds.includes(authorId)) {
+        return {
+          data: [],
+          meta: { total: 0, page, limit, totalPages: 0 },
+        };
+      }
+      if (commenterId && blockedUserIds.includes(commenterId)) {
+        return {
+          data: [],
+          meta: { total: 0, page, limit, totalPages: 0 },
+        };
+      }
     }
 
     const where: Prisma.PostWhereInput = {
@@ -223,6 +229,15 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      ...(commenterId && {
+        comments: {
+          some: {
+            authorId: commenterId,
+            isActive: true,
+            isDeleted: false,
+          },
+        },
+      }),
       ...(category && { postCategory: category }),
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: { notIn: blockedUserIds },
@@ -236,7 +251,7 @@ export class PostService {
       // Use raw SQL for accurate (upvote_count - downvote_count) ordering
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, blockedUserIds, search: undefined, category },
+          { boardId, authorId, commenterId, blockedUserIds, search: undefined, category },
           sortBy,
           limit,
           skip,
@@ -302,20 +317,23 @@ export class PostService {
   }
 
   private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = []) {
-    const { boardId, authorId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
+    const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
 
-    // If authorId is specified and that author is blocked, return empty results
-    if (authorId && blockedUserIds.length > 0 && blockedUserIds.includes(authorId)) {
-      return {
-        data: [],
-        meta: {
-          total: 0,
-          page,
-          limit,
-          totalPages: 0,
-        },
-      };
+    // If authorId or commenterId is specified and that user is blocked, return empty results
+    if (blockedUserIds.length > 0) {
+      if (authorId && blockedUserIds.includes(authorId)) {
+        return {
+          data: [],
+          meta: { total: 0, page, limit, totalPages: 0 },
+        };
+      }
+      if (commenterId && blockedUserIds.includes(commenterId)) {
+        return {
+          data: [],
+          meta: { total: 0, page, limit, totalPages: 0 },
+        };
+      }
     }
 
     const where: Prisma.PostWhereInput = {
@@ -323,6 +341,15 @@ export class PostService {
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
+      ...(commenterId && {
+        comments: {
+          some: {
+            authorId: commenterId,
+            isActive: true,
+            isDeleted: false,
+          },
+        },
+      }),
       ...(category && { postCategory: category }),
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: { notIn: blockedUserIds },
@@ -340,7 +367,7 @@ export class PostService {
     if (sortBy === 'mostLiked' || sortBy === 'trending') {
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, blockedUserIds, search, category },
+          { boardId, authorId, commenterId, blockedUserIds, search, category },
           sortBy,
           limit,
           skip,

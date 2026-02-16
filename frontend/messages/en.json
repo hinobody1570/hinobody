@@ -152,7 +152,10 @@
   "userProfile": {
     "memberSince": "Member since",
     "posts": "Posts",
+    "comments": "Comments",
+    "postsWithCommentsByUser": "Posts with comments by this user",
     "noPosts": "No posts yet",
+    "noPostsWithCommentsByUser": "No posts with comments by this user yet",
     "backToHome": "Back to Home",
     "edit": "Edit Profile",
     "save": "Save",
@@ -746,6 +749,7 @@
     "best": "Best"
   },
   "postCard": {
+    "sendMessageComingSoon": "Send message - Coming soon",
     "report": "Report",
     "reportPost": "Report Post",
     "reportComment": "Report Comment",

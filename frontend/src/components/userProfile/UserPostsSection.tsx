@@ -6,14 +6,18 @@ import { PostCard } from '@/components/reuseComponents/PostCard';
 interface UserPostsSectionProps {
   posts: any[];
   loading: boolean;
+  title?: string;
+  emptyMessage?: string;
 }
 
-export function UserPostsSection({ posts, loading }: UserPostsSectionProps) {
+export function UserPostsSection({ posts, loading, title, emptyMessage }: UserPostsSectionProps) {
   const t = useTranslations('userProfile');
+  const displayTitle = title ?? t('posts');
+  const displayEmptyMessage = emptyMessage ?? t('noPosts');
 
   return (
     <div>
-      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{t('posts')} ({posts.length})</h2>
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{displayTitle} ({posts.length})</h2>
       
       {loading ? (
         <div className="flex items-center justify-center py-8 sm:py-12">
@@ -27,7 +31,7 @@ export function UserPostsSection({ posts, loading }: UserPostsSectionProps) {
         </div>
       ) : (
         <div className="bg-white border border-gray-300 rounded-lg p-6 sm:p-8 text-center">
-          <p className="text-gray-500 text-sm sm:text-base">{t('noPosts')}</p>
+          <p className="text-gray-500 text-sm sm:text-base">{displayEmptyMessage}</p>
         </div>
       )}
     </div>

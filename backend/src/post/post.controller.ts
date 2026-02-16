@@ -54,6 +54,11 @@ export class PostController {
     description: 'Filter by author ID',
   })
   @ApiQuery({
+    name: 'commenterId',
+    required: false,
+    description: 'Filter posts that have comments by this user ID',
+  })
+  @ApiQuery({
     name: 'page',
     required: false,
     description: 'Page number',
