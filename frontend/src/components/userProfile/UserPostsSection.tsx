@@ -8,9 +8,10 @@ interface UserPostsSectionProps {
   loading: boolean;
   title?: string;
   emptyMessage?: string;
+  onPostDelete?: (postId: string) => void;
 }
 
-export function UserPostsSection({ posts, loading, title, emptyMessage }: UserPostsSectionProps) {
+export function UserPostsSection({ posts, loading, title, emptyMessage, onPostDelete }: UserPostsSectionProps) {
   const t = useTranslations('userProfile');
   const displayTitle = title ?? t('posts');
   const displayEmptyMessage = emptyMessage ?? t('noPosts');
@@ -26,7 +27,7 @@ export function UserPostsSection({ posts, loading, title, emptyMessage }: UserPo
       ) : posts.length > 0 ? (
         <div className="space-y-3 sm:space-y-4">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} onDelete={onPostDelete} />
           ))}
         </div>
       ) : (

@@ -6,6 +6,7 @@ import PostingGuide from "@/components/reuseComponents/PostingGuide";
 import RichTextEditor from "@/components/reuseComponents/RichTextEditor";
 import { Tab } from "@/components/reuseComponents/Tabs";
 import TagsInput from "@/components/reuseComponents/TagsInput";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/contexts/ToastContext";
 import { Board, boardsApi, Language, PostCategory, postsApi } from "@/lib/api";
@@ -31,8 +32,10 @@ const CreatePost = () => {
   const tToast = useTranslations("toast");
   const { locale } = useLanguage();
   const { showSuccess, showError } = useToast();
+  const { user: currentUser } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const editPostId = searchParams?.get("edit") || null;
   const communityRef = useRef<HTMLDivElement | null>(null);
   const [activeTab, setActiveTab] = useState("text");
   const [title, setTitle] = useState("");
@@ -49,6 +52,41 @@ const CreatePost = () => {
   const [showJoinPopup, setShowJoinPopup] = useState(false);
   const [boardToJoin, setBoardToJoin] = useState<Board | null>(null);
   const [postImageIds, setPostImageIds] = useState<string[]>([]);
+  const [isLoadingPost, setIsLoadingPost] = useState(false);
+
+  // Load post for edit mode
+  useEffect(() => {
+    if (!editPostId || !currentUser) return;
+    const loadPostForEdit = async () => {
+      try {
+        setIsLoadingPost(true);
+        const post = await postsApi.getById(editPostId);
+        if (post.authorId !== currentUser.id) {
+          showError(t("notAuthorOfPost") || "You can only edit your own posts");
+          router.push(ROUTE_PATHS.HOME);
+          return;
+        }
+        setTitle(post.title || "");
+        setBody(post.body || "");
+        if (post.board) {
+          setSelectedCommunity(post.board);
+          setSelectedCategory(null);
+        } else if (post.postCategory && VALID_CATEGORIES.includes(post.postCategory as PostCategory)) {
+          setSelectedCategory(post.postCategory as PostCategory);
+          setSelectedCommunity(null);
+        }
+        if (post.images && post.images.length > 0) {
+          setPostImageIds(post.images.map((img: { id: string }) => img.id));
+        }
+      } catch (error: any) {
+        showError(error.message || t("failedToLoadPost") || "Failed to load post");
+        router.push(ROUTE_PATHS.HOME);
+      } finally {
+        setIsLoadingPost(false);
+      }
+    };
+    loadPostForEdit();
+  }, [editPostId, currentUser]);
 
   // Pre-select category from URL when navigating from sidebar (e.g. ?category=News)
   useEffect(() => {
@@ -85,13 +123,13 @@ const CreatePost = () => {
     }
 
     const hasSelection = selectedCommunity || selectedCategory;
-    if (!hasSelection) {
+    if (!editPostId && !hasSelection) {
       showError(t("communityRequired"));
       return;
     }
 
-    // Check membership before posting (only when posting to a community)
-    if (selectedCommunity) {
+    // Check membership before posting (only when creating and posting to a community)
+    if (!editPostId && selectedCommunity) {
       try {
         const membership = await boardsApi.getMembershipStatus(selectedCommunity.id);
         if (!membership || membership.status !== "APPROVED") {
@@ -106,27 +144,33 @@ const CreatePost = () => {
 
     setIsPosting(true);
     try {
-      const postData = {
-        title: title.trim(),
-        ...(body.trim() && { body: body.trim() }),
-        originalLanguage: getLanguage(),
-        ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
-        tags: tags.length > 0 ? tags : undefined,
-        imageIds: postImageIds.length > 0 ? postImageIds : undefined,
-      };
-      await postsApi.create(postData);
-      
-      // Show success message
-      showSuccess(tToast("postSuccess") || "Post created successfully!");
-      
-      // Reset form
+      if (editPostId) {
+        await postsApi.update(editPostId, {
+          title: title.trim(),
+          body: body.trim() || undefined,
+          imageIds: postImageIds.length > 0 ? postImageIds : undefined,
+        });
+        showSuccess(tToast("postUpdated") || "Post updated successfully!");
+      } else {
+        const postData = {
+          title: title.trim(),
+          ...(body.trim() && { body: body.trim() }),
+          originalLanguage: getLanguage(),
+          ...(selectedCommunity ? { boardId: selectedCommunity.id } : { category: selectedCategory! }),
+          tags: tags.length > 0 ? tags : undefined,
+          imageIds: postImageIds.length > 0 ? postImageIds : undefined,
+        };
+        await postsApi.create(postData);
+        showSuccess(tToast("postSuccess") || "Post created successfully!");
+      }
+
       setTitle("");
       setBody("");
       setSelectedCommunity(null);
       setSelectedCategory(null);
       setTags([]);
       setPostImageIds([]);
-      
+
       router.push(ROUTE_PATHS.HOME);
     } catch (error: any) {
       console.error("Error creating post:", error);
@@ -282,7 +326,9 @@ const CreatePost = () => {
         <div className="flex-1 min-w-0">
         {/* Header */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{t("title")}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
+            {isLoadingPost ? t("loadingPost") || "Loading..." : editPostId ? t("editTitle") || "Edit Post" : t("title")}
+          </h1>
           {/* <button
             type="button"
             className="text-sm text-gray-600 hover:text-gray-800 font-semibold cursor-pointer w-fit touch-manipulation"
@@ -446,14 +492,14 @@ const CreatePost = () => {
               <button
                 type="button"
                 onClick={handlePost}
-                disabled={!title.trim() || isPosting || !(selectedCommunity || selectedCategory)}
+                disabled={!title.trim() || isPosting || isLoadingPost || (!editPostId && !(selectedCommunity || selectedCategory))}
                 className={`w-full sm:w-auto min-h-[44px] cursor-pointer sm:min-h-0 px-8 py-2.5 sm:py-2 text-sm font-semibold rounded-full transition-colors touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed ${
-                  title.trim() && !isPosting && (selectedCommunity || selectedCategory)
+                  title.trim() && !isPosting && !isLoadingPost && (editPostId || selectedCommunity || selectedCategory)
                     ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
-                {isPosting ? t("posting") : t("post")}
+                {isPosting ? t("posting") : editPostId ? (t("update") || "Update") : t("post")}
               </button>
             </div>
           </div>

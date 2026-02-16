@@ -2,23 +2,32 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
-import { boardsApi, reportsApi, votesApi } from "@/lib/api";
+import { boardsApi, postsApi, reportsApi, votesApi } from "@/lib/api";
+import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaLayerGroup } from "react-icons/fa";
-import { FiMessageSquare } from "react-icons/fi";
+import { FiEdit2, FiMessageSquare, FiTrash2 } from "react-icons/fi";
 import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
 import { CommentsSection } from "../commentSection/CommentSection";
 import { AuthorPopup } from "../modals/AuthorPopup";
+import { ConfirmationModal } from "../modals/ConfirmationModal";
 import { ReportModal } from "../modals/ReportModal";
 import { DropdownMenu } from "./DropDownMenu";
 
-export const PostCard = ({ post }: any) => {
+interface PostCardProps {
+  post: any;
+  onDelete?: (postId: string) => void;
+}
+
+export const PostCard = ({ post, onDelete }: PostCardProps) => {
   const t = useTranslations("feed");
   const tToast = useTranslations("toast");
   const tPostCard = useTranslations("postCard");
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user: currentUser } = useAuth();
+  const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [upvotes, setUpvotes] = useState(post?.upvotes || 0);
   const [downvotes, setDownvotes] = useState(post?.downvotes || 0);
@@ -29,6 +38,10 @@ export const PostCard = ({ post }: any) => {
   const [isVoting, setIsVoting] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const isAuthor = currentUser?.id && post?.authorId && currentUser.id === post.authorId;
 
   // Fetch user vote status on mount
   useEffect(() => {
@@ -181,13 +194,41 @@ export const PostCard = ({ post }: any) => {
     }
   };
 
-  // Post-specific menu items
+  const handleDeletePost = async () => {
+    if (!post?.id || isDeleting) return;
+    try {
+      setIsDeleting(true);
+      await postsApi.delete(post.id);
+      showSuccess(tToast("postDeleted") || "Post deleted successfully");
+      setShowDeleteModal(false);
+      onDelete?.(post.id);
+    } catch (error: any) {
+      showError(error.message || "Failed to delete post");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleEditPost = () => {
+    router.push(`${ROUTE_PATHS.CREATE_POST}?edit=${post?.id}`);
+  };
+
+  // Post-specific menu items - Edit and Delete only for author
   const postMenuItems = [
-    // {
-    //   icon: FiEyeOff,
-    //   label: "Hide",
-    //   onClick: () => console.log("Hide clicked"),
-    // },
+    ...(isAuthor
+      ? [
+          {
+            icon: FiEdit2,
+            label: tPostCard("editPost"),
+            onClick: handleEditPost,
+          },
+          {
+            icon: FiTrash2,
+            label: tPostCard("deletePost"),
+            onClick: () => setShowDeleteModal(true),
+          },
+        ]
+      : []),
     {
       icon: FaLayerGroup,
       label: tPostCard("report"),
@@ -199,11 +240,6 @@ export const PostCard = ({ post }: any) => {
         }
       },
     },
-    // {
-    //   icon: BiInfoCircle,
-    //   label: "About this post",
-    //   onClick: () => console.log("About clicked"),
-    // },
   ];
   return (
     <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
@@ -324,6 +360,19 @@ export const PostCard = ({ post }: any) => {
         onSubmit={handleReportSubmit}
         title={tPostCard("reportPost")}
         isLoading={isReporting}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeletePost}
+        title={tPostCard("confirmDeletePost")}
+        description={tPostCard("confirmDeletePostMessage")}
+        confirmText={tPostCard("deletePost")}
+        cancelText={tPostCard("cancel")}
+        confirmButtonColor="red"
+        isLoading={isDeleting}
       />
     </article>
   );

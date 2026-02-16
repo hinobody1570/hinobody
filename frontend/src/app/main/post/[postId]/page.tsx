@@ -17,6 +17,7 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
     id: post.id,
     boardId: post.boardId,
     authorId: post.authorId,
+    authorName: post.author?.nickname || "",
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
@@ -94,7 +95,7 @@ export default function PostDetailPage() {
       <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
         {/* Post Detail */}
         <div className="mb-4 sm:mb-6">
-          <PostCard post={post} />
+          <PostCard post={post} onDelete={() => router.push(ROUTE_PATHS.HOME)} />
         </div>
 
         {/* Comments Section */}

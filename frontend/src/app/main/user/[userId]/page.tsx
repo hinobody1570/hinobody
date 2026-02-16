@@ -361,6 +361,7 @@ export default function UserProfilePage() {
           loading={loadingPosts}
           title={tab === 'comments' ? t('postsWithCommentsByUser') : undefined}
           emptyMessage={tab === 'comments' ? t('noPostsWithCommentsByUser') : undefined}
+          onPostDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))}
         />
       </div>
     </div>

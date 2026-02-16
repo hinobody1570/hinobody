@@ -268,7 +268,14 @@ export const RedditFeed = () => {
             {!loading && !error && (
               <>
                 {displayPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onDelete={(id) => {
+                      setPosts((prev) => prev.filter((p) => p.id !== id));
+                      setRecentPosts((prev) => prev.filter((p) => p.id !== id));
+                    }}
+                  />
                 ))}
                 
                 {/* Infinite scroll trigger */}
