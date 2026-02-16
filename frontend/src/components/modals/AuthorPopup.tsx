@@ -98,7 +98,7 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
               className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 transition-colors text-left cursor-pointer"
             >
               <MdOutlineArticle size={20} className="text-gray-700 flex-shrink-0" />
-              <span className="text-sm font-medium text-gray-800">View posts by this user</span>
+              <span className="text-sm font-medium text-gray-800">{tPostCard("viewPostsByThisUser")}</span>
             </button>
             <button
               type="button"
@@ -106,7 +106,7 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
               className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 transition-colors text-left cursor-pointer"
             >
               <MdOutlineComment size={20} className="text-gray-700 flex-shrink-0" />
-              <span className="text-sm font-medium text-gray-800">View comments by this user</span>
+              <span className="text-sm font-medium text-gray-800">{tPostCard("viewCommentsByThisUser")}</span>
             </button>
             <button
               type="button"
@@ -114,7 +114,7 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
               className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 transition-colors text-left cursor-pointer"
             >
               <MdOutlineMail size={20} className="text-gray-700 flex-shrink-0" />
-              <span className="text-sm font-medium text-gray-800">Send message</span>
+              <span className="text-sm font-medium text-gray-800">{tPostCard("sendMessage")}</span>
             </button>
           </div>,
           document.body

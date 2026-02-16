@@ -756,6 +756,9 @@
   },
   "postCard": {
     "sendMessageComingSoon": "メッセージを送る - 準備中",
+    "viewPostsByThisUser": "このユーザーの投稿を見る",
+    "viewCommentsByThisUser": "このユーザーのコメントを見る",
+    "sendMessage": "メッセージを送る",
     "report": "報告",
     "editPost": "投稿を編集",
     "deletePost": "投稿を削除",

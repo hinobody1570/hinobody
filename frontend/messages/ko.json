@@ -756,6 +756,9 @@
   },
   "postCard": {
     "sendMessageComingSoon": "메시지 보내기 - 준비 중",
+    "viewPostsByThisUser": "이 사용자의 게시물 보기",
+    "viewCommentsByThisUser": "이 사용자의 댓글 보기",
+    "sendMessage": "메시지 보내기",
     "report": "신고",
     "editPost": "게시물 수정",
     "deletePost": "게시물 삭제",

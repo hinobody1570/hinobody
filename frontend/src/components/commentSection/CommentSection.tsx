@@ -6,7 +6,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { commentsApi, Comment as CommentType, Language } from '@/lib/api';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 import Comment from './Comment';
@@ -45,6 +45,8 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
   const t = useTranslations('comments');
+  const tRef = useRef(t);
+  tRef.current = t;
   const tTime = useTranslations('timeAgo');
   const [sortBy, setSortBy] = useState(t('best'));
   const [comments, setComments] = useState<CommentType[]>([]);
@@ -95,12 +97,12 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
       console.error('Error fetching comments:', err);
-      setError(err.message || t('failedToLoadComments'));
+      setError(err.message || tRef.current('failedToLoadComments'));
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [postId, postAuthorId, t]);
+  }, [postId, postAuthorId]);
 
   // Handle search with debounce
   useEffect(() => {

@@ -757,6 +757,9 @@
   },
   "postCard": {
     "sendMessageComingSoon": "Send message - Coming soon",
+    "viewPostsByThisUser": "View posts by this user",
+    "viewCommentsByThisUser": "View comments by this user",
+    "sendMessage": "Send message",
     "report": "Report",
     "editPost": "Edit post",
     "deletePost": "Delete post",

@@ -756,6 +756,9 @@
   },
   "postCard": {
     "sendMessageComingSoon": "发送消息 - 即将推出",
+    "viewPostsByThisUser": "查看该用户的帖子",
+    "viewCommentsByThisUser": "查看该用户的评论",
+    "sendMessage": "发送消息",
     "report": "举报",
     "editPost": "编辑帖子",
     "deletePost": "删除帖子",

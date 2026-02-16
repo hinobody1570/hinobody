@@ -46,6 +46,8 @@ const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<st
 
 export const RedditFeed = () => {
   const t = useTranslations('feed');
+  const tRef = useRef(t);
+  tRef.current = t;
   const tTime = useTranslations('timeAgo');
   const { locale } = useLanguage();
   const searchParams = useSearchParams();
@@ -117,12 +119,12 @@ export const RedditFeed = () => {
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
       console.error('Error fetching posts:', err);
-      setError(err.message || t('failedToLoadPosts'));
+      setError(err.message || tRef.current('failedToLoadPosts'));
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [t]);
+  }, []);
 
   // Transform posts for display - re-runs when locale changes so timestamps update
   const displayPosts = useMemo(
