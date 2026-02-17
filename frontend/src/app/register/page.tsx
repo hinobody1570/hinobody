@@ -28,6 +28,7 @@ type SignUpFormErrors = Partial<Record<keyof SignUpFormType, string>>;
 export default function SignupForm() {
   const t = useTranslations("auth.registerPage");
   const tAuth = useTranslations("auth");
+  const tVerify = useTranslations("auth.verifyEmailPage");
   const tToast = useTranslations("toast");
   const router = useRouter();
   const { locale } = useLanguage();
@@ -39,7 +40,7 @@ export default function SignupForm() {
   });
 
   const [errors, setErrors] = useState<any>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
@@ -126,7 +127,7 @@ export default function SignupForm() {
       <ConfirmationMessage 
         message={tAuth("registrationSuccessful")} 
         title={t("accountCreatedTitle")} 
-        buttonTitle="Verify Email"
+        buttonTitle={tVerify("verifyEmail")}
         onClick={()=> router.push(`${ROUTE_PATHS.VERIFY_EMAIL}?email=${encodeURIComponent(formData.email!)}`)}
       />
     );

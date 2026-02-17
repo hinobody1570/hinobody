@@ -463,7 +463,7 @@
     "success": "成功！",
     "loginFailed": "登录失败。请重试。",
     "registrationFailed": "注册失败。请重试。",
-    "registrationSuccessful": "注册成功！正在跳转到登录页面...",
+    "registrationSuccessful": "账户已成功创建。请点击“验证电子邮件”继续。",
     "dontHaveAccount": "没有账户？",
     "alreadyHaveAccount": "已有账户？",
     "emailPlaceholder": "user@example.com",

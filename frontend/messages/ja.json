@@ -463,7 +463,7 @@
     "success": "成功！",
     "loginFailed": "ログインに失敗しました。もう一度お試しください。",
     "registrationFailed": "登録に失敗しました。もう一度お試しください。",
-    "registrationSuccessful": "登録が成功しました！ログインページにリダイレクトしています...",
+    "registrationSuccessful": "アカウントが正常に作成されました。「メールアドレスを確認」をクリックして続行してください。",
     "dontHaveAccount": "アカウントをお持ちでないですか？",
     "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
     "emailPlaceholder": "user@example.com",

@@ -463,7 +463,7 @@
     "success": "Success!",
     "loginFailed": "Login failed. Please try again.",
     "registrationFailed": "Registration failed. Please try again.",
-    "registrationSuccessful": "Registration successful! Redirecting to verify email...",
+    "registrationSuccessful": "Account created successfully. Please click 'Verify Email' to continue.",
     "dontHaveAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
     "emailPlaceholder": "user@example.com",
