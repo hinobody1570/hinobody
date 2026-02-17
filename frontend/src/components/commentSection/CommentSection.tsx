@@ -213,7 +213,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
 
       {/* Sort and Search - stacked on mobile, row on tablet+ */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 mb-4 sm:mb-6">
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-sm text-gray-600">{t('sortBy')}</span>
           <button
             className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors cursor-pointer touch-manipulation"
@@ -222,9 +222,9 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
             {sortBy}
             <BiChevronDown size={16} />
           </button>
-        </div>
+        </div> */}
 
-        <div className="relative flex-1 w-full min-w-0 max-w-full sm:max-w-md">
+        <div className="relative flex-1 w-full min-w-0 max-w-full">
           <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 flex-shrink-0" />
           <input
             type="text"
