@@ -140,13 +140,13 @@ const ResetPassword = () => {
         <div className="space-y-6">
           {/* New Password */}
           <div>
-            <FormLabel labelTitle={t("newPassword")} htmlForTitle="new-password" />
+            <FormLabel required labelTitle={t("newPassword")} htmlForTitle="new-password" />
             <PasswordInput onChange={(e) => handlePasswordChange("new", e.target.value)} value={newPassword} error={passwordErrors.newPassword} />
           </div>
 
           {/* Confirm Password */}
           <div>
-            <FormLabel labelTitle={t("confirmPassword")} htmlForTitle="confirm-password" />
+            <FormLabel required labelTitle={t("confirmPassword")} htmlForTitle="confirm-password" />
             <PasswordInput
               onChange={(e) => handlePasswordChange("confirm", e.target.value)}
               value={confirmPassword}

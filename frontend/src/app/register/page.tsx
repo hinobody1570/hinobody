@@ -143,7 +143,7 @@ export default function SignupForm() {
         <div className="space-y-6">
           {/* Email Field */}
           <div>
-            <FormLabel labelTitle={t("emailAddress")} htmlForTitle="email" />
+            <FormLabel required labelTitle={t("emailAddress")} htmlForTitle="email" />
             <FormInput
               type="email"
               icon={<BsEnvelope className="h-5 w-5 text-gray-400" />}
@@ -159,7 +159,7 @@ export default function SignupForm() {
 
           {/* Nickname Field */}
           <div>
-            <FormLabel labelTitle={t("nickname")} htmlForTitle="nickname" />
+            <FormLabel required labelTitle={t("nickname")} htmlForTitle="nickname" />
             <FormInput
               type="text"
               icon={<FiUser className="h-5 w-5 text-gray-400" />}
@@ -175,7 +175,7 @@ export default function SignupForm() {
 
           {/* Password Field */}
           <div>
-            <FormLabel labelTitle={t("password")} htmlForTitle="password" />
+            <FormLabel required labelTitle={t("password")} htmlForTitle="password" />
             <PasswordInput onChange={handleChange} onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
           </div>
 
