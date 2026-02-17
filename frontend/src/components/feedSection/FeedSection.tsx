@@ -22,7 +22,7 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
     verified: false, // Can be enhanced later based on board settings
     timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
-    image: post.images && post.images.length > 0 ? post.images[0].url : null,
+    images: post.images?.map((img) => img.url) ?? [],
     upvotes: post.upvoteCount || 0,
     downvotes: post.downvoteCount || 0,
     comments: post.commentCount || 0,
@@ -43,6 +43,7 @@ const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<st
     title: post.title,
     upvotes: upvoteCount - downvoteCount, // net score (can be negative)
     comments: post.commentCount || 0,
+    images: post.images?.map((img) => img.url) ?? [],
   };
 };
 

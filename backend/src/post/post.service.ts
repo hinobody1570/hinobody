@@ -272,7 +272,7 @@ export class PostService {
           include: {
             author: { select: { id: true, nickname: true, language: true } },
             board: true,
-            images: { take: 1 },
+            images: true,
             _count: { select: { votes: true, comments: true } },
           },
         });
@@ -291,7 +291,7 @@ export class PostService {
           include: {
             author: { select: { id: true, nickname: true, language: true } },
             board: true,
-            images: { take: 1 },
+            images: true,
             _count: { select: { votes: true, comments: true } },
           },
         }),

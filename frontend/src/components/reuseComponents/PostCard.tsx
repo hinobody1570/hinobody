@@ -16,6 +16,7 @@ import { AuthorPopup } from "../modals/AuthorPopup";
 import { ConfirmationModal } from "../modals/ConfirmationModal";
 import { ReportModal } from "../modals/ReportModal";
 import { DropdownMenu } from "./DropDownMenu";
+import { ImageSlider } from "./ImageSlider";
 
 interface PostCardProps {
   post: any;
@@ -320,10 +321,8 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
       </div>
 
       {/* Post Image/Content */}
-      {post.image && (
-        <div className="bg-[#f5f5f5]">
-          <Image src={post?.image ?? ""} width={400} height={400} alt={post.title} className="mx-auto object-contain" />
-        </div>
+      {post.images && post.images.length > 0 && (
+        <ImageSlider images={post.images} alt={post.title} />
       )}
 
       {post?.body && (
