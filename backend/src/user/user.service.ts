@@ -50,7 +50,7 @@ export class UserService {
     // Generate OTP
     const otp = this.generateOTP();
     const otpExpiry = new Date();
-    otpExpiry.setMinutes(otpExpiry.getMinutes() + 10); // OTP expires in 10 minutes
+    otpExpiry.setMinutes(otpExpiry.getMinutes() + 60); // OTP expires in 60 minutes
 
     // Create user with email verification fields
     const user: any = await this.prisma.user.create({

@@ -520,7 +520,7 @@
       "sending": "Sending...",
       "checkYourEmail": "Check Your Email",
       "resetLinkSent": "We've sent a password reset link to",
-      "resetLinkInstructions": "Click the link in the email to reset your password. The link will expire in 24 hours.",
+      "resetLinkInstructions": "Click the link in the email to reset your password. The link will expire in 1 hour.",
       "openEmailApp": "Open Email App",
       "didntReceiveEmail": "Didn't receive the email?",
       "resendEmail": "Resend Email",

@@ -519,7 +519,7 @@
       "sending": "送信中...",
       "checkYourEmail": "メールを確認してください",
       "resetLinkSent": "パスワードリセットリンクを次のアドレスに送信しました",
-      "resetLinkInstructions": "メール内のリンクをクリックしてパスワードをリセットしてください。リンクは24時間後に期限切れになります。",
+      "resetLinkInstructions": "メール内のリンクをクリックしてパスワードをリセットしてください。リンクは1時間後に期限切れになります。",
       "openEmailApp": "メールアプリを開く",
       "didntReceiveEmail": "メールが届いていませんか？",
       "resendEmail": "メールを再送信",

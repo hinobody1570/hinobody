@@ -519,7 +519,7 @@
       "sending": "发送中...",
       "checkYourEmail": "检查您的电子邮件",
       "resetLinkSent": "我们已向以下地址发送了密码重置链接",
-      "resetLinkInstructions": "点击电子邮件中的链接以重置您的密码。链接将在 24 小时后过期。",
+      "resetLinkInstructions": "点击电子邮件中的链接以重置您的密码。链接将在 1 小时后过期。",
       "openEmailApp": "打开电子邮件应用",
       "didntReceiveEmail": "没有收到电子邮件？",
       "resendEmail": "重新发送电子邮件",

@@ -519,7 +519,7 @@
       "sending": "전송 중...",
       "checkYourEmail": "이메일을 확인하세요",
       "resetLinkSent": "비밀번호 재설정 링크를 다음 주소로 보냈습니다",
-      "resetLinkInstructions": "이메일의 링크를 클릭하여 비밀번호를 재설정하세요. 링크는 24시간 후에 만료됩니다.",
+      "resetLinkInstructions": "이메일의 링크를 클릭하여 비밀번호를 재설정하세요. 링크는 1시간 후에 만료됩니다.",
       "openEmailApp": "이메일 앱 열기",
       "didntReceiveEmail": "이메일을 받지 못하셨나요?",
       "resendEmail": "이메일 다시 보내기",
