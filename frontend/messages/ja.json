@@ -187,6 +187,7 @@
     "failedToBlockUser": "ユーザーのブロックに失敗しました",
     "failedToUnblockUser": "ブロック解除に失敗しました",
     "failedToUpdateProfile": "プロフィールの更新に失敗しました",
+    "nicknameUpdatedSuccessfully": "ニックネームが正常に更新されました",
     "failedToUploadAvatar": "アバターのアップロードに失敗しました",
     "pleaseSelectImageFile": "画像ファイルを選択してください",
     "imageSizeTooLarge": "画像サイズは5MB未満である必要があります",

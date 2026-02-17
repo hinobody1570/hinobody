@@ -187,6 +187,7 @@
     "failedToBlockUser": "사용자 차단에 실패했습니다",
     "failedToUnblockUser": "차단 해제에 실패했습니다",
     "failedToUpdateProfile": "프로필 업데이트에 실패했습니다",
+    "nicknameUpdatedSuccessfully": "닉네임이 성공적으로 업데이트되었습니다",
     "failedToUploadAvatar": "아바타 업로드에 실패했습니다",
     "pleaseSelectImageFile": "이미지 파일을 선택해주세요",
     "imageSizeTooLarge": "이미지 크기는 5MB 미만이어야 합니다",

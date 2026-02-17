@@ -8,6 +8,7 @@ import { formatTimestamp } from '@/utils/helperFunction';
 import { FiEdit, FiCamera, FiUserX } from 'react-icons/fi';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 import { usersApi, s3Api } from '@/lib/api';
+import { useToast } from '@/contexts/ToastContext';
 
 interface UserProfileHeaderProps {
   user: User;
@@ -36,6 +37,8 @@ export function UserProfileHeader({
   const tTime = useTranslations('timeAgo');
   const [isEditing, setIsEditing] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const { showSuccess, showError } = useToast();
+  
   const [editForm, setEditForm] = useState({
     nickname: user.nickname,
   });
@@ -56,9 +59,10 @@ export function UserProfileHeader({
       if (onUserUpdate) {
         onUserUpdate(updatedUser);
       }
+      showSuccess(t('nicknameUpdatedSuccessfully'));
     } catch (err: any) {
       console.error('Error updating user:', err);
-      alert(err.message || t('failedToUpdateProfile'));
+      showError(err.message || t('failedToUpdateProfile'));
     }
   };
 

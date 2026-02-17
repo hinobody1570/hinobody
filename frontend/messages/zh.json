@@ -187,6 +187,7 @@
     "failedToBlockUser": "屏蔽用户失败",
     "failedToUnblockUser": "取消屏蔽失败",
     "failedToUpdateProfile": "更新个人资料失败",
+    "nicknameUpdatedSuccessfully": "昵称更新成功",
     "failedToUploadAvatar": "上传头像失败",
     "pleaseSelectImageFile": "请选择图片文件",
     "imageSizeTooLarge": "图片大小应小于5MB",

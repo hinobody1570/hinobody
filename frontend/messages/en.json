@@ -186,6 +186,7 @@
     "failedToBlockUser": "Failed to block user",
     "failedToUnblockUser": "Failed to unblock user",
     "failedToUpdateProfile": "Failed to update profile",
+    "nicknameUpdatedSuccessfully": "Nickname updated successfully",
     "failedToUploadAvatar": "Failed to upload avatar",
     "pleaseSelectImageFile": "Please select an image file",
     "imageSizeTooLarge": "Image size should be less than 5MB",
