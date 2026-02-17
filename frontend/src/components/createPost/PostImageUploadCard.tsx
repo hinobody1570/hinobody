@@ -78,7 +78,7 @@ export const PostImageUploadCard = ({ onImagesReady, imageIds }: PostImageUpload
           role="presentation"
         >
           <div
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-lg mt-20 shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
