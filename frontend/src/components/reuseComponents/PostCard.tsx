@@ -326,7 +326,9 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
         </div>
       )}
 
-      {post?.body && <div className="px-3 pb-2 [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800" dangerouslySetInnerHTML={{ __html: post?.body }} />}
+      {post?.body && (
+        <div className="px-3 pb-2 [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800" dangerouslySetInnerHTML={{ __html: post?.body }} />
+      )}
 
       {/* Post Actions */}
       <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-200">
@@ -356,7 +358,7 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
           onClick={() => setShowComments(!showComments)}
           className="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
         >
-          <FiMessageSquare size={20} className="text-gray-600" />
+          <FiMessageSquare size={20} className={`${showComments ? "text-blue-600" : "text-gray-600"}`} />
           <span className="text-sm font-semibold text-gray-800">{displayCommentCount}</span>
         </button>
 
@@ -370,17 +372,17 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
         </button> */}
       </div>
       {showComments && (
-          <CommentsSection
-            postId={post?.id}
-            postAuthorId={post?.authorId}
-            onCommentAdded={() => {
-              if (commentCountProp === undefined) {
-                setCommentCount((prev: number) => prev + 1);
-              }
-              onCommentAddedProp?.();
-            }}
-          />
-        )}
+        <CommentsSection
+          postId={post?.id}
+          postAuthorId={post?.authorId}
+          onCommentAdded={() => {
+            if (commentCountProp === undefined) {
+              setCommentCount((prev: number) => prev + 1);
+            }
+            onCommentAddedProp?.();
+          }}
+        />
+      )}
 
       {/* Report Modal */}
       <ReportModal
