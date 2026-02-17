@@ -33,13 +33,15 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
 
 // Transform API post to RecentPostCard format
 const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
+  const upvoteCount = post.upvoteCount ?? 0;
+  const downvoteCount = post.downvoteCount ?? 0;
   return {
     id: post.id,
     community: post.board?.name ? `r/${post.board.name}` : post.postCategory || "r/community",
     avatar: DP, // Default avatar
     timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
-    upvotes: post.upvoteCount || 0,
+    upvotes: upvoteCount - downvoteCount, // net score (can be negative)
     comments: post.commentCount || 0,
   };
 };
@@ -92,6 +94,30 @@ export const RedditFeed = () => {
   const handleClearRecentPosts = () => {
     setShowRecentPosts(false);
   };
+
+  // Update comment count in recent posts when a comment is added
+  const handleCommentAdded = useCallback((postId: string) => {
+    setRecentPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, commentCount: (p.commentCount ?? 0) + 1 } : p
+      )
+    );
+  }, []);
+
+  // Update vote counts in recent posts when a vote is cast
+  const handleVoteChange = useCallback((postId: string, upvoteDelta: number, downvoteDelta: number) => {
+    setRecentPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              upvoteCount: (p.upvoteCount ?? 0) + upvoteDelta,
+              downvoteCount: (p.downvoteCount ?? 0) + downvoteDelta,
+            }
+          : p
+      )
+    );
+  }, []);
 
   // Fetch posts with sort and category filter
   const fetchPosts = useCallback(async (page: number = 1, sortBy: PostSortBy = 'newest', append: boolean = false, category?: string) => {
@@ -277,6 +303,8 @@ export const RedditFeed = () => {
                       setPosts((prev) => prev.filter((p) => p.id !== id));
                       setRecentPosts((prev) => prev.filter((p) => p.id !== id));
                     }}
+                    onCommentAdded={() => handleCommentAdded(post.id)}
+                    onVoteChange={handleVoteChange}
                   />
                 ))}
                 

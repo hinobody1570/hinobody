@@ -20,9 +20,15 @@ import { DropdownMenu } from "./DropDownMenu";
 interface PostCardProps {
   post: any;
   onDelete?: (postId: string) => void;
+  /** Override comment count (e.g. when CommentsSection is rendered outside PostCard) */
+  commentCount?: number;
+  /** Callback when comment/reply added (use when commentCount is controlled by parent) */
+  onCommentAdded?: () => void;
+  /** Callback when vote changes (upvoteDelta, downvoteDelta from API response) */
+  onVoteChange?: (postId: string, upvoteDelta: number, downvoteDelta: number) => void;
 }
 
-export const PostCard = ({ post, onDelete }: PostCardProps) => {
+export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCommentAdded: onCommentAddedProp, onVoteChange }: PostCardProps) => {
   const t = useTranslations("feed");
   const tToast = useTranslations("toast");
   const tPostCard = useTranslations("postCard");
@@ -40,8 +46,18 @@ export const PostCard = ({ post, onDelete }: PostCardProps) => {
   const [isReporting, setIsReporting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [commentCount, setCommentCount] = useState(commentCountProp ?? post?.comments ?? 0);
 
   const isAuthor = currentUser?.id && post?.authorId && currentUser.id === post.authorId;
+
+  // Use prop override when provided (e.g. post detail page), otherwise sync from post
+  const displayCommentCount = commentCountProp !== undefined ? commentCountProp : commentCount;
+
+  useEffect(() => {
+    if (commentCountProp === undefined) {
+      setCommentCount(post?.comments ?? 0);
+    }
+  }, [post?.id, post?.comments, commentCountProp]);
 
   // Fetch user vote status on mount
   useEffect(() => {
@@ -87,6 +103,7 @@ export const PostCard = ({ post, onDelete }: PostCardProps) => {
       // Update counts based on API response
       setUpvotes((prev: number) => prev + response.upvoteCount);
       setDownvotes((prev: number) => prev + response.downvoteCount);
+      onVoteChange?.(post.id, response.upvoteCount, response.downvoteCount);
     } catch (error: any) {
       console.error("Error voting:", error);
       showError(error.message || "Failed to vote. Please try again.");
@@ -115,6 +132,7 @@ export const PostCard = ({ post, onDelete }: PostCardProps) => {
       // Update counts based on API response
       setUpvotes((prev: number) => prev + response.upvoteCount);
       setDownvotes((prev: number) => prev + response.downvoteCount);
+      onVoteChange?.(post.id, response.upvoteCount, response.downvoteCount);
     } catch (error: any) {
       console.error("Error voting:", error);
       showError(error.message || "Failed to vote. Please try again.");
@@ -339,7 +357,7 @@ export const PostCard = ({ post, onDelete }: PostCardProps) => {
           className="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
         >
           <FiMessageSquare size={20} className="text-gray-600" />
-          <span className="text-sm font-semibold text-gray-800">{post?.comments}</span>
+          <span className="text-sm font-semibold text-gray-800">{displayCommentCount}</span>
         </button>
 
         {/* <button className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-full transition-colors cursor-pointer">
@@ -351,7 +369,18 @@ export const PostCard = ({ post, onDelete }: PostCardProps) => {
           <span className="text-sm font-semibold text-gray-800">{t("share")}</span>
         </button> */}
       </div>
-      {showComments && <CommentsSection postId={post?.id} postAuthorId={post?.authorId} />}
+      {showComments && (
+          <CommentsSection
+            postId={post?.id}
+            postAuthorId={post?.authorId}
+            onCommentAdded={() => {
+              if (commentCountProp === undefined) {
+                setCommentCount((prev: number) => prev + 1);
+              }
+              onCommentAddedProp?.();
+            }}
+          />
+        )}
 
       {/* Report Modal */}
       <ReportModal

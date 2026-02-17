@@ -42,6 +42,7 @@ export default function PostDetailPage() {
   const [rawPost, setRawPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -67,6 +68,13 @@ export default function PostDetailPage() {
     () => (rawPost ? transformPost(rawPost, tTime) : null),
     [rawPost, tTime, locale]
   );
+
+  // Sync comment count when post loads
+  useEffect(() => {
+    if (post) {
+      setCommentCount(post.comments ?? 0);
+    }
+  }, [post?.id, post?.comments]);
 
   if (loading) {
     return (
@@ -95,12 +103,21 @@ export default function PostDetailPage() {
       <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
         {/* Post Detail */}
         <div className="mb-4 sm:mb-6">
-          <PostCard post={post} onDelete={() => router.push(ROUTE_PATHS.HOME)} />
+          <PostCard
+            post={post}
+            onDelete={() => router.push(ROUTE_PATHS.HOME)}
+            commentCount={commentCount}
+            onCommentAdded={() => setCommentCount((c) => c + 1)}
+          />
         </div>
 
         {/* Comments Section */}
         <div className="bg-white border border-gray-300 rounded-lg p-3 sm:p-4 md:p-6 overflow-hidden">
-          <CommentsSection postId={postId} postAuthorId={post.authorId} />
+          <CommentsSection
+            postId={postId}
+            postAuthorId={post.authorId}
+            onCommentAdded={() => setCommentCount((c) => c + 1)}
+          />
         </div>
       </div>
     </div>

@@ -37,10 +37,11 @@ const transformComment = (
 interface CommentsSectionProps {
   postId: string;
   postAuthorId?: string;
+  onCommentAdded?: () => void;
 }
 
 // Main Comments Section Component
-export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
+export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: CommentsSectionProps) => {
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
@@ -177,6 +178,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       });
       setNewComment('');
       showSuccess(t('commentAddedSuccess'));
+      onCommentAdded?.();
       // Refresh comments from page 1
       await fetchComments(1, false);
     } catch (err: any) {
@@ -272,12 +274,15 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       {!loading && !error && (
         <div className="space-y-3 sm:space-y-4">
           {displayComments.map((comment) => (
-            <Comment 
-              key={comment.id} 
+            <Comment
+              key={comment.id}
               comment={comment}
               postId={postId}
               postAuthorId={postAuthorId}
-              onReplyAdded={() => fetchComments(1, false)}
+              onReplyAdded={() => {
+                onCommentAdded?.();
+                fetchComments(1, false);
+              }}
             />
           ))}
           
