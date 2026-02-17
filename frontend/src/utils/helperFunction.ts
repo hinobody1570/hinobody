@@ -1,3 +1,9 @@
+// Password validation: at least 8 chars, uppercase, lowercase, number, special character
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
+
+export const isValidPasswordFormat = (password: string): boolean =>
+  PASSWORD_REGEX.test(password);
+
 // Helper function to format timestamp (relative time, e.g. "5 mins ago")
 // Pass t from useTranslations("timeAgo") to get localized strings in all languages
 export type TimeAgoTranslator = (key: string, values?: Record<string, number | string>) => string;

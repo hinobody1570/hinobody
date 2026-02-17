@@ -6,6 +6,7 @@ import FormLabel from "@/components/reuseComponents/FormLabel";
 import PasswordInput from "@/components/reuseComponents/PasswordInput";
 import { useToast } from "@/contexts/ToastContext";
 import { authApi } from "@/lib/api";
+import { isValidPasswordFormat } from "@/utils/helperFunction";
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -16,6 +17,7 @@ import { GoArrowLeft } from "react-icons/go";
 
 const ResetPassword = () => {
   const t = useTranslations("auth.resetPasswordPage");
+  const tAuth = useTranslations("auth");
   const tToast = useTranslations("toast");
   const tReset = useTranslations("resetPassword");
   const router = useRouter();
@@ -44,8 +46,8 @@ const ResetPassword = () => {
 
     if (!newPassword) {
       errors.newPassword = t("passwordRequired");
-    } else if (newPassword.length < 8) {
-      errors.newPassword = t("passwordMinLength8");
+    } else if (!isValidPasswordFormat(newPassword)) {
+      errors.newPassword = tAuth("passwordInvalidFormat");
     }
 
     if (!confirmPassword) {

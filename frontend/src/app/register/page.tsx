@@ -12,6 +12,7 @@ import { BsEnvelope } from "react-icons/bs";
 import { FiUser } from "react-icons/fi";
 import { useTranslations } from "next-intl";
 import { register } from "@/lib/auth";
+import { isValidPasswordFormat } from "@/utils/helperFunction";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/contexts/ToastContext";
@@ -58,8 +59,8 @@ export default function SignupForm() {
 
     if (!formData.password) {
       newErrors.password = t("passwordRequired");
-    } else if (formData.password.length < 8) {
-      newErrors.password = t("passwordMinLength8");
+    } else if (!isValidPasswordFormat(formData.password)) {
+      newErrors.password = tAuth("passwordInvalidFormat");
     }
 
     return newErrors;
