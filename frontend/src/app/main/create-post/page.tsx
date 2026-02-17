@@ -132,13 +132,39 @@ const CreatePost = () => {
     if (!editPostId && selectedCommunity) {
       try {
         const membership = await boardsApi.getMembershipStatus(selectedCommunity.id);
-        if (!membership || membership.status !== "APPROVED") {
+        
+        // For PRIVATE/RESTRICTED boards, user must be an APPROVED member
+        if (selectedCommunity.visibilityAccess === "PRIVATE" || selectedCommunity.visibilityAccess === "RESTRICTED") {
+          if (!membership || membership.status !== "APPROVED") {
+            if (membership && membership.status === "PENDING") {
+              showError(t("requestPending") || "Your request to join this board is pending approval. You can post once your request is approved.");
+            } else {
+              setBoardToJoin(selectedCommunity);
+              setShowJoinPopup(true);
+            }
+            return;
+          }
+        }
+        // For PUBLIC boards, membership is optional but if exists, should be APPROVED
+        else if (selectedCommunity.visibilityAccess === "PUBLIC") {
+          if (membership && membership.status !== "APPROVED") {
+            if (membership.status === "PENDING") {
+              showError(t("requestPending") || "Your request to join this board is pending approval. You can post once your request is approved.");
+              return;
+            } else if (membership.status === "REJECTED") {
+              showError(t("requestRejected") || "Your request to join this board was rejected. You cannot post in this board.");
+              return;
+            }
+          }
+        }
+      } catch (error: any) {
+        console.warn("Could not check membership status:", error);
+        // For PRIVATE/RESTRICTED boards, if we can't check membership, require join
+        if (selectedCommunity.visibilityAccess === "PRIVATE" || selectedCommunity.visibilityAccess === "RESTRICTED") {
           setBoardToJoin(selectedCommunity);
           setShowJoinPopup(true);
           return;
         }
-      } catch (error: any) {
-        console.warn("Could not check membership status:", error);
       }
     }
 
@@ -278,13 +304,19 @@ const CreatePost = () => {
     setShowDropdown(false);
     setSearchQuery("");
     
-    // Check membership status when board is selected (optional - for UI feedback)
-    // This is optional and doesn't block selection
-    try {
-      const membership = await boardsApi.getMembershipStatus(board.id);
-      // Could show a visual indicator here if needed
-    } catch (error) {
-      // Silently fail - we'll check again when posting
+    // Check membership status when board is selected
+    // For PRIVATE/RESTRICTED boards, show toast if request is pending
+    if (board.visibilityAccess === "PRIVATE" || board.visibilityAccess === "RESTRICTED") {
+      try {
+        const membership = await boardsApi.getMembershipStatus(board.id);
+        if (membership && membership.status === "PENDING") {
+          showError(t("requestPending") || "Your request to join this board is pending approval. You can post once your request is approved.");
+        } else if (!membership || membership.status !== "APPROVED") {
+          // User needs to join - will be handled when they try to post
+        }
+      } catch (error) {
+        // Silently fail - we'll check again when posting
+      }
     }
   };
 

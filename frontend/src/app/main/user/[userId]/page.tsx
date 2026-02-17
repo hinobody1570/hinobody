@@ -313,21 +313,21 @@ export default function UserProfilePage() {
         )} */}
 
         {/* Community Boards Section */}
-        {/* <CommunityBoardsSection
+        <CommunityBoardsSection
           createdBoards={createdBoards}
           memberBoards={memberBoards}
           loading={loadingBoards}
-        /> */}
+        />
 
         {/* Pending Membership Requests - Only show on own profile */}
-        {/* {isOwnProfile && (
+        {isOwnProfile && (
           <PendingRequestsSection
             requests={pendingRequests}
             loading={loadingRequests}
             onApprove={handleApproveRequest}
             onReject={handleRejectRequest}
           />
-        )} */}
+        )}
 
         {/* Tabs: Posts | Comments */}
         <div className="flex gap-2 border-b border-gray-200 mb-4">

@@ -305,6 +305,22 @@ export const boardsApi = {
   rejectMembership: async (membershipId: string): Promise<void> => {
     await api.delete(`${API_END_POINT.BOARDS}/membership/${membershipId}/reject`);
   },
+  // Admin endpoints
+  getAllMemberships: async (): Promise<BoardMembership[]> => {
+    const response = await api.get<ApiResponse<BoardMembership[]>>(`${API_END_POINT.BOARDS}/admin/memberships`);
+    return response.data;
+  },
+  approveMembershipAdmin: async (boardId: string, memberId: string): Promise<BoardMembership> => {
+    const response = await api.patch<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/admin/${boardId}/members/${memberId}/approve`);
+    return response.data;
+  },
+  rejectMembershipAdmin: async (boardId: string, memberId: string): Promise<BoardMembership> => {
+    const response = await api.patch<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/admin/${boardId}/members/${memberId}/reject`);
+    return response.data;
+  },
+  deleteMembershipAdmin: async (boardId: string, memberId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/admin/${boardId}/members/${memberId}`);
+  },
 };
 
 // Board Categories API endpoints

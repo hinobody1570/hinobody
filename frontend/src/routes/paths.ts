@@ -33,5 +33,6 @@ export const ROUTE_PATHS = {
     ADMIN_BOARD_CATEGORIES: "/admin/board-categories",
     ADMIN_EYE_MASKING: "/admin/eye-masking",
     ADMIN_REPORTS: "/admin/reports",
-    ADMIN_BLOCKS: "/admin/blocks"
+    ADMIN_BLOCKS: "/admin/blocks",
+    ADMIN_MEMBERSHIPS: "/admin/memberships"
 }

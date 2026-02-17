@@ -295,5 +295,163 @@ export class BoardMemberService {
 
     return { message: 'Successfully left the board' };
   }
+
+  /**
+   * Get all memberships across all boards (admin only)
+   * Pending requests are shown first
+   */
+  async getAllMemberships() {
+    const memberships = await this.prisma.boardMember.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+            email: true,
+            createdAt: true,
+          },
+        },
+        board: {
+          select: {
+            id: true,
+            name: true,
+            visibilityAccess: true,
+            creator: {
+              select: {
+                id: true,
+                nickname: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [
+        { status: 'asc' }, // PENDING comes before APPROVED alphabetically
+        { createdAt: 'desc' },
+      ],
+    });
+
+    // Sort manually to ensure PENDING is first
+    return memberships.sort((a, b) => {
+      if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
+      if (a.status !== 'PENDING' && b.status === 'PENDING') return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
+
+  /**
+   * Admin: Approve a membership request
+   */
+  async approveMembership(boardId: string, memberId: string) {
+    const membership = await this.prisma.boardMember.findUnique({
+      where: {
+        userId_boardId: {
+          userId: memberId,
+          boardId,
+        },
+      },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('Membership not found');
+    }
+
+    return this.prisma.boardMember.update({
+      where: {
+        userId_boardId: {
+          userId: memberId,
+          boardId,
+        },
+      },
+      data: { status: 'APPROVED' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+            email: true,
+          },
+        },
+        board: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Admin: Delete a membership
+   */
+  async deleteMembership(boardId: string, memberId: string) {
+    const membership = await this.prisma.boardMember.findUnique({
+      where: {
+        userId_boardId: {
+          userId: memberId,
+          boardId,
+        },
+      },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('Membership not found');
+    }
+
+    await this.prisma.boardMember.delete({
+      where: {
+        userId_boardId: {
+          userId: memberId,
+          boardId,
+        },
+      },
+    });
+
+    return { message: 'Membership deleted successfully' };
+  }
+
+  /**
+   * Admin: Reject a membership request
+   */
+  async rejectMembership(boardId: string, memberId: string) {
+    const membership = await this.prisma.boardMember.findUnique({
+      where: {
+        userId_boardId: {
+          userId: memberId,
+          boardId,
+        },
+      },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('Membership not found');
+    }
+
+    return this.prisma.boardMember.update({
+      where: {
+        userId_boardId: {
+          userId: memberId,
+          boardId,
+        },
+      },
+      data: { status: 'REJECTED' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+            email: true,
+          },
+        },
+        board: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
 }
 
