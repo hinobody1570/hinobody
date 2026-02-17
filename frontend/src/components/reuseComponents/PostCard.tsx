@@ -248,7 +248,7 @@ export const PostCard = ({ post, onDelete }: PostCardProps) => {
         {/* Left: board avatar, name, verified, timestamp, badge */}
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <Image src={post?.communityAvatar} alt={post?.community} className="w-8 h-8 rounded-full flex-shrink-0" />
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
+          <div className="flex gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
             <div className="flex flex-col min-w-0">
               <span className="font-bold text-sm hover:underline cursor-pointer truncate min-w-0" title={post?.community}>
                 {post?.community}
