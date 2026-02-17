@@ -38,6 +38,7 @@ export default function FormInput({
           id={id}
           name={name}
           type={type}
+          autoComplete="off"
           value={value}
           onChange={onChange}
           onKeyPress={onKeyPress}
