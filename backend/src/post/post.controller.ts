@@ -72,8 +72,8 @@ export class PostController {
   })
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiResponse({ status: 200, description: 'List of posts with pagination' })
-  findAll(@Query() query: QueryPostsDto, @GetUser('id') userId: string) {
-    return this.postService.findAll(query, userId);
+  findAll(@Query() query: QueryPostsDto, @GetUser('id') userId: string, @GetUser('role') role: string) {
+    return this.postService.findAll(query, userId, role === 'ADMIN');
   }
 
   @Get('feed')
@@ -81,8 +81,8 @@ export class PostController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get home feed (all boards combined)' })
   @ApiResponse({ status: 200, description: 'Home feed posts' })
-  getHomeFeed(@Query() query: QueryPostsDto, @GetUser('id') userId: string) {
-    return this.postService.getHomeFeed(query, userId);
+  getHomeFeed(@Query() query: QueryPostsDto, @GetUser('id') userId: string, @GetUser('role') role: string) {
+    return this.postService.getHomeFeed(query, userId, role === 'ADMIN');
   }
 
   @Get(':id')

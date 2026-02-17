@@ -11,7 +11,7 @@ import { S3Service } from '../s3/s3.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { QueryPostsDto, PostSortBy } from './dto/query-posts.dto';
-import { Post, Prisma } from '@prisma/client';
+import { Post, Prisma, BoardVisibility } from '@prisma/client';
 
 @Injectable()
 export class PostService {
@@ -194,7 +194,7 @@ export class PostService {
     return rows.map((r) => r.id);
   }
 
-  async findAll(query: QueryPostsDto, userId?: string) {
+  async findAll(query: QueryPostsDto, userId?: string, isAdmin: boolean = false) {
     const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
 
@@ -208,9 +208,22 @@ export class PostService {
       blockedUserIds = blocks.map((block) => block.blockedId);
     }
 
+    // Get board IDs where user is an approved member (for filtering private/restricted boards)
+    let memberBoardIds: string[] = [];
+    if (userId && !isAdmin) {
+      const memberships = await this.prisma.boardMember.findMany({
+        where: {
+          userId,
+          status: 'APPROVED',
+        },
+        select: { boardId: true },
+      });
+      memberBoardIds = memberships.map((m) => m.boardId);
+    }
+
     // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
     if (search) {
-      return this.findAllWithFTS(query, blockedUserIds);
+      return this.findAllWithFTS(query, blockedUserIds, userId, isAdmin);
     }
 
     // If authorId or commenterId is specified and that user is blocked, return empty results
@@ -310,20 +323,58 @@ export class PostService {
           }))
         : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds);
 
+    // Filter posts by board visibility and membership (unless admin)
+    const filteredPosts = isAdmin
+      ? postsWithFilteredCounts
+      : postsWithFilteredCounts.filter((post) => {
+          // Category posts (no board) are always visible
+          if (!post.boardId || !post.board) {
+            return true;
+          }
+
+          const boardVisibility = post.board.visibilityAccess;
+
+          // PUBLIC boards are always visible
+          if (boardVisibility === BoardVisibility.PUBLIC) {
+            return true;
+          }
+
+          // PRIVATE/RESTRICTED boards: only visible if user is a member
+          if (boardVisibility === BoardVisibility.PRIVATE || boardVisibility === BoardVisibility.RESTRICTED) {
+            return memberBoardIds.includes(post.boardId);
+          }
+
+          // Default: hide if visibility is unknown
+          return false;
+        });
+
     return {
-      data: postsWithFilteredCounts,
+      data: filteredPosts,
       meta: {
-        total,
+        total: filteredPosts.length, // Note: This is filtered count, not total from DB
         page,
         limit,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(filteredPosts.length / limit),
       },
     };
   }
 
-  private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = []) {
+  private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = [], userId?: string, isAdmin: boolean = false) {
     const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
+
+    // Get board IDs where user is an approved member (for filtering private/restricted boards)
+    let memberBoardIds: string[] = [];
+    if (userId && !isAdmin) {
+      const memberships = await this.prisma.boardMember.findMany({
+        where: {
+          userId,
+          status: 'APPROVED',
+        },
+        select: { boardId: true },
+      });
+      memberBoardIds = memberships.map((m) => m.boardId);
+    }
 
     // If authorId or commenterId is specified and that user is blocked, return empty results
     if (blockedUserIds.length > 0) {
@@ -424,13 +475,38 @@ export class PostService {
           }))
         : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds);
 
+    // Filter posts by board visibility and membership (unless admin)
+    const filteredPosts = isAdmin
+      ? postsWithFilteredCounts
+      : postsWithFilteredCounts.filter((post) => {
+          // Category posts (no board) are always visible
+          if (!post.boardId || !post.board) {
+            return true;
+          }
+
+          const boardVisibility = post.board.visibilityAccess;
+
+          // PUBLIC boards are always visible
+          if (boardVisibility === BoardVisibility.PUBLIC) {
+            return true;
+          }
+
+          // PRIVATE/RESTRICTED boards: only visible if user is a member
+          if (boardVisibility === BoardVisibility.PRIVATE || boardVisibility === BoardVisibility.RESTRICTED) {
+            return memberBoardIds.includes(post.boardId);
+          }
+
+          // Default: hide if visibility is unknown
+          return false;
+        });
+
     return {
-      data: postsWithFilteredCounts,
+      data: filteredPosts,
       meta: {
-        total,
+        total: filteredPosts.length, // Note: This is filtered count, not total from DB
         page,
         limit,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(filteredPosts.length / limit),
       },
     };
   }
@@ -623,13 +699,14 @@ export class PostService {
   }
 
   // Get home feed (all boards combined)
-  async getHomeFeed(query: QueryPostsDto, userId?: string) {
+  async getHomeFeed(query: QueryPostsDto, userId?: string, isAdmin: boolean = false) {
     return this.findAll(
       {
         ...query,
         boardId: undefined, // Remove board filter for home feed
       },
       userId,
+      isAdmin,
     );
   }
 }
