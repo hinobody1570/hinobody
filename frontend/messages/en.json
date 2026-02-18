@@ -219,6 +219,7 @@
     "created": "Created",
     "join": "Join",
     "joined": "Joined",
+    "pending": "Pending",
     "loading": "Loading...",
     "posts": "Posts",
     "noPosts": "No posts yet",
@@ -824,6 +825,8 @@
     "joinedSuccess": "Successfully joined the board! You can now post.",
     "joinRequestSubmitted": "Join request submitted! The board creator will review your request.",
     "joinError": "Failed to join board. Please try again.",
+    "leaveError": "Failed to leave board. Please try again.",
+    "requestCancelled": "Membership request cancelled",
     "cancel": "Cancel",
     "join": "Join",
     "joining": "Joining..."

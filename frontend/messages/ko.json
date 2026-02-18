@@ -216,6 +216,7 @@
     "created": "생성일",
     "join": "가입",
     "joined": "가입됨",
+    "pending": "대기 중",
     "loading": "로딩 중...",
     "posts": "게시물",
     "noPosts": "아직 게시물이 없습니다",
@@ -819,6 +820,8 @@
     "joinedSuccess": "보드에 성공적으로 가입했습니다! 이제 게시할 수 있습니다.",
     "joinRequestSubmitted": "가입 요청이 제출되었습니다! 보드 생성자가 요청을 검토할 것입니다.",
     "joinError": "보드 가입에 실패했습니다. 다시 시도해주세요.",
+    "leaveError": "보드 탈퇴에 실패했습니다. 다시 시도해주세요.",
+    "requestCancelled": "가입 요청이 취소되었습니다",
     "cancel": "취소",
     "join": "가입",
     "joining": "가입 중..."

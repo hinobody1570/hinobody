@@ -216,6 +216,7 @@
     "created": "创建时间",
     "join": "加入",
     "joined": "已加入",
+    "pending": "待批准",
     "loading": "加载中...",
     "posts": "帖子",
     "noPosts": "还没有帖子",
@@ -820,6 +821,8 @@
     "joinedSuccess": "成功加入看板！您现在可以发帖了。",
     "joinRequestSubmitted": "加入请求已提交！看板创建者将审核您的请求。",
     "joinError": "加入看板失败。请重试。",
+    "leaveError": "离开看板失败。请重试。",
+    "requestCancelled": "已取消加入请求",
     "cancel": "取消",
     "join": "加入",
     "joining": "加入中..."
