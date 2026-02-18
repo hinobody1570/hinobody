@@ -703,6 +703,7 @@
     "addImages": "画像を追加",
     "addImagesHint": "アップロードまたはカメラで目マスキング",
     "imagesAttached": "枚の画像が添付されました",
+    "maxImagesExceeded": "1つの投稿につき最大5枚まで画像をアップロードできます。",
     "addImageWithMasking": "画像を追加（目マスキング）",
     "tabs": {
       "text": "テキスト",

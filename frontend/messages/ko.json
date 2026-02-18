@@ -702,6 +702,7 @@
     "addImages": "이미지 추가",
     "addImagesHint": "업로드 또는 카메라로 눈 마스킹",
     "imagesAttached": "개 이미지 첨부됨",
+    "maxImagesExceeded": "게시물당 최대 5장의 이미지만 업로드할 수 있습니다.",
     "addImageWithMasking": "이미지 추가 (눈 마스킹)",
     "tabs": {
       "text": "텍스트",

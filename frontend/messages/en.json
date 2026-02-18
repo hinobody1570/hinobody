@@ -707,6 +707,7 @@
     "addImages": "Add Images",
     "addImagesHint": "Upload or capture with eye masking",
     "imagesAttached": "image(s) attached",
+    "maxImagesExceeded": "You can upload a maximum of 5 images per post.",
     "addImageWithMasking": "Add Image (Eye Masking)",
     "tabs": {
       "text": "Text",

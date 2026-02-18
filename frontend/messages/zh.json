@@ -703,6 +703,7 @@
     "addImages": "添加图片",
     "addImagesHint": "上传或拍照，支持眼部遮罩",
     "imagesAttached": "张图片已添加",
+    "maxImagesExceeded": "每个帖子最多可上传5张图片。",
     "addImageWithMasking": "添加图片（眼部遮罩）",
     "tabs": {
       "text": "文本",
