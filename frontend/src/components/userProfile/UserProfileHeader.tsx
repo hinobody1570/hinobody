@@ -66,17 +66,19 @@ export function UserProfileHeader({
     }
   };
 
+  const ALLOWED_AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert(t('pleaseSelectImageFile'));
+    if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+      showError(t('avatarFormatRestriction'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert(t('imageSizeTooLarge'));
+      showError(t('imageSizeTooLarge'));
       return;
     }
 
@@ -87,9 +89,10 @@ export function UserProfileHeader({
       if (onUserUpdate) {
         onUserUpdate(updatedUser);
       }
+      showSuccess(t('avatarUpdatedSuccessfully'));
     } catch (err: any) {
       console.error('Error uploading avatar:', err);
-      alert(err.message || t('failedToUploadAvatar'));
+      showError(err.message || t('failedToUploadAvatar'));
     } finally {
       setIsUploadingAvatar(false);
       e.target.value = '';
@@ -119,7 +122,7 @@ export function UserProfileHeader({
               <FiCamera size={16} />
               <input
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
                 onChange={handleAvatarChange}
                 disabled={isUploadingAvatar}
                 className="hidden"

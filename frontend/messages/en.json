@@ -201,6 +201,8 @@
     "nicknameUpdatedSuccessfully": "Nickname updated successfully",
     "failedToUploadAvatar": "Failed to upload avatar",
     "pleaseSelectImageFile": "Please select an image file",
+    "avatarFormatRestriction": "Profile photo must be PNG, JPG, or WebP. GIF and other formats are not allowed.",
+    "avatarUpdatedSuccessfully": "Profile photo updated successfully",
     "imageSizeTooLarge": "Image size should be less than 5MB",
     "uploading": "Uploading...",
     "failedToApproveRequest": "Failed to approve request",

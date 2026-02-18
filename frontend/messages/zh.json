@@ -202,6 +202,8 @@
     "nicknameUpdatedSuccessfully": "昵称更新成功",
     "failedToUploadAvatar": "上传头像失败",
     "pleaseSelectImageFile": "请选择图片文件",
+    "avatarFormatRestriction": "头像必须为 PNG、JPG 或 WebP 格式。不支持 GIF 及其他格式。",
+    "avatarUpdatedSuccessfully": "头像更新成功",
     "imageSizeTooLarge": "图片大小应小于5MB",
     "uploading": "上传中...",
     "failedToApproveRequest": "批准请求失败",

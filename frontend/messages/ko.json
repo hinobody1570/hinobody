@@ -202,6 +202,8 @@
     "nicknameUpdatedSuccessfully": "닉네임이 성공적으로 업데이트되었습니다",
     "failedToUploadAvatar": "아바타 업로드에 실패했습니다",
     "pleaseSelectImageFile": "이미지 파일을 선택해주세요",
+    "avatarFormatRestriction": "프로필 사진은 PNG, JPG 또는 WebP만 가능합니다. GIF 및 기타 형식은 지원하지 않습니다.",
+    "avatarUpdatedSuccessfully": "프로필 사진이 성공적으로 업데이트되었습니다",
     "imageSizeTooLarge": "이미지 크기는 5MB 미만이어야 합니다",
     "uploading": "업로드 중...",
     "failedToApproveRequest": "요청 승인에 실패했습니다",

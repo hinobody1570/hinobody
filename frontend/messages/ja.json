@@ -202,6 +202,8 @@
     "nicknameUpdatedSuccessfully": "ニックネームが正常に更新されました",
     "failedToUploadAvatar": "アバターのアップロードに失敗しました",
     "pleaseSelectImageFile": "画像ファイルを選択してください",
+    "avatarFormatRestriction": "プロフィール写真はPNG、JPG、WebP形式のみ可能です。GIFなどの形式は使用できません。",
+    "avatarUpdatedSuccessfully": "プロフィール写真が正常に更新されました",
     "imageSizeTooLarge": "画像サイズは5MB未満である必要があります",
     "uploading": "アップロード中...",
     "failedToApproveRequest": "リクエストの承認に失敗しました",
