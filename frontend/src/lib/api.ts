@@ -247,6 +247,10 @@ export interface BoardMembership {
     name: string;
     description?: string;
     visibilityAccess: BoardVisibility;
+    creator?: {
+      id: string;
+      nickname: string;
+    };
   };
 }
 
@@ -297,6 +301,13 @@ export const boardsApi = {
   getPendingRequests: async (): Promise<BoardMembership[]> => {
     const response = await api.get<ApiResponse<BoardMembership[]>>(`${API_END_POINT.BOARDS}/pending-requests`);
     return response.data;
+  },
+  getSentMembershipRequests: async (): Promise<BoardMembership[]> => {
+    const response = await api.get<ApiResponse<BoardMembership[]>>(`${API_END_POINT.BOARDS}/sent-requests`);
+    return response.data;
+  },
+  cancelMembershipRequest: async (boardId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/${boardId}/cancel-request`);
   },
   approveMembership: async (membershipId: string): Promise<BoardMembership> => {
     const response = await api.patch<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/membership/${membershipId}/approve`);

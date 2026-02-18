@@ -354,27 +354,13 @@ export class BoardService {
     return membership;
   }
 
+  /**
+   * Get all BoardMember records for the current logged-in user
+   */
   async getPendingRequests(userId: string) {
-    // Get all boards created by user
-    const boards = await this.prisma.board.findMany({
+    const memberships = await this.prisma.boardMember.findMany({
       where: {
-        creatorId: userId,
-        isActive: true,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    const boardIds = boards.map((b) => b.id);
-
-    // Get all pending membership requests for these boards
-    const pendingRequests = await this.prisma.boardMember.findMany({
-      where: {
-        boardId: {
-          in: boardIds,
-        },
-        status: 'PENDING',
+        userId,
       },
       include: {
         user: {
@@ -392,6 +378,12 @@ export class BoardService {
             name: true,
             description: true,
             visibilityAccess: true,
+            creator: {
+              select: {
+                id: true,
+                nickname: true,
+              },
+            },
           },
         },
       },
@@ -399,8 +391,12 @@ export class BoardService {
         createdAt: 'desc',
       },
     });
-
-    return pendingRequests;
+    // Sort: PENDING first, then APPROVED, then REJECTED
+    const order = { PENDING: 0, APPROVED: 1, REJECTED: 2 };
+    return memberships.sort((a, b) => {
+      const diff = (order[a.status] ?? 3) - (order[b.status] ?? 3);
+      return diff !== 0 ? diff : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
   }
 
   async approveMembership(membershipId: string, userId: string): Promise<BoardMember> {

@@ -43,10 +43,10 @@ export class BoardController {
     return this.boardService.findAll(query);
   }
 
-  @Get('pending-requests')
+   @Get('pending-requests')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get pending membership requests for boards created by user' })
+  @ApiOperation({ summary: 'Get all board memberships for the current logged-in user' })
   getPendingRequests(@GetUser('id') userId: string) {
     return this.boardService.getPendingRequests(userId);
   }

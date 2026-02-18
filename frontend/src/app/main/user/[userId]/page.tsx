@@ -161,6 +161,7 @@ export default function UserProfilePage() {
   useEffect(() => {
     const fetchPendingRequests = async () => {
       // Only fetch if it's the user's own profile
+      // Fetch membership requests that the user has SENT (not received)
       if (!isOwnProfile || !userId) return;
       
       try {
@@ -168,7 +169,7 @@ export default function UserProfilePage() {
         const requests = await boardsApi.getPendingRequests();
         setPendingRequests(requests);
       } catch (err: any) {
-        console.error('Error fetching pending requests:', err);
+        console.error('Error fetching sent membership requests:', err);
       } finally {
         setLoadingRequests(false);
       }
@@ -228,28 +229,23 @@ export default function UserProfilePage() {
   };
 
   const handleApproveRequest = async (membershipId: string) => {
-    try {
-      await boardsApi.approveMembership(membershipId);
-      // Remove from pending requests
-      setPendingRequests(prev => prev.filter(req => req.id !== membershipId));
-      // Refresh boards to show the new member (using userId from URL params)
-      const boards = await boardsApi.getByUserId(userId);
-      setCreatedBoards(boards.created);
-      setMemberBoards(boards.member);
-    } catch (err: any) {
-      console.error('Error approving request:', err);
-      alert(err.message || t('failedToApproveRequest'));
-    }
+    // This function is no longer needed since users can't approve their own requests
+    // Requests are approved by board creators/admins
   };
 
   const handleRejectRequest = async (membershipId: string) => {
+    // Users can cancel their own pending requests
     try {
-      await boardsApi.rejectMembership(membershipId);
+      const request = pendingRequests.find(req => req.id === membershipId);
+      if (!request || !request.boardId) return;
+      
+      // Cancel the pending membership request
+      await boardsApi.cancelMembershipRequest(request.boardId);
       // Remove from pending requests
       setPendingRequests(prev => prev.filter(req => req.id !== membershipId));
     } catch (err: any) {
-      console.error('Error rejecting request:', err);
-      alert(err.message || t('failedToRejectRequest'));
+      console.error('Error canceling request:', err);
+      alert(err.message || t('failedToCancelRequest') || 'Failed to cancel request');
     }
   };
 
@@ -313,11 +309,11 @@ export default function UserProfilePage() {
         )} */}
 
         {/* Community Boards Section */}
-        <CommunityBoardsSection
+        {/* <CommunityBoardsSection
           createdBoards={createdBoards}
           memberBoards={memberBoards}
           loading={loadingBoards}
-        />
+        /> */}
 
         {/* Pending Membership Requests - Only show on own profile */}
         {isOwnProfile && (

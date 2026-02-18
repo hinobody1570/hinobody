@@ -453,5 +453,69 @@ export class BoardMemberService {
       },
     });
   }
+
+  /**
+   * Get membership requests sent by a user (where user is the requester)
+   */
+  async getSentMembershipRequests(userId: string) {
+    return this.prisma.boardMember.findMany({
+      where: {
+        userId,
+        status: 'PENDING',
+      },
+      include: {
+        board: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            visibilityAccess: true,
+            creator: {
+              select: {
+                id: true,
+                nickname: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  /**
+   * Cancel a pending membership request (user can cancel their own pending request)
+   */
+  async cancelMembershipRequest(boardId: string, userId: string) {
+    const membership = await this.prisma.boardMember.findUnique({
+      where: {
+        userId_boardId: {
+          userId,
+          boardId,
+        },
+      },
+    });
+
+    if (!membership) {
+      throw new NotFoundException('Membership not found');
+    }
+
+    if (membership.status !== 'PENDING') {
+      throw new BadRequestException('Can only cancel pending membership requests');
+    }
+
+    await this.prisma.boardMember.delete({
+      where: {
+        userId_boardId: {
+          userId,
+          boardId,
+        },
+      },
+    });
+
+    return { message: 'Membership request cancelled successfully' };
+  }
 }
 

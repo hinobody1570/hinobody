@@ -149,5 +149,26 @@ export class BoardMemberController {
   ) {
     return this.boardMemberService.deleteMembership(boardId, memberId);
   }
+
+  @Get('sent-requests')
+  @ApiOperation({ summary: 'Get membership requests sent by the current user' })
+  @ApiResponse({ status: 200, description: 'Sent membership requests retrieved' })
+  async getSentMembershipRequests(
+    @GetUser('id') userId: string,
+  ) {
+    return this.boardMemberService.getSentMembershipRequests(userId);
+  }
+
+  @Delete(':boardId/cancel-request')
+  @ApiOperation({ summary: 'Cancel a pending membership request' })
+  @ApiParam({ name: 'boardId', description: 'Board ID' })
+  @ApiResponse({ status: 200, description: 'Membership request cancelled' })
+  @ApiResponse({ status: 400, description: 'Can only cancel pending requests' })
+  async cancelMembershipRequest(
+    @Param('boardId') boardId: string,
+    @GetUser('id') userId: string,
+  ) {
+    return this.boardMemberService.cancelMembershipRequest(boardId, userId);
+  }
 }
 
