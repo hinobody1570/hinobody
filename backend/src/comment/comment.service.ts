@@ -371,6 +371,56 @@ export class CommentService {
     };
   }
 
+  /**
+   * Get all comments for admin (flat list with pagination)
+   */
+  async findAllForAdmin(query: QueryCommentsDto) {
+    const { page = 1, limit = 20, postId, authorId, search } = query;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.CommentWhereInput = {
+      ...(postId && { postId }),
+      ...(authorId && { authorId }),
+      ...(search && {
+        body: { contains: search, mode: 'insensitive' as const },
+      }),
+    };
+
+    const [comments, total] = await Promise.all([
+      this.prisma.comment.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
+          post: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+      }),
+      this.prisma.comment.count({ where }),
+    ]);
+
+    return {
+      data: comments,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async findOne(id: string): Promise<Comment> {
     const comment = await this.prisma.comment.findUnique({
       where: { id },

@@ -767,6 +767,10 @@ export interface Comment {
     id: string;
     nickname: string;
   };
+  post?: {
+    id: string;
+    title: string;
+  };
   replies?: Comment[];
   _count?: {
     votes: number;
@@ -791,6 +795,14 @@ export interface CreateCommentDto {
   parentId?: string;
 }
 
+export interface QueryCommentsParams {
+  page?: number;
+  limit?: number;
+  postId?: string;
+  authorId?: string;
+  search?: string;
+}
+
 export const commentsApi = {
   getByPost: async (postId: string, page: number = 1, limit: number = 20, search?: string): Promise<CommentsResponse> => {
     const params = new URLSearchParams({
@@ -801,11 +813,26 @@ export const commentsApi = {
       params.append('search', search);
     }
     const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/post/${postId}?${params.toString()}`);
-    return response.data;
+    return (response as any)?.data ?? response;
   },
   create: async (createCommentDto: CreateCommentDto): Promise<Comment> => {
     const response = await api.post<ApiResponse<Comment>>(API_END_POINT.COMMENTS, createCommentDto);
-    return response.data;
+    return (response as any)?.data ?? response;
+  },
+  getAllAdmin: async (params: QueryCommentsParams = {}): Promise<CommentsResponse> => {
+    const { page = 1, limit = 20, postId, authorId, search } = params;
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (postId) queryParams.append('postId', postId);
+    if (authorId) queryParams.append('authorId', authorId);
+    if (search) queryParams.append('search', search);
+    const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/admin/all?${queryParams.toString()}`);
+    return (response as any)?.data ?? response;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.COMMENTS}/${id}`);
   },
 };
 

@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -29,6 +30,25 @@ export class CommentController {
     @GetUser('id') userId: string,
   ) {
     return this.commentService.create(createCommentDto, userId);
+  }
+
+  @Get('admin/all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get all comments for admin with pagination' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
+  @ApiQuery({ name: 'postId', required: false, description: 'Filter by post ID' })
+  @ApiQuery({ name: 'authorId', required: false, description: 'Filter by author ID' })
+  @ApiQuery({ name: 'search', required: false, description: 'Search in comment body' })
+  findAllForAdmin(
+    @Query() query: QueryCommentsDto,
+    @GetUser('role') role: string,
+  ) {
+    if (role !== 'ADMIN') {
+      throw new ForbiddenException('Only admins can access all comments');
+    }
+    return this.commentService.findAllForAdmin(query);
   }
 
   @Get('post/:postId')
