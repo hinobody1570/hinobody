@@ -115,6 +115,7 @@ export class PostService {
   private async enrichPostsWithFilteredCommentCounts(
     posts: any[],
     blockedUserIds: string[],
+    reportedCommentIds: string[] = [],
   ): Promise<any[]> {
     const postIds = posts.map((p) => p.id);
     const counts = await this.prisma.comment.groupBy({
@@ -123,7 +124,8 @@ export class PostService {
         postId: { in: postIds },
         isActive: true,
         isDeleted: false,
-        authorId: { notIn: blockedUserIds },
+        ...(blockedUserIds.length > 0 && { authorId: { notIn: blockedUserIds } }),
+        ...(reportedCommentIds.length > 0 && { id: { notIn: reportedCommentIds } }),
       },
       _count: { id: true },
     });
@@ -151,7 +153,7 @@ export class PostService {
    * Uses raw SQL because Prisma orderBy cannot express (upvote_count - downvote_count).
    */
   private async getOrderedPostIds(
-    params: { boardId?: string; authorId?: string; commenterId?: string; blockedUserIds: string[]; search?: string; category?: string },
+    params: { boardId?: string; authorId?: string; commenterId?: string; blockedUserIds: string[]; reportedPostIds?: string[]; search?: string; category?: string },
     sortBy: 'mostLiked' | 'trending',
     limit: number,
     skip: number,
@@ -173,6 +175,9 @@ export class PostService {
     }
     if (params.category) {
       conditions.push(Prisma.sql`"postCategory" = ${params.category}`);
+    }
+    if (params.reportedPostIds && params.reportedPostIds.length > 0) {
+      conditions.push(Prisma.sql`"id" NOT IN (${Prisma.join(params.reportedPostIds)})`);
     }
     if (params.search) {
       const pattern = `%${params.search}%`;
@@ -221,9 +226,21 @@ export class PostService {
       memberBoardIds = memberships.map((m) => m.boardId);
     }
 
+    // Get post and comment IDs the current user has reported (hide those from their feed)
+    let reportedPostIds: string[] = [];
+    let reportedCommentIds: string[] = [];
+    if (userId) {
+      const reports = await this.prisma.report.findMany({
+        where: { reportedById: userId },
+        select: { postId: true, commentId: true },
+      });
+      reportedPostIds = reports.map((r) => r.postId).filter((id): id is string => !!id);
+      reportedCommentIds = reports.map((r) => r.commentId).filter((id): id is string => !!id);
+    }
+
     // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
     if (search) {
-      return this.findAllWithFTS(query, blockedUserIds, userId, isAdmin);
+      return this.findAllWithFTS(query, blockedUserIds, reportedPostIds, userId, isAdmin);
     }
 
     // If authorId or commenterId is specified and that user is blocked, return empty results
@@ -260,6 +277,7 @@ export class PostService {
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: { notIn: blockedUserIds },
       }),
+      ...(reportedPostIds.length > 0 && { id: { notIn: reportedPostIds } }),
     };
 
     let posts: any[];
@@ -269,7 +287,7 @@ export class PostService {
       // Use raw SQL for accurate (upvote_count - downvote_count) ordering
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, commenterId, blockedUserIds, search: undefined, category },
+          { boardId, authorId, commenterId, blockedUserIds, reportedPostIds, search: undefined, category },
           sortBy,
           limit,
           skip,
@@ -315,13 +333,13 @@ export class PostService {
     }
 
     const postsWithFilteredCounts =
-      blockedUserIds.length === 0
+      blockedUserIds.length === 0 && reportedCommentIds.length === 0
         ? posts.map((post) => ({
             ...post,
             commentCount: post._count.comments,
             _count: { ...post._count, comments: post._count.comments },
           }))
-        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds);
+        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds, reportedCommentIds);
 
     // Filter posts by board visibility and membership (unless admin)
     const filteredPosts = isAdmin
@@ -359,7 +377,7 @@ export class PostService {
     };
   }
 
-  private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = [], userId?: string, isAdmin: boolean = false) {
+  private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = [], reportedPostIds: string[] = [], userId?: string, isAdmin: boolean = false) {
     const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
 
@@ -374,6 +392,20 @@ export class PostService {
         select: { boardId: true },
       });
       memberBoardIds = memberships.map((m) => m.boardId);
+    }
+
+    // Get reported post and comment IDs if not passed (for FTS path called with search)
+    let reportedIds = reportedPostIds;
+    let reportedCommentIds: string[] = [];
+    if (userId) {
+      const reports = await this.prisma.report.findMany({
+        where: { reportedById: userId },
+        select: { postId: true, commentId: true },
+      });
+      if (reportedIds.length === 0) {
+        reportedIds = reports.map((r) => r.postId).filter((id): id is string => !!id);
+      }
+      reportedCommentIds = reports.map((r) => r.commentId).filter((id): id is string => !!id);
     }
 
     // If authorId or commenterId is specified and that user is blocked, return empty results
@@ -410,6 +442,7 @@ export class PostService {
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: { notIn: blockedUserIds },
       }),
+      ...(reportedIds.length > 0 && { id: { notIn: reportedIds } }),
       OR: search
         ? [
           { title: { contains: search, mode: 'insensitive' } },
@@ -423,7 +456,7 @@ export class PostService {
     if (sortBy === 'mostLiked' || sortBy === 'trending') {
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, commenterId, blockedUserIds, search, category },
+          { boardId, authorId, commenterId, blockedUserIds, reportedPostIds: reportedIds, search, category },
           sortBy,
           limit,
           skip,
@@ -467,13 +500,13 @@ export class PostService {
     }
 
     const postsWithFilteredCounts =
-      blockedUserIds.length === 0
+      blockedUserIds.length === 0 && reportedCommentIds.length === 0
         ? posts.map((post) => ({
             ...post,
             commentCount: post._count.comments,
             _count: { ...post._count, comments: post._count.comments },
           }))
-        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds);
+        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds, reportedCommentIds);
 
     // Filter posts by board visibility and membership (unless admin)
     const filteredPosts = isAdmin
@@ -520,6 +553,26 @@ export class PostService {
       });
       blockedUserIds = blocks.map((block) => block.blockedId);
     }
+
+    // If user has reported this post, do not show it to them
+    if (userId) {
+      const report = await this.prisma.report.findFirst({
+        where: { reportedById: userId, postId: id },
+      });
+      if (report) {
+        throw new NotFoundException(`Post with ID ${id} not found`);
+      }
+    }
+
+    // Get reported comment IDs to exclude from comments (only for the reporter)
+    let reportedCommentIds: string[] = [];
+    if (userId) {
+      const reportedComments = await this.prisma.report.findMany({
+        where: { reportedById: userId, commentId: { not: null } },
+        select: { commentId: true },
+      });
+      reportedCommentIds = reportedComments.map((r) => r.commentId).filter((id): id is string => !!id);
+    }
     
     const post = await this.prisma.post.findUnique({
       where: { id },
@@ -538,10 +591,9 @@ export class PostService {
             isActive: true,
             isDeleted: false,
             ...(blockedUserIds.length > 0 && {
-              authorId: {
-                notIn: blockedUserIds,
-              },
+              authorId: { notIn: blockedUserIds },
             }),
+            ...(reportedCommentIds.length > 0 && { id: { notIn: reportedCommentIds } }),
           },
           include: {
             author: {
@@ -566,25 +618,17 @@ export class PostService {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
-    // Calculate comment count excluding blocked users
-    const commentCount = blockedUserIds.length > 0
-      ? await this.prisma.comment.count({
-        where: {
-          postId: post.id,
-          isActive: true,
-          isDeleted: false,
-          authorId: {
-            notIn: blockedUserIds,
-          },
-        },
-      })
-      : await this.prisma.comment.count({
-        where: {
-          postId: post.id,
-          isActive: true,
-          isDeleted: false,
-        },
-      });
+    // Calculate comment count excluding blocked users and reported comments
+    const commentCountWhere: Prisma.CommentWhereInput = {
+      postId: post.id,
+      isActive: true,
+      isDeleted: false,
+      ...(blockedUserIds.length > 0 && { authorId: { notIn: blockedUserIds } }),
+      ...(reportedCommentIds.length > 0 && { id: { notIn: reportedCommentIds } }),
+    };
+    const commentCount = await this.prisma.comment.count({
+      where: commentCountWhere,
+    });
 
     // Increment view count
     await this.prisma.post.update({
