@@ -191,6 +191,7 @@
     "joinedAt": "参加日時",
     "blockUser": "ユーザーをブロック",
     "unblockUser": "ブロック解除",
+    "processing": "処理中...",
     "blockedUser": "ブロックされたユーザー",
     "confirmBlockUser": "ユーザーをブロックしますか？",
     "confirmBlockUserMessage": "{name}をブロックしてもよろしいですか？彼らの投稿を見たり、やり取りしたりできなくなります。",
