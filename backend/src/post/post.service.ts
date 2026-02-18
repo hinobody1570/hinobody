@@ -153,13 +153,13 @@ export class PostService {
    * Uses raw SQL because Prisma orderBy cannot express (upvote_count - downvote_count).
    */
   private async getOrderedPostIds(
-    params: { boardId?: string; authorId?: string; commenterId?: string; blockedUserIds: string[]; reportedPostIds?: string[]; search?: string; category?: string },
+    params: { boardId?: string; authorId?: string; commenterId?: string; blockedUserIds: string[]; reportedPostIds?: string[]; search?: string; category?: string; isAdmin?: boolean },
     sortBy: 'mostLiked' | 'trending',
     limit: number,
     skip: number,
   ): Promise<string[]> {
     const conditions: Prisma.Sql[] = [
-      Prisma.sql`"isActive" = true`,
+      ...(!params.isAdmin ? [Prisma.sql`"isActive" = true`] : []),
       Prisma.sql`"isDeleted" = false`,
     ];
     if (params.boardId) {
@@ -260,7 +260,7 @@ export class PostService {
     }
 
     const where: Prisma.PostWhereInput = {
-      isActive: true,
+      ...(!isAdmin && { isActive: true }),
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
@@ -287,7 +287,7 @@ export class PostService {
       // Use raw SQL for accurate (upvote_count - downvote_count) ordering
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, commenterId, blockedUserIds, reportedPostIds, search: undefined, category },
+          { boardId, authorId, commenterId, blockedUserIds, reportedPostIds, search: undefined, category, isAdmin },
           sortBy,
           limit,
           skip,
@@ -369,10 +369,10 @@ export class PostService {
     return {
       data: filteredPosts,
       meta: {
-        total: filteredPosts.length, // Note: This is filtered count, not total from DB
+        total,
         page,
         limit,
-        totalPages: Math.ceil(filteredPosts.length / limit),
+        totalPages: Math.ceil(total / limit),
       },
     };
   }
@@ -425,7 +425,7 @@ export class PostService {
     }
 
     const where: Prisma.PostWhereInput = {
-      isActive: true,
+      ...(!isAdmin && { isActive: true }),
       isDeleted: false,
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
@@ -456,7 +456,7 @@ export class PostService {
     if (sortBy === 'mostLiked' || sortBy === 'trending') {
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, commenterId, blockedUserIds, reportedPostIds: reportedIds, search, category },
+          { boardId, authorId, commenterId, blockedUserIds, reportedPostIds: reportedIds, search, category, isAdmin },
           sortBy,
           limit,
           skip,
@@ -536,10 +536,10 @@ export class PostService {
     return {
       data: filteredPosts,
       meta: {
-        total: filteredPosts.length, // Note: This is filtered count, not total from DB
+        total,
         page,
         limit,
-        totalPages: Math.ceil(filteredPosts.length / limit),
+        totalPages: Math.ceil(total / limit),
       },
     };
   }

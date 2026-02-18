@@ -501,8 +501,8 @@ export const postsApi = {
       queryParams.append('category', category);
     }
     const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
-    // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
-    return response.data;
+    // API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
+    return (response as any)?.data ?? response;
   },
   getById: async (id: string): Promise<Post> => {
     const response = await api.get<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`);

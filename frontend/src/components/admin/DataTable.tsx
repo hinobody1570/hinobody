@@ -17,6 +17,12 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
   pagination?: boolean;
   itemsPerPage?: number;
+  /** Server-side pagination: total count from API */
+  totalCount?: number;
+  /** Server-side pagination: current page (1-based) */
+  currentPage?: number;
+  /** Server-side pagination: called when page changes */
+  onPageChange?: (page: number) => void;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -26,12 +32,18 @@ export function DataTable<T extends Record<string, any>>({
   searchPlaceholder = "Search...",
   pagination = true,
   itemsPerPage = 10,
+  totalCount,
+  currentPage: controlledPage,
+  onPageChange,
 }: DataTableProps<T>) {
   const t = useTranslations("admin");
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
 
-  // Filter data based on search query
+  const isServerSide = onPageChange !== undefined;
+  const currentPage = isServerSide ? (controlledPage ?? 1) : internalPage;
+
+  // Filter data based on search query (client-side only)
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return data;
 
@@ -47,21 +59,28 @@ export function DataTable<T extends Record<string, any>>({
     );
   }, [data, searchQuery, columns]);
 
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  // Pagination: server-side uses totalCount from API, client-side uses filteredData.length
+  const totalCountOrFiltered = isServerSide ? (totalCount ?? 0) : filteredData.length;
+  const totalPages = Math.ceil(totalCountOrFiltered / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedData = pagination
-    ? filteredData.slice(startIndex, endIndex)
-    : filteredData;
+  const paginatedData = isServerSide
+    ? filteredData // Server-side: data is already the current page, optionally filter by search
+    : pagination
+      ? filteredData.slice(startIndex, endIndex)
+      : filteredData;
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search changes (client-side only)
   useMemo(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
+    if (!isServerSide) setInternalPage(1);
+  }, [searchQuery, isServerSide]);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    if (isServerSide) {
+      onPageChange?.(page);
+    } else {
+      setInternalPage(page);
+    }
   };
 
   const renderCell = (column: Column<T>, row: T) => {
@@ -154,13 +173,13 @@ export function DataTable<T extends Record<string, any>>({
         </table>
       </div>
 
-      {/* Pagination */}
-      {pagination && totalPages > 1 && (
+      {/* Pagination - show when multiple pages, or in server-side mode with any data */}
+      {pagination && (totalPages > 1 || (isServerSide && totalCountOrFiltered > 0)) && (
         <div className="px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="text-sm text-gray-700">
-            {t("showing")} {startIndex + 1} {t("to")}{" "}
-            {Math.min(endIndex, filteredData.length)} {t("of")}{" "}
-            {filteredData.length} {t("results")}
+            {t("showing")} {totalCountOrFiltered > 0 ? startIndex + 1 : 0} {t("to")}{" "}
+            {startIndex + paginatedData.length} {t("of")}{" "}
+            {totalCountOrFiltered} {t("results")}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <button
