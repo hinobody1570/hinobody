@@ -460,6 +460,7 @@
   },
   "sidebar": {
     "home": "홈",
+    "chat": "메시지",
     "news": "뉴스",
     "reviews": "리뷰",
     "recommend": "추천",

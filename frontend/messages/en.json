@@ -461,6 +461,7 @@
   },
   "sidebar": {
     "home": "Home",
+    "chat": "Messages",
     "news": "News",
     "reviews": "Reviews",
     "recommend": "Recommend",

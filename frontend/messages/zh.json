@@ -461,6 +461,7 @@
   },
   "sidebar": {
     "home": "首页",
+    "chat": "消息",
     "news": "新闻",
     "reviews": "评测",
     "recommend": "推荐",

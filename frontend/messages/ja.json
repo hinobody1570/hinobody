@@ -461,6 +461,7 @@
   },
   "sidebar": {
     "home": "ホーム",
+    "chat": "メッセージ",
     "news": "ニュース",
     "reviews": "レビュー",
     "recommend": "おすすめ",
