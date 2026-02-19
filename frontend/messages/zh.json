@@ -405,7 +405,6 @@
     "confirmDeleteReportDescription": "您确定要删除此举报吗？此操作无法撤销。",
     "reportDeleted": "举报删除成功",
     "deleteReportError": "删除举报失败",
-    "boardCategories": "看板分类",
     "addNew": "添加新项",
     "addNewCategory": "添加新分类",
     "editCategory": "编辑分类",
