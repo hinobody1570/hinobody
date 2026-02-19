@@ -46,12 +46,16 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <div className="flex">
         {/* Sidebar - fixed height, sticky position */}
         <div className="h-screen sticky top-16">
-          <RedditSidebar isOpen={isOpen} onToggle={() => setIsOpen((prev) => !prev)} />
+          <RedditSidebar
+            isOpen={isOpen}
+            onToggle={() => setIsOpen((prev) => !prev)}
+            onItemClick={() => isMobile && setIsOpen(false)}
+          />
         </div>
 
         {/* Main Content - hidden on mobile when sidebar is open */}
         <main
-          className={`flex-1 px-6 py-4 overflow-y-auto max-h-screen ${hideMain ? "hidden" : ""}`}
+          className={`flex-1 px-0 sm:px-6 py-4 overflow-y-auto max-h-screen ${hideMain ? "hidden" : ""}`}
         >
           {children}
         </main>
