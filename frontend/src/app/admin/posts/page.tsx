@@ -21,6 +21,8 @@ export default function AdminPostsPage() {
   const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [meta, setMeta] = useState<{ total: number; page: number; limit: number; totalPages: number } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -36,23 +38,24 @@ export default function AdminPostsPage() {
     postTitle: null,
   });
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await postsApi.getAll({ page: 1, limit: 20 });
-        setPosts(response.data);
-      } catch (err: any) {
-        console.error("Error fetching posts:", err);
-        setError(err.message || "Failed to load posts");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchPosts = async (page: number = 1) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await postsApi.getAll({ page, limit: 20 });
+      setPosts(response.data ?? []);
+      setMeta(response.meta ?? { total: 0, page, limit: 20, totalPages: 0 });
+    } catch (err: any) {
+      console.error("Error fetching posts:", err);
+      setError(err.message || "Failed to load posts");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchPosts();
-  }, []);
+  useEffect(() => {
+    fetchPosts(currentPage);
+  }, [currentPage]);
 
   const openConfirmationModal = (action: ActionType, postId: string, postTitle: string) => {
     setConfirmationModal({
@@ -91,9 +94,10 @@ export default function AdminPostsPage() {
         showSuccess(t("postDeactivated"));
       }
 
-      // Refresh posts list
-      const response = await postsApi.getAll({ page: 1, limit: 20 });
-      setPosts(response.data);
+      // Refresh posts list (stay on current page)
+      const response = await postsApi.getAll({ page: currentPage, limit: 20 });
+      setPosts(response.data ?? []);
+      setMeta(response.meta ?? { total: 0, page: currentPage, limit: 20, totalPages: 0 });
 
       closeConfirmationModal();
     } catch (err: any) {
@@ -242,7 +246,14 @@ export default function AdminPostsPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-6">{t("posts")}</h1>
-      <DataTable columns={columns} data={posts} />
+      <DataTable
+        columns={columns}
+        data={posts}
+        itemsPerPage={20}
+        totalCount={meta?.total}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
 
       <ConfirmationModal
         isOpen={confirmationModal.isOpen}

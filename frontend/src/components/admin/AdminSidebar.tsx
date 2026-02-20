@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ROUTE_PATHS } from "@/routes/paths";
-import { FaUsers, FaFileAlt, FaLayerGroup, FaHome, FaEye, FaExclamationTriangle, FaBan, FaTags } from "react-icons/fa";
+import { FaUsers, FaFileAlt, FaLayerGroup, FaHome, FaEye, FaExclamationTriangle, FaBan, FaTags, FaUserCheck, FaComment } from "react-icons/fa";
 
 interface SidebarItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -33,6 +33,11 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       path: ROUTE_PATHS.ADMIN_POSTS,
     },
     {
+      icon: FaComment,
+      label: t("comments"),
+      path: ROUTE_PATHS.ADMIN_COMMENTS,
+    },
+    {
       icon: FaLayerGroup,
       label: t("boards"),
       path: ROUTE_PATHS.ADMIN_BOARDS,
@@ -43,10 +48,15 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       path: ROUTE_PATHS.ADMIN_BOARD_CATEGORIES,
     },
     {
-      icon: FaEye,
-      label: t("eyeMasking"),
-      path: ROUTE_PATHS.ADMIN_EYE_MASKING,
+      icon: FaUserCheck,
+      label: t("memberships"),
+      path: ROUTE_PATHS.ADMIN_MEMBERSHIPS,
     },
+    // {
+    //   icon: FaEye,
+    //   label: t("eyeMasking"),
+    //   path: ROUTE_PATHS.ADMIN_EYE_MASKING,
+    // },
     {
       icon: FaExclamationTriangle,
       label: t("reports"),

@@ -255,11 +255,11 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
               {comment.timestamp}
             </span>
             {comment.stickied && <PiNavigationArrow size={14} className="text-green-600 flex-shrink-0" />}
-            {comment.edited && (
+            {/* {comment.edited && (
               <span className="text-xs text-gray-500 flex-shrink-0 hidden sm:inline">
                 • {t('edited')} {comment.editedTime}
               </span>
-            )}
+            )} */}
           </div>
 
           {/* Comment Content */}

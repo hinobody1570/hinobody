@@ -8,6 +8,7 @@ import { formatTimestamp } from '@/utils/helperFunction';
 import { FiEdit, FiCamera, FiUserX } from 'react-icons/fi';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 import { usersApi, s3Api } from '@/lib/api';
+import { useToast } from '@/contexts/ToastContext';
 
 interface UserProfileHeaderProps {
   user: User;
@@ -36,6 +37,8 @@ export function UserProfileHeader({
   const tTime = useTranslations('timeAgo');
   const [isEditing, setIsEditing] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const { showSuccess, showError } = useToast();
+  
   const [editForm, setEditForm] = useState({
     nickname: user.nickname,
   });
@@ -56,23 +59,26 @@ export function UserProfileHeader({
       if (onUserUpdate) {
         onUserUpdate(updatedUser);
       }
+      showSuccess(t('nicknameUpdatedSuccessfully'));
     } catch (err: any) {
       console.error('Error updating user:', err);
-      alert(err.message || t('failedToUpdateProfile'));
+      showError(err.message || t('failedToUpdateProfile'));
     }
   };
+
+  const ALLOWED_AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert(t('pleaseSelectImageFile'));
+    if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+      showError(t('avatarFormatRestriction'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert(t('imageSizeTooLarge'));
+      showError(t('imageSizeTooLarge'));
       return;
     }
 
@@ -83,9 +89,10 @@ export function UserProfileHeader({
       if (onUserUpdate) {
         onUserUpdate(updatedUser);
       }
+      showSuccess(t('avatarUpdatedSuccessfully'));
     } catch (err: any) {
       console.error('Error uploading avatar:', err);
-      alert(err.message || t('failedToUploadAvatar'));
+      showError(err.message || t('failedToUploadAvatar'));
     } finally {
       setIsUploadingAvatar(false);
       e.target.value = '';
@@ -115,7 +122,7 @@ export function UserProfileHeader({
               <FiCamera size={16} />
               <input
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
                 onChange={handleAvatarChange}
                 disabled={isUploadingAvatar}
                 className="hidden"

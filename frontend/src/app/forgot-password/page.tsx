@@ -90,7 +90,7 @@ export default function ForgotPassword() {
           <div className="space-y-6">
             {/* Email Field */}
             <div>
-              <FormLabel labelTitle={t("emailAddress")} htmlForTitle="email" />
+              <FormLabel required labelTitle={t("emailAddress")} htmlForTitle="email" />
               <FormInput
                 type="email"
                 icon={<BsEnvelope className="h-5 w-5 text-gray-400" />}

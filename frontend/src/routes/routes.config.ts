@@ -105,6 +105,11 @@ export const routesConfig: RouteConfig[] = [
     redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
+    path: ROUTE_PATHS.ADMIN_COMMENTS,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.DEFAULT,
+  },
+  {
     path: ROUTE_PATHS.ADMIN_USERS,
     access: ROUTE_ACCESS.PRIVATE,
     redirectTo: ROUTE_PATHS.DEFAULT,

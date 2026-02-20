@@ -8,13 +8,16 @@ import { formatTimestamp } from "@/utils/helperFunction";
 import { useToast } from "@/contexts/ToastContext";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { StatusUpdateModal } from "@/components/modals/StatusUpdateModal";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { ROUTE_PATHS } from "@/routes/paths";
 import Loading from "@/components/reuseComponents/Loading";
 import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
 export default function AdminReportsPage() {
   const t = useTranslations("admin");
   const tTime = useTranslations("timeAgo");
+  const router = useRouter();
   const { showSuccess, showError } = useToast();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -193,6 +196,14 @@ export default function AdminReportsPage() {
       header: "",
       actions: (row: Report) => (
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push(`${ROUTE_PATHS.ADMIN_REPORTS}/${row.id}`)}
+            disabled={!!actionLoading}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            title={t("viewDetails")}
+          >
+            <FaEye size={16} />
+          </button>
           <button
             onClick={() => openStatusModal(row.id, row.status)}
             disabled={!!actionLoading}

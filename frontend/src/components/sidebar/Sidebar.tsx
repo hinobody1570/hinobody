@@ -19,9 +19,10 @@ import { MenuItem } from "../reuseComponents/MenuItem";
 interface RedditSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
+  onItemClick?: () => void;
 }
 
-const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
+const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) => {
   const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
   const t = useTranslations("sidebar");
   const router = useRouter();
@@ -81,6 +82,7 @@ const RedditSidebar = ({ isOpen, onToggle }: RedditSidebarProps) => {
                   } else {
                     router.push(item?.navigate);
                   }
+                  onItemClick?.();
                 }}
               />
             ))}

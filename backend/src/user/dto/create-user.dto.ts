@@ -15,16 +15,23 @@ export class CreateUserDto {
     example: 'user@example.com',
     description: 'User email address',
   })
-  @IsEmail()
+  @IsEmail({}, { message: 'Please enter a valid email address.' })
   email: string;
 
   @ApiProperty({
-    example: 'StrongPass123',
+    example: 'StrongPass123!',
     minLength: 8,
-    description: 'User password (minimum 8 characters)',
+    description: 'User password (minimum 8 characters, uppercase, lowercase, number, special character)',
   })
   @IsString()
-  @MinLength(8)
+  @MinLength(8, {
+    message:
+      'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.',
+  })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/, {
+    message:
+      'Password must be at least 8 characters and include uppercase, lowercase, number, and special character.',
+  })
   password: string;
 
   @ApiProperty({

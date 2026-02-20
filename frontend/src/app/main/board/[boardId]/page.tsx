@@ -10,6 +10,7 @@ import { PostCard } from '@/components/reuseComponents/PostCard';
 import { formatTimestamp } from '@/utils/helperFunction';
 import DP from '../../../../../public/assets/images/avatar_default_4.png';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import Loading from '@/components/reuseComponents/Loading';
 
 const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
@@ -22,7 +23,7 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
     verified: false,
     timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
-    image: post.images && post.images.length > 0 ? post.images[0].url : null,
+    images: post.images?.map((img) => img.url) ?? [],
     upvotes: post.upvoteCount || 0,
     downvotes: post.downvoteCount || 0,
     comments: post.commentCount || 0,
@@ -34,7 +35,10 @@ export default function BoardProfilePage() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations('boardProfile');
+  const tToast = useTranslations('toast');
+  const tJoinBoard = useTranslations('joinBoard');
   const tTime = useTranslations('timeAgo');
+  const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
   const { user } = useAuth();
   const boardId = params?.boardId as string;
@@ -44,8 +48,9 @@ export default function BoardProfilePage() {
   const [loading, setLoading] = useState(true);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMember, setIsMember] = useState(false);
+  const [membershipStatus, setMembershipStatus] = useState<'PENDING' | 'APPROVED' | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const [isPendingHovered, setIsPendingHovered] = useState(false);
 
   useEffect(() => {
     const fetchBoard = async () => {
@@ -72,7 +77,7 @@ export default function BoardProfilePage() {
       if (!user || !boardId) return;
       try {
         const membership = await boardsApi.getMembershipStatus(boardId);
-        setIsMember(!!membership);
+        setMembershipStatus(membership?.status === 'APPROVED' || membership?.status === 'PENDING' ? membership.status : null);
       } catch (err: any) {
         console.error('Error fetching membership:', err);
       }
@@ -116,15 +121,22 @@ export default function BoardProfilePage() {
 
     try {
       setIsJoining(true);
-      if (isMember) {
+      if (membershipStatus === 'APPROVED') {
         await boardsApi.leave(boardId);
-        setIsMember(false);
+        setMembershipStatus(null);
+        showSuccess(tToast('leftBoard'));
+      } else if (membershipStatus === 'PENDING') {
+        await boardsApi.cancelMembershipRequest(boardId);
+        setMembershipStatus(null);
+        showSuccess(tJoinBoard('requestCancelled'));
       } else {
-        await boardsApi.join(boardId);
-        setIsMember(true);
+        const membership = await boardsApi.join(boardId);
+        setMembershipStatus(membership.status as 'PENDING' | 'APPROVED');
+        showSuccess(membership.status === 'APPROVED' ? tToast('joinedBoard') : tToast('joinRequestPending'));
       }
     } catch (err: any) {
       console.error('Error joining/leaving board:', err);
+      showError(err.message || (membershipStatus === 'APPROVED' ? tJoinBoard('leaveError') : tJoinBoard('joinError')));
     } finally {
       setIsJoining(false);
     }
@@ -177,13 +189,19 @@ export default function BoardProfilePage() {
             <button
               onClick={handleJoinLeave}
               disabled={isJoining}
+              onMouseEnter={() => membershipStatus === 'PENDING' && setIsPendingHovered(true)}
+              onMouseLeave={() => setIsPendingHovered(false)}
               className={`w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-2.5 sm:py-2 rounded-full font-semibold transition-colors cursor-pointer flex-shrink-0 touch-manipulation ${
-                isMember
+                membershipStatus === 'APPROVED'
                   ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  : membershipStatus === 'PENDING'
+                    ? isPendingHovered
+                      ? 'bg-red-200 text-red-800 hover:bg-red-300'
+                      : 'bg-amber-200 text-amber-800 hover:bg-amber-300'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              {isJoining ? t('loading') : isMember ? t('joined') : t('join')}
+              {isJoining ? t('loading') : membershipStatus === 'APPROVED' ? t('joined') : membershipStatus === 'PENDING' ? (isPendingHovered ? tJoinBoard('cancel') : t('pending')) : t('join')}
             </button>
           </div>
         </div>

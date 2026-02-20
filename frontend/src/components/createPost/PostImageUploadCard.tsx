@@ -5,6 +5,9 @@ import { useTranslations } from "next-intl";
 import { FiUpload, FiCamera } from "react-icons/fi";
 import EyeMaskingForm from "@/components/EyeMaskingForm";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
+
+const MAX_IMAGES_PER_POST = 5;
 
 interface PostImageUploadCardProps {
   onImagesReady: (imageIds: string[]) => void;
@@ -15,15 +18,25 @@ export const PostImageUploadCard = ({ onImagesReady, imageIds }: PostImageUpload
   const t = useTranslations("eyeMasking");
   const tCreate = useTranslations("createPost");
   const { isAuthenticated } = useAuth();
+  const { showError } = useToast();
   const [showModal, setShowModal] = useState(false);
   const [initialAction, setInitialAction] = useState<"upload" | "camera" | null>(null);
 
   const handleOpenModal = (action: "upload" | "camera") => {
+    if (imageIds.length >= MAX_IMAGES_PER_POST) {
+      showError(tCreate("maxImagesExceeded") || "You can upload a maximum of 5 images per post.");
+      return;
+    }
     setInitialAction(action);
     setShowModal(true);
   };
 
   const handleImagesReady = (ids: string[]) => {
+    const remaining = MAX_IMAGES_PER_POST - imageIds.length;
+    if (ids.length > remaining) {
+      showError(tCreate("maxImagesExceeded") || "You can upload a maximum of 5 images per post. Only the first images have been added.");
+      ids = ids.slice(0, remaining);
+    }
     onImagesReady([...imageIds, ...ids]);
     setShowModal(false);
     setInitialAction(null);
@@ -65,7 +78,7 @@ export const PostImageUploadCard = ({ onImagesReady, imageIds }: PostImageUpload
         </div>
         {imageIds.length > 0 && (
           <p className="text-xs text-green-600 mt-3 font-medium">
-            {imageIds.length} {tCreate("imagesAttached") || "image(s) attached"}
+            {imageIds.length}/{MAX_IMAGES_PER_POST} {tCreate("imagesAttached") || "image(s) attached"}
           </p>
         )}
       </div>
@@ -78,7 +91,7 @@ export const PostImageUploadCard = ({ onImagesReady, imageIds }: PostImageUpload
           role="presentation"
         >
           <div
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-lg mt-20 shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"

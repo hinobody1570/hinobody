@@ -170,9 +170,9 @@ export default function AdminUserDetailPage() {
                   className="rounded-full border-4 border-white shadow-lg"
                 />
               </div>
-              <div className="flex-1 pb-4">
+              <div className="flex-1 pb-6">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2 capitalize">{user.nickname || user.email}</h2>
-                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-4">
                   <div className="flex items-center gap-2">
                     <FaEnvelope size={14} />
                     <span>{user.email}</span>

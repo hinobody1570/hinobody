@@ -12,6 +12,7 @@ import { BsEnvelope } from "react-icons/bs";
 import { FiUser } from "react-icons/fi";
 import { useTranslations } from "next-intl";
 import { register } from "@/lib/auth";
+import { isValidPasswordFormat } from "@/utils/helperFunction";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/contexts/ToastContext";
@@ -58,8 +59,8 @@ export default function SignupForm() {
 
     if (!formData.password) {
       newErrors.password = t("passwordRequired");
-    } else if (formData.password.length < 8) {
-      newErrors.password = t("passwordMinLength8");
+    } else if (!isValidPasswordFormat(formData.password)) {
+      newErrors.password = tAuth("passwordInvalidFormat");
     }
 
     return newErrors;
@@ -142,7 +143,7 @@ export default function SignupForm() {
         <div className="space-y-6">
           {/* Email Field */}
           <div>
-            <FormLabel labelTitle={t("emailAddress")} htmlForTitle="email" />
+            <FormLabel required labelTitle={t("emailAddress")} htmlForTitle="email" />
             <FormInput
               type="email"
               icon={<BsEnvelope className="h-5 w-5 text-gray-400" />}
@@ -158,7 +159,7 @@ export default function SignupForm() {
 
           {/* Nickname Field */}
           <div>
-            <FormLabel labelTitle={t("nickname")} htmlForTitle="nickname" />
+            <FormLabel required labelTitle={t("nickname")} htmlForTitle="nickname" />
             <FormInput
               type="text"
               icon={<FiUser className="h-5 w-5 text-gray-400" />}
@@ -174,7 +175,7 @@ export default function SignupForm() {
 
           {/* Password Field */}
           <div>
-            <FormLabel labelTitle={t("password")} htmlForTitle="password" />
+            <FormLabel required labelTitle={t("password")} htmlForTitle="password" />
             <PasswordInput onChange={handleChange} onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
           </div>
 
