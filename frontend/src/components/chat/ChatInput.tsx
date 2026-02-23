@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface ChatInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -7,6 +9,7 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
+  const t = useTranslations("chat");
   const hasText = value.trim().length > 0;
 
   return (
@@ -14,7 +17,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
       <div className="flex-1 bg-gray-50 rounded-[22px] py-2.5 px-4 flex items-center gap-2 border border-[#2a2a2a] transition-colors focus-within:border-[#333]">
         <input
           type="text"
-          placeholder="Message..."
+          placeholder={t("messagePlaceholder")}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onSend()}
@@ -28,7 +31,7 @@ export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
           onClick={onSend}
           className="py-1.5 px-2.5 rounded-lg text-[#3897f0] text-[13px] font-semibold tracking-wide hover:opacity-75 disabled:opacity-30 disabled:cursor-default transition-opacity"
         >
-          Send
+          {t("send")}
         </button>
       )}
     </div>

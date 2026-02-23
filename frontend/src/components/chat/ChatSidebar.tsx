@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ContactItem } from "./ContactItem";
 import { ChatAvatar } from "./ChatAvatar";
 import type { Contact, MessagesByContact } from "./types";
@@ -26,6 +27,7 @@ export function ChatSidebar({
   onSelectContact,
   onStartNewChat,
 }: ChatSidebarProps) {
+  const t = useTranslations("chat");
   const avatarLetter =
     currentUser?.avatar && (currentUser.avatar.startsWith("http") || currentUser.avatar.startsWith("/"))
       ? currentUser.avatar
@@ -40,7 +42,7 @@ export function ChatSidebar({
             color="#64748b"
             size="md"
           />
-          <span className="text-xl font-bold tracking-tight text-black truncate">Messages</span>
+          <span className="text-xl font-bold tracking-tight text-black truncate">{t("messages")}</span>
         </div>
         <div className="bg-gray-200 rounded-[10px] py-2 px-3.5 flex items-center gap-2">
           <svg
@@ -58,7 +60,7 @@ export function ChatSidebar({
           </svg>
           <input
             type="search"
-            placeholder="Search"
+            placeholder={t("searchPlaceholder")}
             className="flex-1 bg-transparent border-none text-black text-sm outline-none font-[inherit] placeholder:text-gray-500"
           />
         </div>
@@ -93,7 +95,7 @@ export function ChatSidebar({
                 <path d="M12 5v14M5 12h14" />
               </svg>
             </div>
-            <span className="font-semibold text-sm text-black">Start new chat</span>
+            <span className="font-semibold text-sm text-black">{t("startNewChat")}</span>
           </button>
         )}
       </div>

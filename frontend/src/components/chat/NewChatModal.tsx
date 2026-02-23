@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { chatApi } from "@/lib/api";
 import { contactFromUser } from "@/app/main/chat/chatHelpers";
 import type { Contact } from "./types";
@@ -39,6 +40,7 @@ export function NewChatModal({ isOpen, onClose, onSelectUser }: NewChatModalProp
     onClose();
   };
 
+  const t = useTranslations("chat");
   if (!isOpen) return null;
 
   return (
@@ -48,12 +50,12 @@ export function NewChatModal({ isOpen, onClose, onSelectUser }: NewChatModalProp
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-900">Start new chat</h2>
+          <h2 className="text-lg font-bold text-gray-900">{t("startNewChatTitle")}</h2>
           <button
             type="button"
             onClick={onClose}
             className="p-2 rounded-full hover:bg-gray-100 text-gray-500"
-            aria-label="Close"
+            aria-label={t("closeAria")}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -63,7 +65,7 @@ export function NewChatModal({ isOpen, onClose, onSelectUser }: NewChatModalProp
         <div className="p-2 border-b border-gray-100">
           <input
             type="search"
-            placeholder="Search users..."
+            placeholder={t("searchUsers")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
@@ -71,9 +73,9 @@ export function NewChatModal({ isOpen, onClose, onSelectUser }: NewChatModalProp
         </div>
         <div className="flex-1 overflow-y-auto p-2 min-h-0">
           {loading ? (
-            <div className="py-8 text-center text-gray-500 text-sm">Loading users...</div>
+            <div className="py-8 text-center text-gray-500 text-sm">{t("loadingUsers")}</div>
           ) : filtered.length === 0 ? (
-            <div className="py-8 text-center text-gray-500 text-sm">No users found.</div>
+            <div className="py-8 text-center text-gray-500 text-sm">{t("noUsersFound")}</div>
           ) : (
             filtered.map((user) => (
               <button

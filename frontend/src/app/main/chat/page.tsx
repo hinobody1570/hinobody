@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ChatView } from "@/components/chat/ChatView";
 import { NewChatModal } from "@/components/chat/NewChatModal";
 import type { Contact, Message, MessagesByContact } from "@/components/chat/types";
@@ -23,6 +24,7 @@ function sortContactsByRecent(contacts: Contact[]): Contact[] {
 }
 
 export default function ChatPage() {
+  const t = useTranslations("chat");
   const searchParams = useSearchParams();
   const { user, token, isAuthenticated } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -177,7 +179,7 @@ export default function ChatPage() {
   if (!isAuthenticated) {
     return (
       <div className="h-full flex items-center justify-center bg-black text-white">
-        <p>Please log in to use chat.</p>
+        <p>{t("pleaseLogIn")}</p>
       </div>
     );
   }
@@ -185,14 +187,14 @@ export default function ChatPage() {
   if (loadingContacts && contacts.length === 0) {
     return (
       <div className="h-full flex items-center justify-center bg-black text-white">
-        <p>Loading...</p>
+        <p>{t("loading")}</p>
       </div>
     );
   }
 
   const PLACEHOLDER_CONTACT: Contact = {
     id: "__placeholder__",
-    name: "Select or start a chat",
+    name: t("selectOrStartChatShort"),
     avatar: "…",
     color: "#94a3b8",
   };

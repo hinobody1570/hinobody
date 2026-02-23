@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ChatAvatar } from "./ChatAvatar";
 import type { Contact } from "./types";
 
@@ -11,7 +12,8 @@ interface ContactItemProps {
 }
 
 export function ContactItem({ contact, isActive, lastMessagePreview, onClick }: ContactItemProps) {
-  const preview = lastMessagePreview ?? contact.lastSeen ?? "No messages yet";
+  const t = useTranslations("chat");
+  const preview = lastMessagePreview ?? contact.lastSeen ?? t("noMessagesYet");
 
   return (
     <button

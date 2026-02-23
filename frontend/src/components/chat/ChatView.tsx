@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatHeader } from "./ChatHeader";
 import { MessageBubble } from "./MessageBubble";
@@ -45,6 +46,7 @@ export function ChatView({
   onDismissError,
   onStartNewChat,
 }: ChatViewProps) {
+  const t = useTranslations("chat");
   const endRef = useRef<HTMLDivElement>(null);
   const currentMsgs = messages[selectedContact.id] ?? [];
 
@@ -78,7 +80,7 @@ export function ChatView({
         <div className="flex-1 overflow-y-auto py-5 px-5 pb-3 flex flex-col gap-1 chat-scrollbar">
           {loadingMessages ? (
             <div className="flex-1 flex items-center justify-center text-gray-500">
-              Loading messages...
+              {t("loadingMessages")}
             </div>
           ) : currentMsgs.length === 0 ? (
             <EmptyState contact={selectedContact} isPlaceholder={selectedContact.id === "__placeholder__"} />

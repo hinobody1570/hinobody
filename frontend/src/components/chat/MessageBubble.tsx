@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import type { Message } from "./types";
-import { CiMenuKebab } from "react-icons/ci";
 
 interface MessageBubbleProps {
   message: Message;
@@ -13,6 +13,7 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, onDelete }: MessageBubbleProps) {
+  const t = useTranslations("chat");
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(message.text);
@@ -55,7 +56,7 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
             ${prevSameSender ? (isSent ? "rounded-br-[22px]" : "rounded-bl-[22px]") : ""}
           `}
         >
-          Message deleted
+          {t("messageDeleted")}
         </div>
       </div>
     );
@@ -97,10 +98,10 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
                 }}
                 className="text-xs opacity-80 hover:opacity-100"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button type="button" onClick={handleSaveEdit} className="text-xs font-medium opacity-80 hover:opacity-100">
-                Save
+                {t("save")}
               </button>
             </div>
           </div>
@@ -116,7 +117,7 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
                onClick={() => setMenuOpen((o) => !o)}
             >
               {message.text}
-              {message.editedAt && <span className="ml-1 text-[10px] opacity-80">(edited)</span>}
+              {message.editedAt && <span className="ml-1 text-[10px] opacity-80">{t("edited")}</span>}
             </div>
             {showActions && (
               <div className="absolute top-8 -translate-y-1/2 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -124,7 +125,7 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
                   type="button"
                   onClick={() => setMenuOpen((o) => !o)}
                   className="p-1 text-2xl mt-12 rounded-full cursor-pointer text-black"
-                  aria-label="Message options"
+                  aria-label={t("messageOptions")}
                 >
                   <CiMenuKebab />
                 </button> */}
@@ -142,7 +143,7 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
                           setMenuOpen(false);
                         }}
                       >
-                        Edit
+                        {t("edit")}
                       </button>
                     )}
                     {onDelete && (
@@ -154,7 +155,7 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
                           setMenuOpen(false);
                         }}
                       >
-                        Delete
+                        {t("delete")}
                       </button>
                     )}
                   </div>

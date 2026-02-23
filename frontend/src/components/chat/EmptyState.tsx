@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ChatAvatar } from "./ChatAvatar";
 import type { Contact } from "./types";
 
@@ -9,6 +10,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ contact, isPlaceholder }: EmptyStateProps) {
+  const t = useTranslations("chat");
   if (isPlaceholder) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-500 px-4">
@@ -17,8 +19,8 @@ export function EmptyState({ contact, isPlaceholder }: EmptyStateProps) {
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         </div>
-        <div className="font-semibold text-base text-gray-700 text-center">Select a conversation or start a new chat</div>
-        <div className="text-[13px] text-center">Use &quot;Start new chat&quot; below to message someone.</div>
+        <div className="font-semibold text-base text-gray-700 text-center">{t("selectOrStartChat")}</div>
+        <div className="text-[13px] text-center">{t("useStartNewChatBelow")}</div>
       </div>
     );
   }
@@ -26,7 +28,7 @@ export function EmptyState({ contact, isPlaceholder }: EmptyStateProps) {
     <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-500">
       <ChatAvatar letter={contact.avatar} color={contact.color} size="lg" />
       <div className="font-semibold text-base text-gray-700 mt-2">{contact.name}</div>
-      <div className="text-[13px]">Start your conversation</div>
+      <div className="text-[13px]">{t("startYourConversation")}</div>
     </div>
   );
 }
