@@ -1,57 +1,228 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { ChatView } from "@/components/chat/ChatView";
-import type { Contact, MessagesByContact } from "@/components/chat/types";
+import { NewChatModal } from "@/components/chat/NewChatModal";
+import type { Contact, Message, MessagesByContact } from "@/components/chat/types";
+import { useAuth } from "@/contexts/AuthContext";
+import { useChatSocket } from "@/hooks/useChatSocket";
+import { chatApi, usersApi, type ChatMessageDto } from "@/lib/api";
+import {
+  contactFromDto,
+  contactFromUser,
+  messageFromDto,
+} from "./chatHelpers";
 
-const CONTACTS: Contact[] = [
-  { id: 1, name: "aria.design", avatar: "A", color: "#f09433", online: true, lastSeen: "Active now" },
-  { id: 2, name: "kai.visuals", avatar: "K", color: "#833ab4", online: false, lastSeen: "Active 3h ago" },
-  { id: 3, name: "muse.collective", avatar: "M", color: "#e1306c", online: true, lastSeen: "Active now" },
-  { id: 4, name: "void.studio", avatar: "V", color: "#405de6", online: false, lastSeen: "Active 1d ago" },
-];
-
-const INITIAL_MESSAGES: MessagesByContact = {
-  1: [
-    { id: 1, text: "hey! loved your latest post 🔥", sent: false, time: "10:32 AM", seen: true },
-    { id: 2, text: "thank you so much! been working on it for weeks", sent: true, time: "10:33 AM", seen: true },
-    { id: 3, text: "it really shows. the composition is insane", sent: false, time: "10:34 AM", seen: true },
-  ],
-  2: [
-    { id: 1, text: "did you see the new drop?", sent: false, time: "Yesterday", seen: true },
-    { id: 2, text: "not yet, sending the link?", sent: true, time: "Yesterday", seen: true },
-  ],
-  3: [
-    { id: 1, text: "collab soon? 👀", sent: false, time: "2d ago", seen: true },
-  ],
-  4: [],
-};
+function sortContactsByRecent(contacts: Contact[]): Contact[] {
+  return [...contacts].sort((a, b) => {
+    const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+    const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+    return bTime - aTime;
+  });
+}
 
 export default function ChatPage() {
-  const [selectedContact, setSelectedContact] = useState<Contact>(CONTACTS[0]);
-  const [messages, setMessages] = useState<MessagesByContact>(INITIAL_MESSAGES);
+  const searchParams = useSearchParams();
+  const { user, token, isAuthenticated } = useAuth();
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [messages, setMessages] = useState<MessagesByContact>({});
   const [input, setInput] = useState("");
+  const [loadingContacts, setLoadingContacts] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newChatModalOpen, setNewChatModalOpen] = useState(false);
+
+  const currentUserId = user?.id ?? "";
+
+  const applyMessage = useCallback(
+    (dto: ChatMessageDto) => {
+      const msg = messageFromDto(dto, currentUserId);
+      const otherId = dto.senderId === currentUserId ? dto.receiverId : dto.senderId;
+      setMessages((prev) => {
+        const list = prev[otherId] ?? [];
+        const idx = list.findIndex((m) => m.id === dto.id);
+        let next: Message[];
+        if (idx >= 0) {
+          next = [...list];
+          next[idx] = msg;
+        } else {
+          next = [...list, msg];
+        }
+        return { ...prev, [otherId]: next };
+      });
+    },
+    [currentUserId]
+  );
+
+  const handleSocketEvent = useCallback(
+    (event: import("@/hooks/useChatSocket").ChatSocketEvent) => {
+      if (event.type === "message") {
+        applyMessage(event.message);
+      } else if (event.type === "message:updated") {
+        applyMessage(event.message);
+      } else if (event.type === "message:deleted") {
+        setMessages((prev) => {
+          const next = { ...prev };
+          for (const contactId of Object.keys(next)) {
+            const list = next[contactId];
+            const idx = list.findIndex((m) => m.id === event.messageId);
+            if (idx >= 0) {
+              next[contactId] = list.map((m) =>
+                m.id === event.messageId
+                  ? { ...m, text: "", isDeleted: true }
+                  : m
+              );
+              break;
+            }
+          }
+          return next;
+        });
+      } else if (event.type === "error") {
+        setError(event.message);
+      }
+    },
+    [applyMessage]
+  );
+
+  const { connected, sendMessage, editMessage, deleteMessage } = useChatSocket(
+    token,
+    handleSocketEvent
+  );
+
+  // Load only contacts with existing conversations (recent first)
+  useEffect(() => {
+    if (!isAuthenticated || !token) return;
+    const withUserId = searchParams?.get("with");
+    setLoadingContacts(true);
+    setError(null);
+    chatApi
+      .getContacts()
+      .then((data) => {
+        const list = sortContactsByRecent(data.map(contactFromDto));
+        setContacts(list);
+        if (list.length > 0 && !selectedContact && !withUserId) {
+          setSelectedContact(list[0]);
+        }
+      })
+      .catch((err: any) => setError(err?.message ?? "Failed to load contacts"))
+      .finally(() => setLoadingContacts(false));
+  }, [isAuthenticated, token]);
+
+  // URL ?with=userId: open chat with that user (e.g. from profile)
+  useEffect(() => {
+    const withUserId = searchParams?.get("with");
+    if (!withUserId || !currentUserId || withUserId === currentUserId) return;
+    usersApi
+      .getById(withUserId)
+      .then((userData) => {
+        const contact = contactFromUser({
+          id: userData.id,
+          nickname: userData.nickname,
+          avatar: userData.avatar,
+        });
+        setContacts((prev) => {
+          const exists = prev.some((c) => c.id === contact.id);
+          if (exists) return prev;
+          return [...prev, contact];
+        });
+        setSelectedContact(contact);
+      })
+      .catch(() => setError("User not found"));
+  }, [searchParams?.get("with"), currentUserId]);
+
+  // Load messages when selected contact changes (from DB – both users' messages)
+  useEffect(() => {
+    if (!selectedContact || !currentUserId || selectedContact.id === "__placeholder__") return;
+    const contactId = selectedContact.id;
+    setLoadingMessages(true);
+    chatApi
+      .getMessages(contactId)
+      .then((res) => {
+        // Backend returns { data: ChatMessageDto[], meta } – use the data array (both users' messages)
+        const rawList = res?.data ?? [];
+        const list = rawList.map((d) => messageFromDto(d, currentUserId));
+        setMessages((prev) => ({ ...prev, [contactId]: list }));
+      })
+      .catch((err: any) => setError(err?.message ?? "Failed to load messages"))
+      .finally(() => setLoadingMessages(false));
+  }, [selectedContact?.id, currentUserId]);
+
+  const handleStartNewChatSelect = useCallback((contact: Contact) => {
+    setContacts((prev) => {
+      const exists = prev.some((c) => c.id === contact.id);
+      if (exists) return prev;
+      return [...prev, contact];
+    });
+    setSelectedContact(contact);
+    setNewChatModalOpen(false);
+  }, []);
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text) return;
-    const newMsg = { id: Date.now(), text, sent: true, time: "Just now", seen: false };
-    setMessages((prev) => ({
-      ...prev,
-      [selectedContact.id]: [...(prev[selectedContact.id] ?? []), newMsg],
-    }));
+    if (!text || !selectedContact) return;
+    sendMessage(selectedContact.id, text);
     setInput("");
   };
 
+  const handleEditMessage = (messageId: string, text: string) => {
+    editMessage(messageId, text);
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    deleteMessage(messageId);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="h-full flex items-center justify-center bg-black text-white">
+        <p>Please log in to use chat.</p>
+      </div>
+    );
+  }
+
+  if (loadingContacts && contacts.length === 0) {
+    return (
+      <div className="h-full flex items-center justify-center bg-black text-white">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  const PLACEHOLDER_CONTACT: Contact = {
+    id: "__placeholder__",
+    name: "Select or start a chat",
+    avatar: "…",
+    color: "#94a3b8",
+  };
+  const displayContact = selectedContact ?? contacts[0] ?? PLACEHOLDER_CONTACT;
+
   return (
-    <ChatView
-      contacts={CONTACTS}
-      selectedContact={selectedContact}
-      messages={messages}
-      input={input}
-      onSelectContact={setSelectedContact}
-      onInputChange={setInput}
-      onSend={handleSend}
-    />
+    <>
+      <ChatView
+        contacts={contacts}
+        selectedContact={displayContact}
+        messages={messages}
+        input={input}
+        currentUserId={currentUserId}
+        currentUser={user ? { nickname: user.nickname, avatar: user.avatar } : null}
+        connected={connected}
+        loadingMessages={loadingMessages}
+        error={error}
+        onSelectContact={(c) => setSelectedContact(c)}
+        onInputChange={setInput}
+        onSend={handleSend}
+        onEditMessage={handleEditMessage}
+        onDeleteMessage={handleDeleteMessage}
+        onDismissError={() => setError(null)}
+        onStartNewChat={() => setNewChatModalOpen(true)}
+      />
+      <NewChatModal
+        isOpen={newChatModalOpen}
+        onClose={() => setNewChatModalOpen(false)}
+        onSelectUser={handleStartNewChatSelect}
+      />
+    </>
   );
 }

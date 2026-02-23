@@ -1075,3 +1075,64 @@ export const blocksApi = {
   },
 };
 
+// Chat API
+export interface ChatContact {
+  id: string;
+  nickname: string;
+  avatar: string | null;
+  lastMessage: string | null;
+  lastMessageAt: string | null;
+}
+
+export interface ChatMessageDto {
+  id: string;
+  text: string;
+  isDeleted: boolean;
+  editedAt: string | null;
+  createdAt: string;
+  senderId: string;
+  receiverId: string;
+  sender: { id: string; nickname: string; avatar: string | null };
+  receiver: { id: string; nickname: string; avatar: string | null };
+}
+
+export interface ChatMessagesResponse {
+  data: ChatMessageDto[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
+export const chatApi = {
+  getContacts: async (): Promise<ChatContact[]> => {
+    const response = await api.get<ApiResponse<ChatContact[]>>(API_END_POINT.CHAT_CONTACTS);
+    return response.data;
+  },
+  getUsers: async (limit = 50): Promise<Array<{ id: string; nickname: string; avatar: string | null }>> => {
+    const response = await api.get<ApiResponse<Array<{ id: string; nickname: string; avatar: string | null }>>>(
+      `${API_END_POINT.CHAT_USERS}?limit=${limit}`
+    );
+    return response.data;
+  },
+  getMessages: async (withUserId: string, page = 1, limit = 50): Promise<ChatMessagesResponse> => {
+    const params = new URLSearchParams({ withUserId, page: String(page), limit: String(limit) });
+    const response = await api.get<ApiResponse<ChatMessagesResponse>>(`${API_END_POINT.CHAT_MESSAGES}?${params}`);
+    return response.data;
+  },
+  sendMessage: async (receiverId: string, text: string): Promise<ChatMessageDto> => {
+    const response = await api.post<ApiResponse<ChatMessageDto>>(API_END_POINT.CHAT_MESSAGES, {
+      receiverId,
+      text,
+    });
+    return response.data;
+  },
+  editMessage: async (messageId: string, text: string): Promise<ChatMessageDto> => {
+    const response = await api.patch<ApiResponse<ChatMessageDto>>(
+      `${API_END_POINT.CHAT_MESSAGES}/${messageId}`,
+      { text }
+    );
+    return response.data;
+  },
+  deleteMessage: async (messageId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.CHAT_MESSAGES}/${messageId}`);
+  },
+};
+

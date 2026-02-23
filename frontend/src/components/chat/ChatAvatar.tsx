@@ -1,7 +1,7 @@
 "use client";
 
 interface ChatAvatarProps {
-  letter: string;
+  letter: string; // can be image url OR single letter
   color?: string;
   size?: "sm" | "md" | "lg";
   showOnline?: boolean;
@@ -23,19 +23,42 @@ export function ChatAvatar({
   gradient = false,
   className = "",
 }: ChatAvatarProps) {
-  const style = color && !gradient ? { backgroundColor: color } : undefined;
+  // Simple check: if string starts with http or /
+  const isImage =
+    letter?.startsWith("http") || letter?.startsWith("/");
+
+  const style =
+    !isImage && color && !gradient
+      ? { backgroundColor: color }
+      : undefined;
 
   return (
     <div
       className={`
         flex-shrink-0 relative rounded-full flex items-center justify-center font-bold
+        overflow-hidden
         ${sizeClasses[size]}
-        ${gradient ? "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888]" : ""}
+        ${
+          !isImage
+            ? gradient
+              ? "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888]"
+              : "bg-red-500 text-white"
+            : ""
+        }
         ${className}
       `}
       style={style}
     >
-      {letter}
+      {isImage ? (
+        <img
+          src={letter}
+          alt="Avatar"
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <span>{letter}</span>
+      )}
+
       {showOnline && (
         <span
           className="absolute bottom-0.5 right-0.5 w-[11px] h-[11px] rounded-full bg-[#31d95e] border-2 border-black"

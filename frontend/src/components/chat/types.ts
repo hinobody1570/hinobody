@@ -1,18 +1,25 @@
 export interface Contact {
-  id: number;
+  id: string;
   name: string;
   avatar: string;
   color: string;
-  online: boolean;
-  lastSeen: string;
+  online?: boolean;
+  lastSeen?: string;
+  lastMessage?: string | null;
+  lastMessageAt?: string | null;
 }
 
 export interface Message {
-  id: number;
+  id: string;
   text: string;
   sent: boolean;
   time: string;
-  seen: boolean;
+  seen?: boolean;
+  senderId?: string;
+  receiverId?: string;
+  editedAt?: string | null;
+  isDeleted?: boolean;
+  createdAt?: string;
 }
 
-export type MessagesByContact = Record<number, Message[]>;
+export type MessagesByContact = Record<string, Message[]>;

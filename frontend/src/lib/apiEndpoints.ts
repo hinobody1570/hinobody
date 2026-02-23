@@ -23,5 +23,8 @@ export const API_END_POINT = {
     EYE_MASKED_IMAGES: "/eye-masked-images",
     EYE_MASKED_IMAGES_BULK: "/eye-masked-images/bulk",
     BOARD_CATEGORIES: "/board-categories",
-    
+    CHAT: "/chat",
+    CHAT_CONTACTS: "/chat/contacts",
+    CHAT_USERS: "/chat/users",
+    CHAT_MESSAGES: "/chat/messages",
 }

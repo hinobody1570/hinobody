@@ -18,6 +18,7 @@ import { EyeMaskedImageModule } from './eye-masked-image/eye-masked-image.module
 import { VoteModule } from './vote/vote.module';
 import { SearchModule } from './search/search.module';
 import { BoardCategoryModule } from './board-category/board-category.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { BoardCategoryModule } from './board-category/board-category.module';
     EyeMaskedImageModule,
     VoteModule,
     SearchModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

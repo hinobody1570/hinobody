@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { User } from '@/lib/api';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { FiEdit, FiCamera, FiUserX } from 'react-icons/fi';
+import { HiChat } from 'react-icons/hi';
+import { ROUTE_PATHS } from '@/routes/paths';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 import { usersApi, s3Api } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
@@ -151,6 +154,15 @@ export function UserProfileHeader({
               )}
             </div>
             <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
+              {!isOwnProfile && currentUser && !isBlocked && (
+                <Link
+                  href={`${ROUTE_PATHS.CHAT}?with=${user.id}`}
+                  className="flex items-center justify-center gap-2 px-3 py-2 min-h-[40px] sm:min-h-0 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer touch-manipulation text-sm"
+                >
+                  <HiChat size={16} />
+                  <span>{t('chat')}</span>
+                </Link>
+              )}
               {!isOwnProfile && currentUser && (
                 <>
                   {isBlocked ? (

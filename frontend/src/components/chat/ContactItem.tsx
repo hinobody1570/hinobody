@@ -10,13 +10,8 @@ interface ContactItemProps {
   onClick: () => void;
 }
 
-export function ContactItem({
-  contact,
-  isActive,
-  lastMessagePreview,
-  onClick,
-}: ContactItemProps) {
-  const preview = lastMessagePreview ?? contact.lastSeen;
+export function ContactItem({ contact, isActive, lastMessagePreview, onClick }: ContactItemProps) {
+  const preview = lastMessagePreview ?? contact.lastSeen ?? "No messages yet";
 
   return (
     <button
@@ -29,15 +24,13 @@ export function ContactItem({
       `}
     >
       <ChatAvatar
-        letter={contact.avatar}
-        color={contact.color}
+        letter={contact.avatar ?? contact.name?.charAt(0).toUpperCase()}
+        color={"red"}
         // showOnline={contact.online}
       />
       <div className="flex-1 min-w-0 text-left">
         <div className="font-semibold text-sm text-black">{contact.name}</div>
-        <div className="text-xs text-gray-500 mt-0.5 truncate">
-          {preview}
-        </div>
+        <div className="text-xs text-gray-500 mt-0.5 truncate">{preview}</div>
       </div>
     </button>
   );

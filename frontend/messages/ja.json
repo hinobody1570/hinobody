@@ -189,6 +189,7 @@
     "myBoardMemberships": "ボードメンバーシップ",
     "noBoardMemberships": "ボードメンバーシップがありません",
     "joinedAt": "参加日時",
+    "chat": "チャット",
     "blockUser": "ユーザーをブロック",
     "unblockUser": "ブロック解除",
     "processing": "処理中...",
