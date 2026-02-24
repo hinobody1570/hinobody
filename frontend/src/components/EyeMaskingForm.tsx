@@ -1294,13 +1294,6 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
               <button type="submit" disabled={isProcessing || masks.length === 0} className="btn btn-success cursor-pointer">
                 {isProcessing ? t("processing") : t("uploadMaskedImageButton")}
               </button>
-              {masks.length > 0 && (
-                <p className="info-text">
-                  {t("masksApplied", { count: masks.length })}
-                  <br />
-                  <small>{t("originalStaysInBrowser")}</small>
-                </p>
-              )}
             </div>
 
             {uploadStatus && <div className={`upload-status ${uploadStatus.includes("Error") ? "error" : "success"}`}>{uploadStatus}</div>}
@@ -1309,54 +1302,12 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
 
         {!model && !debugInfo.modelError && <div className="loading-model">{t("loadingModel")}</div>}
 
-        {debugInfo.modelError && (
-          <div className="model-error-notice">
-            <strong>{t("modelNotAvailable")}</strong>
-            <p>
-              {t("error")} {debugInfo.modelError}
-            </p>
-            <p>{t("canUseManualMode")}</p>
-            <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary cursor-pointer">
-              {t("retryLoadingModel")}
-            </button>
-          </div>
-        )}
       </form>
-
-      <div className="privacy-notice">
-        <strong>{t("privacyNotice")}</strong> {t("privacyDescription")}
-      </div>
 
       {/* Debug Panel - Remove in production */}
       {Object.keys(debugInfo).length > 0 && (
         <div className="debug-panel">
-          <h3>{t("debugInformation")}</h3>
           <div className="debug-content">
-            <p>
-              <strong>{t("modelStatus")}</strong> {debugInfo.modelLoaded ? t("modelLoaded") : t("modelNotLoaded")}
-            </p>
-            {debugInfo.modelError && (
-              <p>
-                <strong>{t("modelError")}</strong> {debugInfo.modelError}
-              </p>
-            )}
-            {debugInfo.imageLoaded && (
-              <>
-                <p>
-                  <strong>{t("image")}</strong> {debugInfo.imageName} ({(debugInfo.imageSize / 1024).toFixed(2)} KB)
-                </p>
-              </>
-            )}
-            {debugInfo.facesDetected !== undefined && (
-              <p>
-                <strong>{t("facesDetected")}</strong> {debugInfo.facesDetected}
-              </p>
-            )}
-            {debugInfo.masksCreated !== undefined && (
-              <p>
-                <strong>{t("masksCreated")}</strong> {debugInfo.masksCreated}
-              </p>
-            )}
             {croppedMasks.length > 0 && (
               <>
                 <p>
@@ -1384,25 +1335,6 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
                 </div>
               </>
             )}
-            {debugInfo.originalSize && (
-              <p>
-                <strong>{t("compression")}</strong> {debugInfo.originalSize} KB → {debugInfo.compressedSize} KB ({debugInfo.compressionRatio}%
-                reduction)
-              </p>
-            )}
-            {debugInfo.s3Key && (
-              <p>
-                <strong>{t("s3Key")}</strong> {debugInfo.s3Key}
-              </p>
-            )}
-            {debugInfo.uploadError && (
-              <p>
-                <strong>{t("uploadError")}</strong> {debugInfo.uploadError}
-              </p>
-            )}
-            <button type="button" onClick={() => setDebugInfo({})} className="btn btn-small cursor-pointer">
-              {t("clearDebugInfo")}
-            </button>
           </div>
         </div>
       )}
