@@ -659,13 +659,14 @@ export class PostService {
       throw new ForbiddenException('You can only update your own posts');
     }
 
+    const { imageIds, ...postData } = updatePostDto;
     return this.prisma.post.update({
       where: { id },
       data: {
-        ...updatePostDto,
-        ...(updatePostDto.imageIds && {
+        ...postData,
+        ...(imageIds !== undefined && {
           images: {
-            set: updatePostDto.imageIds.map((imageId) => ({ id: imageId })),
+            set: imageIds.map((imageId) => ({ id: imageId })),
           },
         }),
       },
