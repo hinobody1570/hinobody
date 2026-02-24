@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { ContactItem } from "./ContactItem";
 import { ChatAvatar } from "./ChatAvatar";
@@ -28,6 +29,14 @@ export function ChatSidebar({
   onStartNewChat,
 }: ChatSidebarProps) {
   const t = useTranslations("chat");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredContacts = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return contacts;
+    return contacts.filter((c) => c.name.toLowerCase().includes(q));
+  }, [contacts, searchQuery]);
+
   const avatarLetter =
     currentUser?.avatar && (currentUser.avatar.startsWith("http") || currentUser.avatar.startsWith("/"))
       ? currentUser.avatar
@@ -60,14 +69,17 @@ export function ChatSidebar({
           </svg>
           <input
             type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
             className="flex-1 bg-transparent border-none text-black text-sm outline-none font-[inherit] placeholder:text-gray-500"
+            aria-label={t("searchPlaceholder")}
           />
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto py-2 px-2 chat-scrollbar flex flex-col">
-        {contacts.map((contact) => {
+        {filteredContacts.map((contact) => {
           const thread = messages[contact.id];
           const lastFromThread =
             thread?.length && thread[thread.length - 1].text
