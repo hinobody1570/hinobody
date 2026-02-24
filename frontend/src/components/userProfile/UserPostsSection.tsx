@@ -18,8 +18,11 @@ export function UserPostsSection({ posts, loading, title, emptyMessage, onPostDe
 
   return (
     <div>
-      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{displayTitle} ({posts.length})</h2>
-      
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
+        {displayTitle}
+        {!loading && ` (${posts.length})`}
+      </h2>
+
       {loading ? (
         <div className="flex items-center justify-center py-8 sm:py-12">
           <div className="text-gray-500 text-sm sm:text-base">{t('loadingPosts')}</div>
