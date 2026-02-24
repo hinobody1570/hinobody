@@ -17,34 +17,40 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
     id: post.id,
     boardId: post.boardId, // Add boardId for membership checks
     authorId: post.authorId, // Add authorId for comment OP badge
-    community: post.board?.name ? `r/${post.board.name}/${post.author?.nickname}` : post.postCategory ? post.postCategory : "r/community",
+    community: post.board?.name ? `r/${post.board.name}` : post.postCategory ? post.postCategory : "r/community",
     communityAvatar: DP, // Default avatar
     verified: false, // Can be enhanced later based on board settings
     timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
-    image: post.images && post.images.length > 0 ? post.images[0].url : null,
+    images: post.images?.map((img) => img.url) ?? [],
     upvotes: post.upvoteCount || 0,
     downvotes: post.downvoteCount || 0,
     comments: post.commentCount || 0,
-    body: post.body || ""
+    body: post.body || "",
+    authorName: post.author?.nickname || ""
   };
 };
 
 // Transform API post to RecentPostCard format
 const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
+  const upvoteCount = post.upvoteCount ?? 0;
+  const downvoteCount = post.downvoteCount ?? 0;
   return {
     id: post.id,
     community: post.board?.name ? `r/${post.board.name}` : post.postCategory || "r/community",
     avatar: DP, // Default avatar
     timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
-    upvotes: post.upvoteCount || 0,
+    upvotes: upvoteCount - downvoteCount, // net score (can be negative)
     comments: post.commentCount || 0,
+    images: post.images?.map((img) => img.url) ?? [],
   };
 };
 
 export const RedditFeed = () => {
   const t = useTranslations('feed');
+  const tRef = useRef(t);
+  tRef.current = t;
   const tTime = useTranslations('timeAgo');
   const { locale } = useLanguage();
   const searchParams = useSearchParams();
@@ -90,6 +96,30 @@ export const RedditFeed = () => {
     setShowRecentPosts(false);
   };
 
+  // Update comment count in recent posts when a comment is added
+  const handleCommentAdded = useCallback((postId: string) => {
+    setRecentPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, commentCount: (p.commentCount ?? 0) + 1 } : p
+      )
+    );
+  }, []);
+
+  // Update vote counts in recent posts when a vote is cast
+  const handleVoteChange = useCallback((postId: string, upvoteDelta: number, downvoteDelta: number) => {
+    setRecentPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              upvoteCount: (p.upvoteCount ?? 0) + upvoteDelta,
+              downvoteCount: (p.downvoteCount ?? 0) + downvoteDelta,
+            }
+          : p
+      )
+    );
+  }, []);
+
   // Fetch posts with sort and category filter
   const fetchPosts = useCallback(async (page: number = 1, sortBy: PostSortBy = 'newest', append: boolean = false, category?: string) => {
     try {
@@ -116,12 +146,12 @@ export const RedditFeed = () => {
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
       console.error('Error fetching posts:', err);
-      setError(err.message || t('failedToLoadPosts'));
+      setError(err.message || tRef.current('failedToLoadPosts'));
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [t]);
+  }, []);
 
   // Transform posts for display - re-runs when locale changes so timestamps update
   const displayPosts = useMemo(
@@ -267,7 +297,16 @@ export const RedditFeed = () => {
             {!loading && !error && (
               <>
                 {displayPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onDelete={(id) => {
+                      setPosts((prev) => prev.filter((p) => p.id !== id));
+                      setRecentPosts((prev) => prev.filter((p) => p.id !== id));
+                    }}
+                    onCommentAdded={() => handleCommentAdded(post.id)}
+                    onVoteChange={handleVoteChange}
+                  />
                 ))}
                 
                 {/* Infinite scroll trigger */}

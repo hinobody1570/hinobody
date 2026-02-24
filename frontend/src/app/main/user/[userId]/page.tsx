@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { usersApi, User, postsApi, Post, eyeMaskedImagesApi, EyeMaskedImage, boardsApi, Board, BoardMembership, blocksApi } from '@/lib/api';
 import { ROUTE_PATHS } from '@/routes/paths';
@@ -22,12 +22,13 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
     id: post.id,
     boardId: post.boardId,
     authorId: post.authorId,
+    authorName: post.author?.nickname || "",
     community: post.board?.name ? `r/${post.board.name}` : "r/community",
     communityAvatar: DP,
     verified: false,
     timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
-    image: post.images && post.images.length > 0 ? post.images[0].url : null,
+    images: post.images?.map((img) => img.url) ?? [],
     upvotes: post.upvoteCount || 0,
     downvotes: post.downvoteCount || 0,
     comments: post.commentCount || 0,
@@ -38,7 +39,9 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
 export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user: currentUser } = useAuth();
+  const tab = searchParams?.get('tab') || 'posts';
   const t = useTranslations('userProfile');
   const tTime = useTranslations('timeAgo');
   const { locale } = useLanguage();
@@ -91,26 +94,23 @@ export default function UserProfilePage() {
   };
 
   useEffect(() => {
-    const fetchUserPosts = async () => {
+    const fetchPosts = async () => {
+      if (!userId) return;
       try {
         setLoadingPosts(true);
-        const response = await postsApi.getAll({
-          authorId: userId,
-          page: 1,
-          limit: 20,
-        });
+        const response = tab === 'comments'
+          ? await postsApi.getAll({ commenterId: userId, page: 1, limit: 20 })
+          : await postsApi.getAll({ authorId: userId, page: 1, limit: 20 });
         setPosts(response.data);
       } catch (err: any) {
-        console.error('Error fetching user posts:', err);
+        console.error('Error fetching posts:', err);
       } finally {
         setLoadingPosts(false);
       }
     };
 
-    if (userId) {
-      fetchUserPosts();
-    }
-  }, [userId]);
+    fetchPosts();
+  }, [userId, tab]);
 
   const displayPosts = useMemo(
     () => posts.map((p) => transformPost(p, tTime)),
@@ -161,6 +161,7 @@ export default function UserProfilePage() {
   useEffect(() => {
     const fetchPendingRequests = async () => {
       // Only fetch if it's the user's own profile
+      // Fetch membership requests that the user has SENT (not received)
       if (!isOwnProfile || !userId) return;
       
       try {
@@ -168,7 +169,7 @@ export default function UserProfilePage() {
         const requests = await boardsApi.getPendingRequests();
         setPendingRequests(requests);
       } catch (err: any) {
-        console.error('Error fetching pending requests:', err);
+        console.error('Error fetching sent membership requests:', err);
       } finally {
         setLoadingRequests(false);
       }
@@ -228,28 +229,23 @@ export default function UserProfilePage() {
   };
 
   const handleApproveRequest = async (membershipId: string) => {
-    try {
-      await boardsApi.approveMembership(membershipId);
-      // Remove from pending requests
-      setPendingRequests(prev => prev.filter(req => req.id !== membershipId));
-      // Refresh boards to show the new member (using userId from URL params)
-      const boards = await boardsApi.getByUserId(userId);
-      setCreatedBoards(boards.created);
-      setMemberBoards(boards.member);
-    } catch (err: any) {
-      console.error('Error approving request:', err);
-      alert(err.message || t('failedToApproveRequest'));
-    }
+    // This function is no longer needed since users can't approve their own requests
+    // Requests are approved by board creators/admins
   };
 
   const handleRejectRequest = async (membershipId: string) => {
+    // Users can cancel their own pending requests
     try {
-      await boardsApi.rejectMembership(membershipId);
+      const request = pendingRequests.find(req => req.id === membershipId);
+      if (!request || !request.boardId) return;
+      
+      // Cancel the pending membership request
+      await boardsApi.cancelMembershipRequest(request.boardId);
       // Remove from pending requests
       setPendingRequests(prev => prev.filter(req => req.id !== membershipId));
     } catch (err: any) {
-      console.error('Error rejecting request:', err);
-      alert(err.message || t('failedToRejectRequest'));
+      console.error('Error canceling request:', err);
+      alert(err.message || t('failedToCancelRequest') || 'Failed to cancel request');
     }
   };
 
@@ -305,19 +301,19 @@ export default function UserProfilePage() {
         )}
 
         {/* Eye Masking Images Section - Only show on own profile */}
-        {isOwnProfile && (
+        {/* {isOwnProfile && (
           <EyeMaskingImagesSection
             images={eyeMaskedImages}
             loading={loadingImages}
           />
-        )}
+        )} */}
 
         {/* Community Boards Section */}
-        <CommunityBoardsSection
+        {/* <CommunityBoardsSection
           createdBoards={createdBoards}
           memberBoards={memberBoards}
           loading={loadingBoards}
-        />
+        /> */}
 
         {/* Pending Membership Requests - Only show on own profile */}
         {isOwnProfile && (
@@ -329,10 +325,39 @@ export default function UserProfilePage() {
           />
         )}
 
-        {/* User Posts */}
+        {/* Tabs: Posts | Comments */}
+        <div className="flex gap-2 border-b border-gray-200 mb-4">
+          <button
+            type="button"
+            onClick={() => router.push(`/main/user/${userId}`)}
+            className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
+              tab !== 'comments'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t('posts')}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push(`/main/user/${userId}?tab=comments`)}
+            className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
+              tab === 'comments'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t('comments')}
+          </button>
+        </div>
+
+        {/* User Posts or Posts with Comments by User */}
         <UserPostsSection
           posts={displayPosts}
           loading={loadingPosts}
+          title={tab === 'comments' ? t('postsWithCommentsByUser') : undefined}
+          emptyMessage={tab === 'comments' ? t('noPostsWithCommentsByUser') : undefined}
+          onPostDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))}
         />
       </div>
     </div>

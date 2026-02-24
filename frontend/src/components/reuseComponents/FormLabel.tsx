@@ -2,12 +2,13 @@
 interface propType {
   labelTitle: string;
   htmlForTitle?: string;
+  required?: boolean
 }
 
-const FormLabel = ({ labelTitle, htmlForTitle }: propType) => {
+const FormLabel = ({ labelTitle, htmlForTitle, required }: propType) => {
   return (
     <label htmlFor={htmlForTitle} className="block text-sm font-medium text-gray-700 mb-2">
-      {labelTitle}{" "}
+      {labelTitle}{" "}{required && <span className="text-red-600">*</span>}
     </label>
   );
 };

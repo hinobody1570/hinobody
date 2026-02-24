@@ -22,6 +22,14 @@ export class QueryPostsDto {
   authorId?: string;
 
   @ApiPropertyOptional({
+    example: 'user_123456',
+    description: 'Filter posts that have comments by this user ID',
+  })
+  @IsOptional()
+  @IsString()
+  commenterId?: string;
+
+  @ApiPropertyOptional({
     example: 1,
     description: 'Page number for pagination (default 1)',
     minimum: 1,

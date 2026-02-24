@@ -7,6 +7,7 @@ import "./EyeMaskingForm.css";
 import ButtonLoader from "./reuseComponents/ButtonLoader";
 import { s3Api, eyeMaskedImagesApi, imagesApi } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 
 // Dynamic import for face-api.js to avoid SSR issues
 let faceapi: any = null;
@@ -23,6 +24,7 @@ interface EyeMaskingFormProps {
 const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = null }: EyeMaskingFormProps) => {
   const t = useTranslations("eyeMasking");
   const { isAuthenticated } = useAuth();
+  const { showError } = useToast();
   const [imageFile, setImageFile] = useState<any>(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -90,9 +92,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
           modelError: `${error.name}: ${error.message}`,
         }));
 
-        alert(
-          `Failed to load AI model: ${error.message}\n\nYou can still use Manual Masking mode.\n\nPlease check:\n1. Internet connection (model downloads from CDN)\n2. Browser console for details\n3. Try refreshing the page`
-        );
+        showError(t("modelLoadFailed", { error: error.message }));
       } finally {
         setIsProcessing(false);
       }
@@ -103,10 +103,19 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
 
   // Handle image file selection
   const handleImageChange = (e: any) => {
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+
     const file = e.target.files?.[0];
-    if (file) {
-      // Close camera if open
-      if (isCameraOpen) {
+    if (!file) return;
+
+    if (!allowedTypes.includes(file.type)) {
+      showError(t("onlyPngJpgWebpAllowed"));
+      e.target.value = "";
+      return;
+    }
+
+    // Close camera if open
+    if (isCameraOpen) {
         closeCamera();
       }
 
@@ -129,7 +138,6 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
         setImagePreview(event.target.result);
       };
       reader.readAsDataURL(file);
-    }
   };
 
   // Open camera
@@ -208,7 +216,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
 
               if (attempts >= maxAttempts && video.videoWidth === 0) {
                 console.error("❌ Video never became ready after 5 seconds");
-                alert(t("cameraVideoNotLoading"));
+                showError(t("cameraVideoNotLoading"));
               }
             }
           }, 100);
@@ -329,7 +337,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
         reader.readAsDataURL(file);
       },
       "image/jpeg",
-      0.9
+      0.9,
     );
   };
 
@@ -507,7 +515,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
 
           // Don't create mask if validation fails
           const errorMessage = `⚠️ Eye Detection Issue:\n\n${validation.issues.join(
-            "\n"
+            "\n",
           )}\n\nPlease:\n- Remove glasses if wearing them\n- Ensure eyes are clearly visible\n- Use Manual Masking mode instead`;
           alert(errorMessage);
           return; // Skip this face
@@ -724,7 +732,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
         eyeRegion.x,
         eyeRegion.y,
         Math.min(eyeRegion.width, canvas.width - eyeRegion.x),
-        Math.min(eyeRegion.height, canvas.height - eyeRegion.y)
+        Math.min(eyeRegion.height, canvas.height - eyeRegion.y),
       );
 
       // Detect glasses using horizontal edge detection
@@ -846,7 +854,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
           0,
           0,
           width,
-          height // Destination (full canvas)
+          height, // Destination (full canvas)
         );
 
         // Convert to blob/dataURL
@@ -865,7 +873,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
             resolve(croppedData);
           },
           "image/jpeg",
-          0.9
+          0.9,
         );
       });
 
@@ -983,7 +991,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
           resolve(compressedBlob);
         },
         "image/jpeg",
-        0.85 // Quality
+        0.85, // Quality
       );
     });
   };
@@ -1156,17 +1164,12 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
             <input
               id="image-upload"
               type="file"
-              accept="image/*"
+              accept="image/png, image/jpeg, image/jpg, image/webp"
               onChange={handleImageChange}
               ref={fileInputRef}
               disabled={isProcessing || isCameraOpen}
             />
-            <button
-              type="button"
-              onClick={openCamera}
-              disabled={isProcessing || isCameraOpen}
-              className="btn btn-secondary cursor-pointer"
-            >
+            <button type="button" onClick={openCamera} disabled={isProcessing || isCameraOpen} className="btn btn-secondary cursor-pointer">
               {t("takePhoto")}
             </button>
           </div>
@@ -1310,14 +1313,14 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
           <div className="debug-content">
             {croppedMasks.length > 0 && (
               <>
-                <p>
+                {/* <p>
                   <strong>{t("croppedRegions")}</strong> {croppedMasks.length}
-                </p>
+                </p> */}
                 <div className="cropped-masks-preview">
                   {croppedMasks.map((cropped: any, idx) => (
                     <div key={idx} className="cropped-mask-item">
                       <img src={cropped.dataURL} alt={`Cropped mask ${idx + 1}`} className="cropped-preview-img" />
-                      <div className="cropped-info">
+                      {/* <div className="cropped-info">
                         <p>
                           <strong>
                             {t("mask")} {idx + 1}
@@ -1329,7 +1332,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
                         <p>
                           {t("size")} {cropped.width} × {cropped.height}px
                         </p>
-                      </div>
+                      </div> */}
                     </div>
                   ))}
                 </div>

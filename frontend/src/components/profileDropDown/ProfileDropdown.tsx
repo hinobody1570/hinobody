@@ -77,6 +77,11 @@ export default function ProfileDropdown() {
   //   },
   // ];
 
+  const handleLogout = () => {
+    logout();
+    router.push(ROUTE_PATHS.DEFAULT);
+  };
+
   return (
     <div className="absolute right-0 top-16 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-fadeIn">
       {/* Profile Section */}
@@ -133,12 +138,15 @@ export default function ProfileDropdown() {
       )}
       {/* Log Out */}
       {isAuthenticated ? (
-        <button onClick={() => logout()} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
+        <button onClick={handleLogout} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
           <MdLogout className="w-5 h-5 text-gray-700" />
           <span className="text-sm font-medium text-gray-900">{t("logOut")}</span>
         </button>
       ) : (
-        <button onClick={() => router.push(ROUTE_PATHS.DEFAULT)} className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3">
+        <button
+          onClick={() => router.push(ROUTE_PATHS.DEFAULT)}
+          className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3"
+        >
           <MdLogin className="w-5 h-5 text-gray-700" />
           <span className="text-sm font-medium text-gray-900">{t("login")}</span>
         </button>

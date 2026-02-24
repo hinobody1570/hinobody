@@ -17,6 +17,9 @@ import {
 } from '@nestjs/swagger';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 import { BoardMemberService } from './board-member.service';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
 
@@ -93,6 +96,79 @@ export class BoardMemberController {
     @GetUser('id') userId: string,
   ) {
     return this.boardMemberService.leaveBoard(boardId, userId);
+  }
+
+  // Admin endpoints
+  @Get('admin/memberships')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all memberships across all boards (admin only)' })
+  @ApiResponse({ status: 200, description: 'All memberships retrieved' })
+  async getAllMemberships() {
+    return this.boardMemberService.getAllMemberships();
+  }
+
+  @Patch('admin/:boardId/members/:memberId/approve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Approve a membership request (admin only)' })
+  @ApiParam({ name: 'boardId', description: 'Board ID' })
+  @ApiParam({ name: 'memberId', description: 'User ID of the member' })
+  @ApiResponse({ status: 200, description: 'Membership approved' })
+  async approveMembership(
+    @Param('boardId') boardId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.boardMemberService.approveMembership(boardId, memberId);
+  }
+
+  @Patch('admin/:boardId/members/:memberId/reject')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Reject a membership request (admin only)' })
+  @ApiParam({ name: 'boardId', description: 'Board ID' })
+  @ApiParam({ name: 'memberId', description: 'User ID of the member' })
+  @ApiResponse({ status: 200, description: 'Membership rejected' })
+  async rejectMembership(
+    @Param('boardId') boardId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.boardMemberService.rejectMembership(boardId, memberId);
+  }
+
+  @Delete('admin/:boardId/members/:memberId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Delete a membership (admin only)' })
+  @ApiParam({ name: 'boardId', description: 'Board ID' })
+  @ApiParam({ name: 'memberId', description: 'User ID of the member' })
+  @ApiResponse({ status: 200, description: 'Membership deleted' })
+  async deleteMembership(
+    @Param('boardId') boardId: string,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.boardMemberService.deleteMembership(boardId, memberId);
+  }
+
+  @Get('sent-requests')
+  @ApiOperation({ summary: 'Get membership requests sent by the current user' })
+  @ApiResponse({ status: 200, description: 'Sent membership requests retrieved' })
+  async getSentMembershipRequests(
+    @GetUser('id') userId: string,
+  ) {
+    return this.boardMemberService.getSentMembershipRequests(userId);
+  }
+
+  @Delete(':boardId/cancel-request')
+  @ApiOperation({ summary: 'Cancel a pending membership request' })
+  @ApiParam({ name: 'boardId', description: 'Board ID' })
+  @ApiResponse({ status: 200, description: 'Membership request cancelled' })
+  @ApiResponse({ status: 400, description: 'Can only cancel pending requests' })
+  async cancelMembershipRequest(
+    @Param('boardId') boardId: string,
+    @GetUser('id') userId: string,
+  ) {
+    return this.boardMemberService.cancelMembershipRequest(boardId, userId);
   }
 }
 

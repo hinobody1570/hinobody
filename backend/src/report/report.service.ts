@@ -280,21 +280,49 @@ export class ReportService {
   }
 
   async update(id: string, updateReportDto: UpdateReportDto, adminId: string) {
-    await this.findOne(id); // Verify exists
-
-    return this.prisma.report.update({
+    const report = await this.prisma.report.findUnique({
       where: { id },
-      data: {
-        ...updateReportDto,
-        reviewedAt: new Date(),
-        reviewedBy: adminId,
-      },
-      include: {
-        reportedBy: true,
-        post: true,
-        comment: true,
-      },
+      include: { post: true, comment: true },
     });
+    if (!report) {
+      throw new NotFoundException(`Report with ID ${id} not found`);
+    }
+
+    const isResolved = updateReportDto.status === 'RESOLVED';
+
+    const updatedReport = await this.prisma.$transaction(async (tx) => {
+      if (isResolved) {
+        // When admin resolves a report, make the reported post or comment inactive for all users
+        if (report.postId) {
+          await tx.post.update({
+            where: { id: report.postId },
+            data: { isActive: false },
+          });
+        }
+        if (report.commentId) {
+          await tx.comment.update({
+            where: { id: report.commentId },
+            data: { isActive: false },
+          });
+        }
+      }
+
+      return tx.report.update({
+        where: { id },
+        data: {
+          ...updateReportDto,
+          reviewedAt: new Date(),
+          reviewedBy: adminId,
+        },
+        include: {
+          reportedBy: true,
+          post: true,
+          comment: true,
+        },
+      });
+    });
+
+    return updatedReport;
   }
 
   async remove(id: string): Promise<void> {

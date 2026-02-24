@@ -5,6 +5,7 @@ import {
   IsEnum,
   IsArray,
   IsOptional,
+  ArrayMaxSize,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Language } from '@prisma/client';
@@ -54,11 +55,13 @@ export class CreatePostDto {
 
   @ApiPropertyOptional({
     example: ['image_abc123', 'image_def456'],
-    description: 'Array of image IDs attached to the post',
+    description: 'Array of image IDs attached to the post (max 5)',
     type: [String],
+    maxItems: 5,
   })
   @IsArray()
   @IsString({ each: true })
+  @ArrayMaxSize(5, { message: 'Maximum 5 images allowed per post' })
   @IsOptional()
   imageIds?: string[];
 

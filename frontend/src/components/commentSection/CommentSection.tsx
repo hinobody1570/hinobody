@@ -6,7 +6,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { commentsApi, Comment as CommentType, Language } from '@/lib/api';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 import Comment from './Comment';
@@ -37,14 +37,17 @@ const transformComment = (
 interface CommentsSectionProps {
   postId: string;
   postAuthorId?: string;
+  onCommentAdded?: () => void;
 }
 
 // Main Comments Section Component
-export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
+export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: CommentsSectionProps) => {
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
   const t = useTranslations('comments');
+  const tRef = useRef(t);
+  tRef.current = t;
   const tTime = useTranslations('timeAgo');
   const [sortBy, setSortBy] = useState(t('best'));
   const [comments, setComments] = useState<CommentType[]>([]);
@@ -95,12 +98,12 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       setHasMore(response.meta.page < response.meta.totalPages);
     } catch (err: any) {
       console.error('Error fetching comments:', err);
-      setError(err.message || t('failedToLoadComments'));
+      setError(err.message || tRef.current('failedToLoadComments'));
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [postId, postAuthorId, t]);
+  }, [postId, postAuthorId]);
 
   // Handle search with debounce
   useEffect(() => {
@@ -175,6 +178,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       });
       setNewComment('');
       showSuccess(t('commentAddedSuccess'));
+      onCommentAdded?.();
       // Refresh comments from page 1
       await fetchComments(1, false);
     } catch (err: any) {
@@ -211,7 +215,7 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
 
       {/* Sort and Search - stacked on mobile, row on tablet+ */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 mb-4 sm:mb-6">
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-sm text-gray-600">{t('sortBy')}</span>
           <button
             className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:bg-gray-100 rounded transition-colors cursor-pointer touch-manipulation"
@@ -220,9 +224,9 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
             {sortBy}
             <BiChevronDown size={16} />
           </button>
-        </div>
+        </div> */}
 
-        <div className="relative flex-1 w-full min-w-0 max-w-full sm:max-w-md">
+        <div className="relative flex-1 w-full min-w-0 max-w-full">
           <BiSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 flex-shrink-0" />
           <input
             type="text"
@@ -270,12 +274,15 @@ export const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) 
       {!loading && !error && (
         <div className="space-y-3 sm:space-y-4">
           {displayComments.map((comment) => (
-            <Comment 
-              key={comment.id} 
+            <Comment
+              key={comment.id}
               comment={comment}
               postId={postId}
               postAuthorId={postAuthorId}
-              onReplyAdded={() => fetchComments(1, false)}
+              onReplyAdded={() => {
+                onCommentAdded?.();
+                fetchComments(1, false);
+              }}
             />
           ))}
           

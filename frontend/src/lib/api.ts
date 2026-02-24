@@ -247,6 +247,10 @@ export interface BoardMembership {
     name: string;
     description?: string;
     visibilityAccess: BoardVisibility;
+    creator?: {
+      id: string;
+      nickname: string;
+    };
   };
 }
 
@@ -298,12 +302,35 @@ export const boardsApi = {
     const response = await api.get<ApiResponse<BoardMembership[]>>(`${API_END_POINT.BOARDS}/pending-requests`);
     return response.data;
   },
+  getSentMembershipRequests: async (): Promise<BoardMembership[]> => {
+    const response = await api.get<ApiResponse<BoardMembership[]>>(`${API_END_POINT.BOARDS}/sent-requests`);
+    return response.data;
+  },
+  cancelMembershipRequest: async (boardId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/${boardId}/cancel-request`);
+  },
   approveMembership: async (membershipId: string): Promise<BoardMembership> => {
     const response = await api.patch<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/membership/${membershipId}/approve`);
     return response.data;
   },
   rejectMembership: async (membershipId: string): Promise<void> => {
     await api.delete(`${API_END_POINT.BOARDS}/membership/${membershipId}/reject`);
+  },
+  // Admin endpoints
+  getAllMemberships: async (): Promise<BoardMembership[]> => {
+    const response = await api.get<ApiResponse<BoardMembership[]>>(`${API_END_POINT.BOARDS}/admin/memberships`);
+    return response.data;
+  },
+  approveMembershipAdmin: async (boardId: string, memberId: string): Promise<BoardMembership> => {
+    const response = await api.patch<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/admin/${boardId}/members/${memberId}/approve`);
+    return response.data;
+  },
+  rejectMembershipAdmin: async (boardId: string, memberId: string): Promise<BoardMembership> => {
+    const response = await api.patch<ApiResponse<BoardMembership>>(`${API_END_POINT.BOARDS}/admin/${boardId}/members/${memberId}/reject`);
+    return response.data;
+  },
+  deleteMembershipAdmin: async (boardId: string, memberId: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.BOARDS}/admin/${boardId}/members/${memberId}`);
   },
 };
 
@@ -437,6 +464,7 @@ export interface QueryPostsParams {
   limit?: number;
   boardId?: string;
   authorId?: string;
+  commenterId?: string;
   search?: string;
   sortBy?: PostSortBy;
   category?: string;
@@ -449,7 +477,7 @@ export const postsApi = {
     return response.data;
   },
   getAll: async (params: QueryPostsParams = {}): Promise<PostsResponse> => {
-    const { page = 1, limit = 20, boardId, authorId, search, sortBy, category } = params;
+    const { page = 1, limit = 20, boardId, authorId, commenterId, search, sortBy, category } = params;
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -459,6 +487,9 @@ export const postsApi = {
     }
     if (authorId) {
       queryParams.append('authorId', authorId);
+    }
+    if (commenterId) {
+      queryParams.append('commenterId', commenterId);
     }
     if (search) {
       queryParams.append('search', search);
@@ -470,14 +501,14 @@ export const postsApi = {
       queryParams.append('category', category);
     }
     const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
-    // The API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
-    return response.data;
+    // API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }
+    return (response as any)?.data ?? response;
   },
   getById: async (id: string): Promise<Post> => {
     const response = await api.get<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`);
     return response.data;
   },
-  update: async (id: string, updatePostDto: { isActive?: boolean }): Promise<Post> => {
+  update: async (id: string, updatePostDto: { title?: string; body?: string; isActive?: boolean; imageIds?: string[] }): Promise<Post> => {
     const response = await api.patch<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`, updatePostDto);
     return response.data;
   },
@@ -736,6 +767,10 @@ export interface Comment {
     id: string;
     nickname: string;
   };
+  post?: {
+    id: string;
+    title: string;
+  };
   replies?: Comment[];
   _count?: {
     votes: number;
@@ -760,6 +795,14 @@ export interface CreateCommentDto {
   parentId?: string;
 }
 
+export interface QueryCommentsParams {
+  page?: number;
+  limit?: number;
+  postId?: string;
+  authorId?: string;
+  search?: string;
+}
+
 export const commentsApi = {
   getByPost: async (postId: string, page: number = 1, limit: number = 20, search?: string): Promise<CommentsResponse> => {
     const params = new URLSearchParams({
@@ -770,11 +813,26 @@ export const commentsApi = {
       params.append('search', search);
     }
     const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/post/${postId}?${params.toString()}`);
-    return response.data;
+    return (response as any)?.data ?? response;
   },
   create: async (createCommentDto: CreateCommentDto): Promise<Comment> => {
     const response = await api.post<ApiResponse<Comment>>(API_END_POINT.COMMENTS, createCommentDto);
-    return response.data;
+    return (response as any)?.data ?? response;
+  },
+  getAllAdmin: async (params: QueryCommentsParams = {}): Promise<CommentsResponse> => {
+    const { page = 1, limit = 20, postId, authorId, search } = params;
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (postId) queryParams.append('postId', postId);
+    if (authorId) queryParams.append('authorId', authorId);
+    if (search) queryParams.append('search', search);
+    const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/admin/all?${queryParams.toString()}`);
+    return (response as any)?.data ?? response;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.COMMENTS}/${id}`);
   },
 };
 
