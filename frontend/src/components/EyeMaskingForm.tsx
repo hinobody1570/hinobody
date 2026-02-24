@@ -903,20 +903,24 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
     }
   };
 
-  // Manual masking - Mouse events
-  const getCanvasCoordinates = (e: any) => {
+  // Manual masking - Mouse and Touch events (touch for mobile PWA)
+  const getCanvasCoordinates = (e: React.MouseEvent | React.TouchEvent) => {
     const canvas: any = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-
+    const te = e as React.TouchEvent;
+    const me = e as React.MouseEvent;
+    const clientX = te.touches?.[0] ? te.touches[0].clientX : te.changedTouches?.[0] ? te.changedTouches[0].clientX : me.clientX;
+    const clientY = te.touches?.[0] ? te.touches[0].clientY : te.changedTouches?.[0] ? te.changedTouches[0].clientY : me.clientY;
     return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY,
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
     };
   };
 
-  const handleMouseDown = (e: any) => {
+  const handlePointerDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (mode !== "manual") return;
     const pos = getCanvasCoordinates(e);
     setIsDrawing(true);
@@ -924,10 +928,10 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
     setCurrentMask({ x: pos.x, y: pos.y, width: 0, height: 0 });
   };
 
-  const handleMouseMove = (e: any) => {
+  const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDrawing || mode !== "manual") return;
+    if ("touches" in e) e.preventDefault(); // prevent scroll when drawing on mobile
     const pos = getCanvasCoordinates(e);
-
     setCurrentMask({
       x: Math.min(startPos.x, pos.x),
       y: Math.min(startPos.y, pos.y),
@@ -936,7 +940,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
     });
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = () => {
     if (!isDrawing || mode !== "manual") return;
 
     if (currentMask && currentMask.width > 5 && currentMask.height > 5) {
@@ -1214,12 +1218,17 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
                 <canvas
                   ref={canvasRef}
                   className="masking-canvas"
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
+                  onMouseDown={handlePointerDown}
+                  onMouseMove={handlePointerMove}
+                  onMouseUp={handlePointerUp}
+                  onMouseLeave={handlePointerUp}
+                  onTouchStart={handlePointerDown}
+                  onTouchMove={handlePointerMove}
+                  onTouchEnd={handlePointerUp}
+                  onTouchCancel={handlePointerUp}
                   style={{
                     cursor: mode === "manual" ? "crosshair" : "default",
+                    touchAction: "none",
                   }}
                 />
 
