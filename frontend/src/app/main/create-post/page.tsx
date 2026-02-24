@@ -174,6 +174,7 @@ const CreatePost = () => {
         await postsApi.update(editPostId, {
           title: title.trim(),
           body: body.trim() || undefined,
+          ...(selectedCommunity ? { boardId: selectedCommunity.id } : selectedCategory ? { postCategory: selectedCategory } : {}),
           imageIds: postImageIds.length > 0 ? postImageIds : undefined,
         });
         showSuccess(tToast("postUpdated") || "Post updated successfully!");

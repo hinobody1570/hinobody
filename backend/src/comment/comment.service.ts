@@ -291,7 +291,7 @@ export class CommentService {
 
     const matchingComments = await this.prisma.comment.findMany({
       where: matchWhere,
-      select: { id: true, parentId: true },
+      select: { id: true },
       orderBy: { createdAt: 'asc' },
     });
 
@@ -307,61 +307,54 @@ export class CommentService {
       };
     }
 
-    // Build map for resolving root ID for each match
-    const allComments = await this.prisma.comment.findMany({
-      where: { postId, isActive: true, isDeleted: false },
-      select: { id: true, parentId: true },
+    const total = matchingComments.length;
+    const paginatedIds = matchingComments.slice(skip, skip + limit).map((m) => m.id);
+
+    // Fetch only the matching comments (flat list, no parent/thread) with same shape as tree nodes
+    const fullComments = await this.prisma.comment.findMany({
+      where: { id: { in: paginatedIds } },
+      include: {
+        author: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+        _count: {
+          select: {
+            votes: true,
+            replies: true,
+          },
+        },
+      },
     });
 
-    const getRootId = (commentId: string): string => {
-      const comment = allComments.find((c) => c.id === commentId);
-      if (!comment || !comment.parentId) return commentId;
-      return getRootId(comment.parentId);
-    };
+    // Preserve creation order and return each as a single comment with no replies
+    const idToOrder = new Map(paginatedIds.map((id, i) => [id, i]));
+    const ordered = fullComments
+      .slice()
+      .sort((a, b) => (idToOrder.get(a.id) ?? 0) - (idToOrder.get(b.id) ?? 0));
 
-    const matchingIds = new Set(matchingComments.map((m) => m.id));
-
-    // Preserve order: roots in creation order of their first matching descendant (unique roots)
-    const rootIdsOrdered: string[] = [];
-    const seen = new Set<string>();
-    for (const m of matchingComments) {
-      const rootId = getRootId(m.id);
-      if (!seen.has(rootId)) {
-        seen.add(rootId);
-        rootIdsOrdered.push(rootId);
-      }
-    }
-
-    const total = rootIdsOrdered.length;
-    const paginatedRootIds = rootIdsOrdered.slice(skip, skip + limit);
-
-    // Fetch full trees for paginated roots, then filter to show only path to matches
-    const filterTreeToMatches = (comment: any): any | null => {
-      const matchesSelf = matchingIds.has(comment.id);
-      const replies = comment.replies || [];
-      const filteredReplies = replies
-        .map((r: any) => filterTreeToMatches(r))
-        .filter((r: any) => r !== null);
-      const hasMatchingDescendant = filteredReplies.length > 0;
-      if (!matchesSelf && !hasMatchingDescendant) return null;
-      return {
-        ...comment,
-        replies: filteredReplies,
-      };
-    };
-
-    const commentsWithReplies: any[] = [];
-    for (const rootId of paginatedRootIds) {
-      const fullTree = await this.fetchCommentWithReplies(rootId, blockedUserIds, reportedCommentIds);
-      if (!fullTree) continue;
-      const filtered = filterTreeToMatches(fullTree);
-      if (filtered) {
-        commentsWithReplies.push(filtered);
-      }
-    }
+    const data = ordered.map((comment) => ({
+      id: comment.id,
+      body: comment.body,
+      originalLanguage: comment.originalLanguage,
+      postId: comment.postId,
+      authorId: comment.authorId,
+      parentId: comment.parentId,
+      isActive: comment.isActive,
+      isDeleted: comment.isDeleted,
+      upvoteCount: comment.upvoteCount,
+      downvoteCount: comment.downvoteCount,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      author: comment.author,
+      _count: comment._count,
+      replies: [],
+    }));
 
     return {
-      data: commentsWithReplies,
+      data,
       meta: {
         total,
         page,
@@ -478,15 +471,24 @@ export class CommentService {
       throw new ForbiddenException('You can only delete your own comments');
     }
 
-    // Soft delete
-    await this.prisma.comment.update({
-      where: { id },
-      data: { isDeleted: true, isActive: false },
-    });
+    const postId = comment.postId;
+
+    if (isAdmin) {
+      // Admin: permanent delete from database (reports/votes cascade via FK)
+      await this.prisma.comment.delete({
+        where: { id },
+      });
+    } else {
+      // Regular user: soft delete
+      await this.prisma.comment.update({
+        where: { id },
+        data: { isDeleted: true, isActive: false },
+      });
+    }
 
     // Update post comment count
     await this.prisma.post.update({
-      where: { id: comment.postId },
+      where: { id: postId },
       data: { commentCount: { decrement: 1 } },
     });
   }

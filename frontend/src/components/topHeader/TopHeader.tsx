@@ -89,7 +89,7 @@ export const RedditHeader = () => {
           {/* Avatar */}
           <div className="relative" ref={dropdownRef}>
             <Avatar color="bg-teal-400" onClick={() => setProfileDropDown(!profileDropdown)} />
-            {profileDropdown && <ProfileDropdown />}
+            {profileDropdown && <ProfileDropdown onClose={() => setProfileDropDown(false)} />}
           </div>
         </div>
       </div>

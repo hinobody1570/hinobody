@@ -9,6 +9,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<User>;
   logout: () => void;
+  /** Update current user (e.g. after profile/avatar update). Persists to localStorage so header/dropdown reflect changes. */
+  updateUser: (updatedUser: Partial<User> & { id: string }) => void;
   loading: boolean;
 }
 
@@ -45,12 +47,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateUser = (updatedUser: Partial<User> & { id: string }) => {
+    if (!user || user.id !== updatedUser.id) return;
+    const next: User = { ...user, ...updatedUser };
+    setUser(next);
+    const t = getToken();
+    if (t) setAuth(t, next);
+  };
+
   const value: AuthContextType = {
     user,
     token,
     isAuthenticated: !!token && !!user,
     login,
     logout,
+    updateUser,
     loading,
   };
 

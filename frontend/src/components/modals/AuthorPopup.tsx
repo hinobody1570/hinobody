@@ -54,12 +54,12 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
   }, [isOpen]);
 
   const handleViewPosts = () => {
-    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}`);
+    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?scrollTo=posts`);
     setIsOpen(false);
   };
 
   const handleViewComments = () => {
-    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?tab=comments`);
+    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?tab=comments&scrollTo=comments`);
     setIsOpen(false);
   };
 

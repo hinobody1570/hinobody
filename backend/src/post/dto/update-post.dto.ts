@@ -5,8 +5,11 @@ import {
   IsBoolean,
   IsArray,
   ArrayMaxSize,
+  IsIn,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+
+const VALID_CATEGORIES = ['News', 'Reviews', 'Recommend', 'Free Board'] as const;
 
 export class UpdatePostDto {
   @ApiPropertyOptional({
@@ -28,6 +31,26 @@ export class UpdatePostDto {
   @MinLength(1)
   @IsOptional()
   body?: string;
+
+  @ApiPropertyOptional({
+    example: 'cm123board456',
+    description: 'Board/community ID when post is moved to a community (mutually exclusive with postCategory)',
+  })
+  @IsString()
+  @IsOptional()
+  boardId?: string;
+
+  @ApiPropertyOptional({
+    example: 'News',
+    description: 'Post category when post is a category post (mutually exclusive with boardId)',
+    enum: VALID_CATEGORIES,
+  })
+  @IsString()
+  @IsIn(VALID_CATEGORIES, {
+    message: `postCategory must be one of: ${VALID_CATEGORIES.join(', ')}`,
+  })
+  @IsOptional()
+  postCategory?: string;
 
   @ApiPropertyOptional({
     example: true,

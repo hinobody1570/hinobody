@@ -161,13 +161,14 @@ export default function AdminUserDetailPage() {
           <div className="bg-gradient-to-r from-blue-500 h-32"></div>
           <div className="px-6 pb-6 -mt-16">
             <div className="flex items-end gap-6">
-              <div className="relative">
+              <div className="relative w-[120px] h-[120px] rounded-full overflow-hidden border-4 border-white shadow-lg bg-gray-100 flex-shrink-0">
                 <Image
                   src={user.avatar ? user.avatar : DP}
                   alt={user.nickname || user.email}
                   width={120}
                   height={120}
-                  className="rounded-full border-4 border-white shadow-lg"
+                  className="w-full h-full object-cover rounded-full"
+                  unoptimized={!!user.avatar}
                 />
               </div>
               <div className="flex-1 pb-6">
