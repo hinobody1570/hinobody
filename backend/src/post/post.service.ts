@@ -659,11 +659,47 @@ export class PostService {
       throw new ForbiddenException('You can only update your own posts');
     }
 
+    const hasBoardId = updatePostDto.boardId !== undefined && updatePostDto.boardId !== null;
+    const hasCategory = updatePostDto.postCategory !== undefined && updatePostDto.postCategory !== null;
+    if (hasBoardId && hasCategory) {
+      throw new BadRequestException('Provide either boardId or postCategory, not both');
+    }
+
+    if (hasBoardId) {
+      const board = await this.prisma.board.findUnique({
+        where: { id: updatePostDto.boardId! },
+      });
+      if (!board) {
+        throw new NotFoundException('Board not found');
+      }
+      const isMember = await this.boardMemberService.isMember(updatePostDto.boardId!, userId);
+      if (!isMember) {
+        const membership = await this.boardMemberService.getMembershipStatus(updatePostDto.boardId!, userId);
+        if (!membership) {
+          throw new BadRequestException('You must join this board before posting. Your request will be processed based on board visibility settings.');
+        }
+        if (membership.status === 'PENDING') {
+          throw new BadRequestException('Your request to join this board is pending approval. You can post once your request is approved.');
+        }
+        if (membership.status === 'REJECTED') {
+          throw new ForbiddenException('Your request to join this board was rejected. You cannot post in this board.');
+        }
+      }
+    }
+
+    if (hasCategory && !this.VALID_CATEGORIES.includes(updatePostDto.postCategory!)) {
+      throw new BadRequestException(
+        `Invalid category. Must be one of: ${this.VALID_CATEGORIES.join(', ')}`,
+      );
+    }
+
     const { imageIds, ...postData } = updatePostDto;
     return this.prisma.post.update({
       where: { id },
       data: {
         ...postData,
+        ...(postData.boardId !== undefined && { postCategory: null }),
+        ...(postData.postCategory !== undefined && { boardId: null }),
         ...(imageIds !== undefined && {
           images: {
             set: imageIds.map((imageId) => ({ id: imageId })),
