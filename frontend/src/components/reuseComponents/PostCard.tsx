@@ -262,8 +262,8 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
   ];
   return (
     <article className="bg-white border border-gray-300 rounded-lg mb-4 overflow-hidden hover:border-gray-400 transition-colors">
-      {/* Post Header - responsive: stacked on mobile, single row on tablet+ */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-3 py-2 sm:gap-3">
+      {/* Post Header - single row; items-start so 3-dot menu aligns with community name */}
+      <div className="flex flex-row items-start justify-between gap-2 sm:gap-3 px-3 py-2">
         {/* Left: board avatar, name, verified, timestamp, badge */}
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <Image src={post?.communityAvatar} alt={post?.community} className="w-8 h-8 rounded-full flex-shrink-0" />
@@ -296,8 +296,8 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
             )}
           </div>
         </div>
-        {/* Right: join button, burger menu */}
-        <div className="flex items-center gap-2 flex-shrink-0 justify-end sm:justify-start">
+        {/* Right: join button, burger menu - top-aligned with community name */}
+        <div className="flex items-center gap-2 flex-shrink-0">
           {isAuthenticated && post?.boardId && (
             <button
               onClick={handleJoinLeave}
