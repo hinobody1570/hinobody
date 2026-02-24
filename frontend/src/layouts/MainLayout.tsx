@@ -38,20 +38,20 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const hideMain = isMobile && isOpen;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Fixed Header */}
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
+      {/* Header - does not scroll */}
       <RedditHeader />
 
-      {/* Main Layout Container */}
-      <div className="flex">
-        {/* Sidebar - fixed height, sticky position */}
-        <div className="h-screen sticky top-16">
+      {/* Main Layout Container - fills remaining height, no page scroll */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* Sidebar - does not scroll with content, stays fixed */}
+        <div className="flex-shrink-0 h-full overflow-hidden">
           <RedditSidebar isOpen={isOpen} onToggle={() => setIsOpen((prev) => !prev)} />
         </div>
 
-        {/* Main Content - hidden on mobile when sidebar is open */}
+        {/* Main Content - only this area scrolls; hidden on mobile when sidebar is open */}
         <main
-          className={`flex-1 px-6 py-4 overflow-y-auto max-h-screen ${hideMain ? "hidden" : ""}`}
+          className={`flex-1 min-h-0 px-6 py-4 overflow-y-auto ${hideMain ? "hidden" : ""}`}
         >
           {children}
         </main>
