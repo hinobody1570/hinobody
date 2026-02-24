@@ -87,12 +87,18 @@ export function ChatView({
           ) : (
             currentMsgs.map((msg, i) => {
               const prevSame = i > 0 && currentMsgs[i - 1].sent === msg.sent;
+              const senderAvatar = msg.sent
+                ? (currentUser?.avatar ?? currentUser?.nickname?.charAt(0))
+                : selectedContact.avatar;
+              const senderColor = msg.sent ? "#3897f0" : selectedContact.color;
               return (
                 <MessageBubble
                   key={msg.id}
                   message={msg}
                   prevSameSender={prevSame}
                   isOwn={msg.sent}
+                  senderAvatar={senderAvatar}
+                  senderColor={senderColor}
                   onEdit={onEditMessage ? (text) => onEditMessage(msg.id, text) : undefined}
                   onDelete={onDeleteMessage ? () => onDeleteMessage(msg.id) : undefined}
                 />

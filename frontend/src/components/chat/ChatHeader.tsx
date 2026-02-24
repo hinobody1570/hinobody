@@ -19,12 +19,12 @@ export function ChatHeader({ contact, connected = true }: ChatHeaderProps) {
         <ChatAvatar letter={contact.avatar} color={contact.color} size="sm" />
         <div className="min-w-0">
           <div className="font-bold text-[15px] text-black truncate">{contact.name}</div>
-          <div
+          {/* <div
             className="text-xs"
             style={{ color: connected ? "#31d95e" : "#666" }}
           >
             {connected ? t("connected") : t("reconnecting")}
-          </div>
+          </div> */}
         </div>
       </div>
       <Link

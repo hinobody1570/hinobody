@@ -903,31 +903,33 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
     }
   };
 
-  // Manual masking - Mouse events
-  const getCanvasCoordinates = (e: any) => {
+  // Manual masking - Pointer events (work for both mouse and touch; touch-friendly on mobile)
+  const getCanvasCoordinates = (e: { clientX: number; clientY: number }) => {
     const canvas: any = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-
     return {
       x: (e.clientX - rect.left) * scaleX,
       y: (e.clientY - rect.top) * scaleY,
     };
   };
 
-  const handleMouseDown = (e: any) => {
+  const handlePointerDown = (e: React.PointerEvent) => {
     if (mode !== "manual") return;
+    e.preventDefault();
     const pos = getCanvasCoordinates(e);
     setIsDrawing(true);
     setStartPos(pos);
     setCurrentMask({ x: pos.x, y: pos.y, width: 0, height: 0 });
+    (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
   };
 
-  const handleMouseMove = (e: any) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDrawing || mode !== "manual") return;
+    e.preventDefault();
     const pos = getCanvasCoordinates(e);
-
     setCurrentMask({
       x: Math.min(startPos.x, pos.x),
       y: Math.min(startPos.y, pos.y),
@@ -936,7 +938,8 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
     });
   };
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    (e.target as HTMLCanvasElement).releasePointerCapture?.(e.pointerId);
     if (!isDrawing || mode !== "manual") return;
 
     if (currentMask && currentMask.width > 5 && currentMask.height > 5) {
@@ -950,6 +953,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
     setIsDrawing(false);
     setCurrentMask(null);
   };
+
 
   // Compress image client-side
   const compressImage = async (blob: any) => {
@@ -1214,12 +1218,13 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
                 <canvas
                   ref={canvasRef}
                   className="masking-canvas"
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerUp}
                   style={{
                     cursor: mode === "manual" ? "crosshair" : "default",
+                    touchAction: "none",
                   }}
                 />
 

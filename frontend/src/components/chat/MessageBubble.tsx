@@ -2,17 +2,28 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { ChatAvatar } from "./ChatAvatar";
 import type { Message } from "./types";
 
 interface MessageBubbleProps {
   message: Message;
   prevSameSender: boolean;
   isOwn?: boolean;
+  senderAvatar?: string;
+  senderColor?: string;
   onEdit?: (newText: string) => void;
   onDelete?: () => void;
 }
 
-export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, onDelete }: MessageBubbleProps) {
+export function MessageBubble({
+  message,
+  prevSameSender,
+  isOwn = false,
+  senderAvatar,
+  senderColor = "#64748b",
+  onEdit,
+  onDelete,
+}: MessageBubbleProps) {
   const t = useTranslations("chat");
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -46,25 +57,41 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
     setMenuOpen(false);
   };
 
+  const avatarLetter =
+    senderAvatar && (senderAvatar.startsWith("http") || senderAvatar.startsWith("/"))
+      ? senderAvatar
+      : (senderAvatar || "?").charAt(0).toUpperCase();
+
   if (message.isDeleted) {
     return (
-      <div className={`flex flex-col ${isSent ? "items-end" : "items-start"} ${prevSameSender ? "mt-0.5" : "mt-2"}`}>
-        <div
-          className={`
-            max-w-[65%] py-2 px-3 rounded-[22px] text-sm italic text-gray-500
-            ${isSent ? "bg-gray-200 rounded-br-[6px]" : "bg-gray-200 rounded-bl-[6px]"}
-            ${prevSameSender ? (isSent ? "rounded-br-[22px]" : "rounded-bl-[22px]") : ""}
-          `}
-        >
-          {t("messageDeleted")}
+      <div className={`flex flex-row gap-2 ${isSent ? "justify-end" : "justify-start"} ${prevSameSender ? "mt-0.5" : "mt-2"}`}>
+        {!isSent && (
+          <ChatAvatar letter={avatarLetter} color={senderColor} size="sm" className="flex-shrink-0 mt-0.5" />
+        )}
+        <div className="flex flex-col max-w-[65%]">
+          <div
+            className={`
+              py-2 px-3 rounded-[22px] text-sm italic text-gray-500
+              ${isSent ? "bg-gray-200 rounded-br-[6px]" : "bg-gray-200 rounded-bl-[6px]"}
+              ${prevSameSender ? (isSent ? "rounded-br-[22px]" : "rounded-bl-[22px]") : ""}
+            `}
+          >
+            {t("messageDeleted")}
+          </div>
         </div>
+        {isSent && (
+          <ChatAvatar letter={avatarLetter} color={senderColor} size="sm" className="flex-shrink-0 mt-0.5" />
+        )}
       </div>
     );
   }
 
   return (
-    <div className={`flex flex-col ${isSent ? "items-end" : "items-start"} ${prevSameSender ? "mt-0.5" : "mt-2"}`}>
-      <div className="relative group">
+    <div className={`flex flex-row gap-2 ${isSent ? "justify-end" : "justify-start"} ${prevSameSender ? "mt-0.5" : "mt-2"}`}>
+      {!isSent && (
+        <ChatAvatar letter={avatarLetter} color={senderColor} size="sm" className="flex-shrink-0 mt-0.5" />
+      )}
+      <div className="flex flex-col max-w-[65%] relative group">
         {editing ? (
           <div
             className={`
@@ -164,10 +191,13 @@ export function MessageBubble({ message, prevSameSender, isOwn = false, onEdit, 
             )}
           </>
         )}
+        <div className="flex items-center gap-1 mt-1 text-[11px] text-[#444]">
+          <span>{message.time}</span>
+        </div>
       </div>
-      <div className="flex items-center gap-1 mt-1 text-[11px] text-[#444]">
-        <span>{message.time}</span>
-      </div>
+      {isSent && (
+        <ChatAvatar letter={avatarLetter} color={senderColor} size="sm" className="flex-shrink-0 mt-0.5" />
+      )}
     </div>
   );
 }
