@@ -40,7 +40,7 @@ export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, updateUser: updateAuthUser } = useAuth();
   const tab = searchParams?.get('tab') || 'posts';
   const t = useTranslations('userProfile');
   const tTime = useTranslations('timeAgo');
@@ -91,6 +91,9 @@ export default function UserProfilePage() {
 
   const handleUserUpdate = (updatedUser: User) => {
     setUser(updatedUser);
+    if (currentUser?.id === updatedUser.id) {
+      updateAuthUser(updatedUser);
+    }
   };
 
   useEffect(() => {
