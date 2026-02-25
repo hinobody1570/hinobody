@@ -50,7 +50,9 @@ export default function ChatPage() {
           next = [...list];
           next[idx] = msg;
         } else {
-          next = [...list, msg];
+          // Remove any optimistic (temp) message so we don't duplicate when server echoes back
+          const withoutTemp = list.filter((m) => typeof m.id !== "string" || !m.id.startsWith("temp-"));
+          next = [...withoutTemp, msg];
         }
         return { ...prev, [otherId]: next };
       });
@@ -164,8 +166,23 @@ export default function ChatPage() {
   const handleSend = () => {
     const text = input.trim();
     if (!text || !selectedContact) return;
-    sendMessage(selectedContact.id, text);
+    const receiverId = selectedContact.id;
+    // Optimistic update: show message immediately, replace with server message when it arrives
+    const optimisticId = `temp-${Date.now()}`;
+    const optimisticMessage: Message = {
+      id: optimisticId,
+      text,
+      sent: true,
+      time: "Just now",
+      senderId: currentUserId,
+      receiverId,
+    };
+    setMessages((prev) => ({
+      ...prev,
+      [receiverId]: [...(prev[receiverId] ?? []), optimisticMessage],
+    }));
     setInput("");
+    sendMessage(receiverId, text);
   };
 
   const handleEditMessage = (messageId: string, text: string) => {
@@ -219,6 +236,7 @@ export default function ChatPage() {
         onDeleteMessage={handleDeleteMessage}
         onDismissError={() => setError(null)}
         onStartNewChat={() => setNewChatModalOpen(true)}
+        initialSidebarOpen={!searchParams?.get("with")}
       />
       <NewChatModal
         isOpen={newChatModalOpen}

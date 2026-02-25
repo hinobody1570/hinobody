@@ -931,6 +931,7 @@
     "reconnecting": "重新连接中…",
     "goToHomeFeed": "前往首页动态",
     "goToHomeFeedAria": "前往首页动态",
+    "backToConversations": "返回会话列表",
     "loadingMessages": "正在加载消息...",
     "dismiss": "关闭",
     "selectOrStartChat": "选择会话或开始新聊天",

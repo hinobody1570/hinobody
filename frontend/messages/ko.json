@@ -930,6 +930,7 @@
     "reconnecting": "재연결 중…",
     "goToHomeFeed": "홈 피드로 이동",
     "goToHomeFeedAria": "홈 피드로 이동",
+    "backToConversations": "대화 목록으로",
     "loadingMessages": "메시지 불러오는 중...",
     "dismiss": "닫기",
     "selectOrStartChat": "대화를 선택하거나 새 채팅을 시작하세요",

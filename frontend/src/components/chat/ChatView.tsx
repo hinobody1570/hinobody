@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatHeader } from "./ChatHeader";
@@ -26,6 +26,8 @@ interface ChatViewProps {
   onDeleteMessage?: (messageId: string) => void;
   onDismissError?: () => void;
   onStartNewChat?: () => void;
+  /** When false (e.g. opened via ?with=userId), start with conversation visible on mobile. */
+  initialSidebarOpen?: boolean;
 }
 
 export function ChatView({
@@ -45,10 +47,20 @@ export function ChatView({
   onDeleteMessage,
   onDismissError,
   onStartNewChat,
+  initialSidebarOpen = true,
 }: ChatViewProps) {
   const t = useTranslations("chat");
   const endRef = useRef<HTMLDivElement>(null);
   const currentMsgs = messages[selectedContact.id] ?? [];
+  const [sidebarOpen, setSidebarOpen] = useState(initialSidebarOpen);
+
+  const handleSelectContact = useCallback(
+    (contact: Contact) => {
+      onSelectContact(contact);
+      if (contact.id !== "__placeholder__") setSidebarOpen(false);
+    },
+    [onSelectContact]
+  );
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -61,12 +73,20 @@ export function ChatView({
         selectedContact={selectedContact}
         messages={messages}
         currentUser={currentUser}
-        onSelectContact={onSelectContact}
+        onSelectContact={handleSelectContact}
         onStartNewChat={onStartNewChat}
+        open={sidebarOpen}
+        onOpenChange={setSidebarOpen}
       />
 
-      <div className="flex-1 flex flex-col bg-gray-50 min-w-0">
-        <ChatHeader contact={selectedContact} connected={connected} />
+      <div
+        className={`flex-1 flex flex-col bg-gray-50 min-w-0 ${sidebarOpen ? "hidden md:flex" : "flex"}`}
+      >
+        <ChatHeader
+          contact={selectedContact}
+          connected={connected}
+          onBack={sidebarOpen ? undefined : () => setSidebarOpen(true)}
+        />
         {/* {error && (
           <div className="px-4 py-2 bg-red-100 text-red-800 text-sm flex items-center justify-between">
             <span>{error}</span>

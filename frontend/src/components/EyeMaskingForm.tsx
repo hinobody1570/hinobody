@@ -116,28 +116,28 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
 
     // Close camera if open
     if (isCameraOpen) {
-        closeCamera();
-      }
+      closeCamera();
+    }
 
-      setImageFile(file);
-      setMasks([]); // Reset masks when new image is selected
-      setCroppedMasks([]); // Reset cropped masks
-      setUploadStatus("");
-      setDebugInfo((prev: any) => ({
-        ...prev,
-        imageLoaded: true,
-        imageName: file.name,
-        imageSize: file.size,
-        croppedMasksCount: 0,
-        croppedMasks: [],
-      }));
+    setImageFile(file);
+    setMasks([]); // Reset masks when new image is selected
+    setCroppedMasks([]); // Reset cropped masks
+    setUploadStatus("");
+    setDebugInfo((prev: any) => ({
+      ...prev,
+      imageLoaded: true,
+      imageName: file.name,
+      imageSize: file.size,
+      croppedMasksCount: 0,
+      croppedMasks: [],
+    }));
 
-      // Create preview URL (will be revoked after processing)
-      const reader = new FileReader();
-      reader.onload = (event: any) => {
-        setImagePreview(event.target.result);
-      };
-      reader.readAsDataURL(file);
+    // Create preview URL (will be revoked after processing)
+    const reader = new FileReader();
+    reader.onload = (event: any) => {
+      setImagePreview(event.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   // Open camera
@@ -957,7 +957,6 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
     setCurrentMask(null);
   };
 
-
   // Compress image client-side
   const compressImage = async (blob: any) => {
     try {
@@ -1316,7 +1315,6 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
         )}
 
         {!model && !debugInfo.modelError && <div className="loading-model">{t("loadingModel")}</div>}
-
       </form>
 
       {/* Debug Panel - Remove in production */}

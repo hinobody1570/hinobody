@@ -18,6 +18,9 @@ interface ChatSidebarProps {
   currentUser?: CurrentUserProps | null;
   onSelectContact: (contact: Contact) => void;
   onStartNewChat?: () => void;
+  /** On mobile: sidebar is a drawer. open/onOpenChange control visibility. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function ChatSidebar({
@@ -27,6 +30,8 @@ export function ChatSidebar({
   currentUser,
   onSelectContact,
   onStartNewChat,
+  open = true,
+  onOpenChange,
 }: ChatSidebarProps) {
   const t = useTranslations("chat");
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,7 +48,13 @@ export function ChatSidebar({
       : currentUser?.nickname?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
-    <aside className="w-[340px] border-r border-[#1a1a1a] flex flex-col bg-gray-50 flex-shrink-0">
+    <aside
+      className={`
+        flex flex-col bg-gray-50 flex-shrink-0 border-r border-[#1a1a1a]
+        w-full max-w-[340px] md:w-[340px]
+        ${open ? "flex fixed inset-0 z-20 md:relative md:z-0" : "hidden md:flex"}
+      `}
+    >
       <div className="py-5 px-4 pb-3 border-b border-[#1a1a1a]">
         <div className="flex items-center gap-3 mb-4">
           <ChatAvatar

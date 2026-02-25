@@ -9,22 +9,31 @@ import { ROUTE_PATHS } from "@/routes/paths";
 interface ChatHeaderProps {
   contact: Contact;
   connected?: boolean;
+  /** On mobile: when set, shows a back button to return to conversation list (sidebar). */
+  onBack?: () => void;
 }
 
-export function ChatHeader({ contact, connected = true }: ChatHeaderProps) {
+export function ChatHeader({ contact, connected = true, onBack }: ChatHeaderProps) {
   const t = useTranslations("chat");
   return (
     <header className="py-3.5 px-5 border-b border-[#1a1a1a] flex items-center justify-between gap-3 bg-gray-50">
       <div className="flex items-center gap-3 min-w-0">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="md:hidden flex-shrink-0 p-2 -ml-1 rounded-lg text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
+            title={t("backToConversations")}
+            aria-label={t("backToConversations")}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+        )}
         <ChatAvatar letter={contact.avatar} color={contact.color} size="sm" />
         <div className="min-w-0">
           <div className="font-bold text-[15px] text-black truncate">{contact.name}</div>
-          {/* <div
-            className="text-xs"
-            style={{ color: connected ? "#31d95e" : "#666" }}
-          >
-            {connected ? t("connected") : t("reconnecting")}
-          </div> */}
         </div>
       </div>
       <Link

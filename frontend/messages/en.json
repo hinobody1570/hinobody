@@ -932,6 +932,7 @@
     "reconnecting": "Reconnecting…",
     "goToHomeFeed": "Go to home feed",
     "goToHomeFeedAria": "Go to home feed",
+    "backToConversations": "Back to conversations",
     "loadingMessages": "Loading messages...",
     "dismiss": "Dismiss",
     "selectOrStartChat": "Select a conversation or start a new chat",
