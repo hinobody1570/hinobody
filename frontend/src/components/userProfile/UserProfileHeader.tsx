@@ -105,16 +105,16 @@ export function UserProfileHeader({
   return (
     <div className="bg-white border border-gray-300 rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-6">
       <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-5 md:gap-6">
-        <div className="relative flex-shrink-0 mx-auto sm:mx-0">
+        <div className="relative flex-shrink-0 mx-auto sm:mx-0 w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-gray-300 bg-gray-100">
           {isUploadingAvatar ? (
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-gray-300 bg-gray-100 flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center">
               <div className="text-gray-400 text-xs sm:text-sm">{t('uploading')}</div>
             </div>
           ) : (
             <Image
               src={user.avatar || DP}
               alt={user.nickname}
-              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-gray-300 object-cover"
+              className="w-full h-full object-cover"
               width={96}
               height={96}
               unoptimized={!!user.avatar}

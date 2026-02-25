@@ -10,7 +10,11 @@ import { GoTrophy } from "react-icons/go";
 import { MdLogin, MdLogout } from "react-icons/md";
 import AvatarImage from "../../../public/assets/images/avatar_default_4.png";
 
-export default function ProfileDropdown() {
+interface ProfileDropdownProps {
+  onClose?: () => void;
+}
+
+export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
   const [darkMode, setDarkMode] = useState(false);
   const { logout, user, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -18,6 +22,7 @@ export default function ProfileDropdown() {
 
   const handleViewProfile = () => {
     if (user?.id) {
+      onClose?.();
       router.push(`${ROUTE_PATHS.USER_PROFILE}/${user.id}`);
     }
   };
@@ -78,6 +83,7 @@ export default function ProfileDropdown() {
   // ];
 
   const handleLogout = () => {
+    onClose?.();
     logout();
     router.push(ROUTE_PATHS.DEFAULT);
   };
@@ -129,7 +135,10 @@ export default function ProfileDropdown() {
 
       {user?.role == USER_ROLES.ADMIN && (
         <button
-          onClick={() => router.push(ROUTE_PATHS.ADMIN_USERS)}
+          onClick={() => {
+            onClose?.();
+            router.push(ROUTE_PATHS.ADMIN_USERS);
+          }}
           className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3"
         >
           <GoTrophy className="w-5 h-5 text-gray-700" />
@@ -144,7 +153,10 @@ export default function ProfileDropdown() {
         </button>
       ) : (
         <button
-          onClick={() => router.push(ROUTE_PATHS.DEFAULT)}
+          onClick={() => {
+            onClose?.();
+            router.push(ROUTE_PATHS.DEFAULT);
+          }}
           className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3"
         >
           <MdLogin className="w-5 h-5 text-gray-700" />

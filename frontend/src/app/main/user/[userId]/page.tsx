@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -40,8 +40,10 @@ export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, updateUser: updateAuthUser } = useAuth();
   const tab = searchParams?.get('tab') || 'posts';
+  const scrollTo = searchParams?.get('scrollTo');
+  const contentSectionRef = useRef<HTMLDivElement>(null);
   const t = useTranslations('userProfile');
   const tTime = useTranslations('timeAgo');
   const { locale } = useLanguage();
@@ -91,6 +93,9 @@ export default function UserProfilePage() {
 
   const handleUserUpdate = (updatedUser: User) => {
     setUser(updatedUser);
+    if (currentUser?.id === updatedUser.id) {
+      updateAuthUser(updatedUser);
+    }
   };
 
   useEffect(() => {
@@ -111,6 +116,16 @@ export default function UserProfilePage() {
 
     fetchPosts();
   }, [userId, tab]);
+
+  // Scroll to posts/comments section when opened from post card "View posts" or "View comments"
+  useEffect(() => {
+    if (!scrollTo || (scrollTo !== 'posts' && scrollTo !== 'comments')) return;
+    if (!contentSectionRef.current) return;
+    const timer = setTimeout(() => {
+      contentSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [scrollTo, tab]);
 
   const displayPosts = useMemo(
     () => posts.map((p) => transformPost(p, tTime)),
@@ -325,40 +340,42 @@ export default function UserProfilePage() {
           />
         )}
 
-        {/* Tabs: Posts | Comments */}
-        <div className="flex gap-2 border-b border-gray-200 mb-4">
-          <button
-            type="button"
-            onClick={() => router.push(`/main/user/${userId}`)}
-            className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
-              tab !== 'comments'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {t('posts')}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push(`/main/user/${userId}?tab=comments`)}
-            className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
-              tab === 'comments'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {t('comments')}
-          </button>
-        </div>
+        {/* Tabs: Posts | Comments - scroll target when opening from post card dropdown */}
+        <div ref={contentSectionRef} className="flex flex-col">
+          <div className="flex gap-2 border-b border-gray-200 mb-4">
+            <button
+              type="button"
+              onClick={() => router.push(`/main/user/${userId}`)}
+              className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
+                tab !== 'comments'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('posts')}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push(`/main/user/${userId}?tab=comments`)}
+              className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
+                tab === 'comments'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('comments')}
+            </button>
+          </div>
 
-        {/* User Posts or Posts with Comments by User */}
-        <UserPostsSection
+          {/* User Posts or Posts with Comments by User */}
+          <UserPostsSection
           posts={displayPosts}
           loading={loadingPosts}
           title={tab === 'comments' ? t('postsWithCommentsByUser') : undefined}
           emptyMessage={tab === 'comments' ? t('noPostsWithCommentsByUser') : undefined}
           onPostDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))}
         />
+        </div>
       </div>
     </div>
   );

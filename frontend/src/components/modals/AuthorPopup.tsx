@@ -54,17 +54,19 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
   }, [isOpen]);
 
   const handleViewPosts = () => {
-    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}`);
+    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?scrollTo=posts`);
     setIsOpen(false);
   };
 
   const handleViewComments = () => {
-    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?tab=comments`);
+    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?tab=comments&scrollTo=comments`);
     setIsOpen(false);
   };
 
   const handleSendMessage = () => {
-    showInfo(tPostCard("sendMessageComingSoon") || "Send message - Coming soon");
+    router.push(`${ROUTE_PATHS.CHAT}`);
+
+    // showInfo(tPostCard("sendMessageComingSoon") || "Send message - Coming soon");
     setIsOpen(false);
   };
 
@@ -117,7 +119,7 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
               <span className="text-sm font-medium text-gray-800">{tPostCard("sendMessage")}</span>
             </button>
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );

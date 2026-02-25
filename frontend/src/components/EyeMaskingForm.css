@@ -266,6 +266,14 @@
   overflow-x: auto;
 }
 
+/* In modal (compact): image scrolls only inside this box, never overlays title */
+.eye-masking-form-compact .canvas-container {
+  max-height: min(60vh, 480px);
+  overflow-y: auto;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
 @media (min-width: 640px) {
   .canvas-container {
     margin: 1.25rem 0;

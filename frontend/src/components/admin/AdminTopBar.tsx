@@ -63,7 +63,7 @@ export function AdminTopBar({ onMenuClick }: AdminTopBarProps) {
             </div>
           </button>
 
-          {showProfileDropdown && <ProfileDropdown />}
+          {showProfileDropdown && <ProfileDropdown onClose={() => setShowProfileDropdown(false)} />}
         </div>
       </div>
     </div>

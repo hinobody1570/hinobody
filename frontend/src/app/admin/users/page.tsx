@@ -159,8 +159,15 @@ export default function AdminUsersPage() {
       key: "avatar",
       header: t("avatar"),
       render: (value: string) => (
-        <div>
-          <Image src={value ? value : DP} alt="DP" width={80} height={80} className="rounded-full" />
+        <div className="flex items-center shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+          <Image
+            src={value ? value : DP}
+            alt=""
+            width={40}
+            height={40}
+            className="rounded-full w-10 h-10 object-cover"
+            unoptimized={!!value}
+          />
         </div>
       ),
     },

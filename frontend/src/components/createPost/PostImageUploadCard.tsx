@@ -91,12 +91,12 @@ export const PostImageUploadCard = ({ onImagesReady, imageIds }: PostImageUpload
           role="presentation"
         >
           <div
-            className="bg-white rounded-lg mt-20 shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
           >
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+            <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0">
               <h2 className="text-lg font-semibold text-gray-800">
                 {tCreate("addImageWithMasking") || "Add Image (Eye Masking)"}
               </h2>

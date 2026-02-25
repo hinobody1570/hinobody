@@ -508,7 +508,7 @@ export const postsApi = {
     const response = await api.get<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`);
     return response.data;
   },
-  update: async (id: string, updatePostDto: { title?: string; body?: string; isActive?: boolean; imageIds?: string[] }): Promise<Post> => {
+  update: async (id: string, updatePostDto: { title?: string; body?: string; boardId?: string; postCategory?: string; isActive?: boolean; imageIds?: string[] }): Promise<Post> => {
     const response = await api.patch<ApiResponse<Post>>(`${API_END_POINT.POSTS}/${id}`, updatePostDto);
     return response.data;
   },
