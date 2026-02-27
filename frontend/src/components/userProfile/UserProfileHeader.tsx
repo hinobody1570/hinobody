@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { User } from '@/lib/api';
-import { formatTimestamp } from '@/utils/helperFunction';
+import { formatTimestamp, isValidNicknameFormat } from '@/utils/helperFunction';
 import { FiEdit, FiCamera, FiUserX } from 'react-icons/fi';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 import { usersApi, s3Api } from '@/lib/api';
@@ -53,9 +53,19 @@ export function UserProfileHeader({
   };
 
   const handleSaveEdit = async () => {
+    const trimmedNickname = editForm.nickname?.trim() ?? '';
+    if (!trimmedNickname) {
+      showError(t('nicknameInvalidFormat'));
+      return;
+    }
+    if (!isValidNicknameFormat(trimmedNickname)) {
+      showError(t('nicknameInvalidFormat'));
+      return;
+    }
     try {
-      const updatedUser = await usersApi.update(user.id, editForm);
+      const updatedUser = await usersApi.update(user.id, { nickname: trimmedNickname });
       setIsEditing(false);
+      setEditForm({ nickname: trimmedNickname });
       if (onUserUpdate) {
         onUserUpdate(updatedUser);
       }

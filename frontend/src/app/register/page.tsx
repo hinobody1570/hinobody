@@ -12,7 +12,7 @@ import { BsEnvelope } from "react-icons/bs";
 import { FiUser } from "react-icons/fi";
 import { useTranslations } from "next-intl";
 import { register } from "@/lib/auth";
-import { isValidPasswordFormat } from "@/utils/helperFunction";
+import { isValidPasswordFormat, isValidNicknameFormat } from "@/utils/helperFunction";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/contexts/ToastContext";
@@ -51,10 +51,11 @@ export default function SignupForm() {
       newErrors.email = t("emailInvalid");
     }
 
-    if (!formData.nickname) {
+    const trimmedNickname = formData.nickname?.trim() ?? "";
+    if (!trimmedNickname) {
       newErrors.nickname = t("nicknameRequired");
-    } else if (formData.nickname.length < 3) {
-      newErrors.nickname = t("nicknameMinLength");
+    } else if (!isValidNicknameFormat(trimmedNickname)) {
+      newErrors.nickname = t("nicknameInvalidFormat");
     }
 
     if (!formData.password) {
@@ -90,7 +91,7 @@ export default function SignupForm() {
       await register({
         email: formData.email!,
         password: formData.password!,
-        nickname: formData.nickname!,
+        nickname: formData.nickname!.trim(),
         language: locale.toUpperCase() as any, // Convert to Language enum format
       });
 

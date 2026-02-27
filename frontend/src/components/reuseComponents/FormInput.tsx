@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 interface FormInputProps {
   id: string;
@@ -11,6 +11,10 @@ interface FormInputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   rightElement?: ReactNode;
+  /** Override autocomplete (e.g. "off", "nope"). Default "off". */
+  autoComplete?: string;
+  /** When true, input is readonly until focused to prevent browser autofill. */
+  readOnlyUntilFocus?: boolean;
 }
 
 export default function FormInput({
@@ -24,7 +28,11 @@ export default function FormInput({
   onChange,
   onKeyPress,
   rightElement,
+  autoComplete = "off",
+  readOnlyUntilFocus = false,
 }: FormInputProps) {
+  const [allowEdit, setAllowEdit] = useState(!readOnlyUntilFocus);
+
   return (
     <div>
       <div className="relative">
@@ -38,7 +46,9 @@ export default function FormInput({
           id={id}
           name={name}
           type={type}
-          autoComplete="off"
+          autoComplete={autoComplete}
+          readOnly={readOnlyUntilFocus && !allowEdit}
+          onFocus={readOnlyUntilFocus ? () => setAllowEdit(true) : undefined}
           value={value}
           onChange={onChange}
           onKeyPress={onKeyPress}

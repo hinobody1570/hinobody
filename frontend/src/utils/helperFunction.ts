@@ -4,6 +4,16 @@ const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/
 export const isValidPasswordFormat = (password: string): boolean =>
   PASSWORD_REGEX.test(password);
 
+// Nickname validation: letters (upper/lower), numbers, and safe special characters only
+const NICKNAME_REGEX = /^[a-zA-Z0-9\s._\-'!@#$%&*()+=[\]{}|;:,?/~]+$/;
+const NICKNAME_MIN_LENGTH = 3;
+const NICKNAME_MAX_LENGTH = 20;
+
+export const isValidNicknameFormat = (nickname: string): boolean =>
+  nickname.length >= NICKNAME_MIN_LENGTH &&
+  nickname.length <= NICKNAME_MAX_LENGTH &&
+  NICKNAME_REGEX.test(nickname);
+
 // Helper function to format timestamp (relative time, e.g. "5 mins ago")
 // Pass t from useTranslations("timeAgo") to get localized strings in all languages
 export type TimeAgoTranslator = (key: string, values?: Record<string, number | string>) => string;
