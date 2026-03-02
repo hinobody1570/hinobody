@@ -1310,7 +1310,7 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
               </button>
             </div>
 
-            {uploadStatus && <div className={`upload-status ${uploadStatus.includes("Error") ? "error" : "success"}`}>{uploadStatus}</div>}
+            {/* {uploadStatus && <div className={`upload-status ${uploadStatus.includes("Error") ? "error" : "success"}`}>{uploadStatus}</div>} */}
           </>
         )}
 

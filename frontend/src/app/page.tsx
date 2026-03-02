@@ -124,8 +124,15 @@ export default function Home() {
           <p className="text-gray-600">{t("signInToContinue")}</p>
         </div>
 
-        <div className="space-y-6">
-          {/* Email Field */}
+        <form
+          autoComplete="off"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          className="space-y-6"
+        >
+          {/* Email Field - readonly until focus to prevent browser autofill on deployed sites */}
           <div>
             <FormLabel required labelTitle={t("emailAddress")} htmlForTitle="email" />
             <FormInput
@@ -138,6 +145,8 @@ export default function Home() {
               value={formData.email}
               error={errors.email}
               placeholder="you@example.com"
+              autoComplete="nope"
+              readOnlyUntilFocus
             />
           </div>
 
@@ -168,8 +177,9 @@ export default function Home() {
 
           {/* Submit Button */}
           <FormButton title={t("signIn")} loadingTitle={t("signingIn")} handleSubmit={handleSubmit} disabled={isLoading} />
+        </form>
 
-          {/* Divider */}
+        {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -179,8 +189,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* OAuth Buttons */}
-          <div className="space-y-3">
+        {/* OAuth Buttons */}
+        <div className="space-y-3">
             <button
               type="button"
               onClick={() => authApi.googleLogin()}
@@ -217,7 +227,6 @@ export default function Home() {
               </svg>
               <span className="text-gray-700 font-medium">{t("continueWithApple")}</span>
             </button>
-          </div>
         </div>
 
         <div className="mt-6 text-center">

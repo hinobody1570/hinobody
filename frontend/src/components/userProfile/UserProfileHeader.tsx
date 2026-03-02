@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { User } from '@/lib/api';
-import { formatTimestamp } from '@/utils/helperFunction';
+import { formatTimestamp, isValidNicknameFormat } from '@/utils/helperFunction';
 import { FiEdit, FiCamera, FiUserX } from 'react-icons/fi';
 import { HiChat } from 'react-icons/hi';
 import { ROUTE_PATHS } from '@/routes/paths';
@@ -56,9 +56,19 @@ export function UserProfileHeader({
   };
 
   const handleSaveEdit = async () => {
+    const trimmedNickname = editForm.nickname?.trim() ?? '';
+    if (!trimmedNickname) {
+      showError(t('nicknameInvalidFormat'));
+      return;
+    }
+    if (!isValidNicknameFormat(trimmedNickname)) {
+      showError(t('nicknameInvalidFormat'));
+      return;
+    }
     try {
-      const updatedUser = await usersApi.update(user.id, editForm);
+      const updatedUser = await usersApi.update(user.id, { nickname: trimmedNickname });
       setIsEditing(false);
+      setEditForm({ nickname: trimmedNickname });
       if (onUserUpdate) {
         onUserUpdate(updatedUser);
       }
