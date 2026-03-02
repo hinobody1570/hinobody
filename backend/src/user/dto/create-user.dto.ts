@@ -38,13 +38,13 @@ export class CreateUserDto {
     example: 'johnDoe123',
     minLength: 3,
     maxLength: 20,
-    description: 'Unique nickname (alphanumeric only)',
+    description: 'Unique nickname (letters, numbers, and special characters allowed)',
   })
   @IsString()
   @MinLength(3)
   @MaxLength(20)
-  @Matches(/^[a-zA-Z0-9]+$/, {
-    message: 'Nickname must be alphanumeric only',
+  @Matches(/^[a-zA-Z0-9\s._\-'!@#$%&*()+=[\]{}|;:,?/~]+$/, {
+    message: 'Nickname can only contain letters, numbers, and special characters (e.g. . _ - \' ! @ # $ % & * + = [ ] { } | ; : , ? / ~)',
   })
   nickname: string;
 
