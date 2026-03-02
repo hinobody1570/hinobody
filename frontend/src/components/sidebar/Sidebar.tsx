@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaBars, FaPlus } from "react-icons/fa6";
-import { IoHomeOutline, IoNewspaperOutline } from "react-icons/io5";
+import { IoChatbubbleOutline, IoHomeOutline, IoNewspaperOutline } from "react-icons/io5";
 import { MdOutlineRecommend } from "react-icons/md";
 import { VscPreview } from "react-icons/vsc";
 import StartCommunityPopup from "../modals/StartCommunityPopup";
@@ -29,6 +29,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
+    // { icon: IoChatbubbleOutline, label: t("chat"), navigate: ROUTE_PATHS.CHAT },
     { icon: IoNewspaperOutline, label: t("news"), navigate: `${ROUTE_PATHS.HOME}?category=News` },
     { icon: VscPreview, label: t("reviews"), navigate: `${ROUTE_PATHS.HOME}?category=Reviews` },
     { icon: MdOutlineRecommend, label: t("recommend"), navigate: `${ROUTE_PATHS.HOME}?category=Recommend` },

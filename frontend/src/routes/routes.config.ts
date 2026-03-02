@@ -93,6 +93,11 @@ export const routesConfig: RouteConfig[] = [
     access: ROUTE_ACCESS.PRIVATE,
     redirectTo: ROUTE_PATHS.DEFAULT,
   },
+  {
+    path: ROUTE_PATHS.CHAT,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.DEFAULT,
+  },
   // Admin Routes
   {
     path: ROUTE_PATHS.ADMIN_BOARDS,

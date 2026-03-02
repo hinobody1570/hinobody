@@ -64,7 +64,9 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
   };
 
   const handleSendMessage = () => {
-    showInfo(tPostCard("sendMessageComingSoon") || "Send message - Coming soon");
+    router.push(`${ROUTE_PATHS.CHAT}`);
+
+    // showInfo(tPostCard("sendMessageComingSoon") || "Send message - Coming soon");
     setIsOpen(false);
   };
 
@@ -117,7 +119,7 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
               <span className="text-sm font-medium text-gray-800">{tPostCard("sendMessage")}</span>
             </button>
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );

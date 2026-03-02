@@ -35,6 +35,8 @@ model User {
   posts                Post[]
   reports              Report[]         @relation("UserReports")
   votes                Vote[]
+  sentChatMessages     ChatMessage[]    @relation("ChatMessageSender")
+  receivedChatMessages ChatMessage[]    @relation("ChatMessageReceiver")
 
   @@unique([provider, providerId])
   @@index([email])
@@ -283,4 +285,22 @@ enum AuthProvider {
   LOCAL
   GOOGLE
   APPLE
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  text       String
+  isDeleted  Boolean  @default(false)
+  editedAt   DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sender     User     @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ChatMessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, receiverId])
+  @@index([receiverId, senderId])
+  @@index([createdAt])
+  @@map("chat_messages")
 }

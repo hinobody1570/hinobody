@@ -1,13 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
+  // WebSocket: use Socket.IO adapter for chat
+  app.useWebSocketAdapter(new IoAdapter(app));
+
   // Enable CORS for frontend
   app.enableCors({
     origin: '*',
@@ -59,7 +63,7 @@ async function bootstrap() {
     },
   });
 
-  const PORT = process.env.PORT || 3000
+  const PORT = process.env.PORT || 3001
 
   await app.listen(`${PORT}`, '0.0.0.0');
   console.log(`🚀 HiNobody Backend is running on: http://localhost:${PORT}`);

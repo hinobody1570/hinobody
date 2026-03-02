@@ -23,7 +23,7 @@ export const ROUTE_PATHS = {
     CREATE_POST: "/main/create-post",
     HOME: "/main/home",
     EYE_MASKING: "/main/eye-masking",
-
+    CHAT: "/main/chat",
 
     // AdminRoutes
     ADMIN_USERS: "/admin/users",
