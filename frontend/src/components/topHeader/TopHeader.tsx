@@ -106,7 +106,16 @@ export const RedditHeader = () => {
 
           {/* Avatar */}
           <div className="relative" ref={dropdownRef}>
-            <Avatar color="bg-teal-400" onClick={() => setProfileDropDown(!profileDropdown)} />
+            <Avatar
+              color="bg-teal-400"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  goLogin();
+                  return;
+                }
+                setProfileDropDown(!profileDropdown);
+              }}
+            />
             {profileDropdown && <ProfileDropdown onClose={() => setProfileDropDown(false)} />}
           </div>
         </div>

@@ -560,7 +560,8 @@
       "passwordMinLength8": "Password must be at least 8 characters",
       "orContinueWith": "Or continue with",
       "continueWithGoogle": "Continue with Google",
-      "continueWithApple": "Continue with Apple"
+      "continueWithApple": "Continue with Apple",
+      "guestUser": "Guest user"
     },
     "processing": "Processing authentication...",
     "passwordInvalidFormat": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",

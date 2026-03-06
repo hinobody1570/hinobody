@@ -258,13 +258,21 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            {tAuth("dontHaveAccount")}{" "}
+          <p className="text-sm text-gray-600 flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-3">
+            <span>
+              {tAuth("dontHaveAccount")}{" "}
+              <Link
+                href={ROUTE_PATHS.REGISTER}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                {t("signUp")}
+              </Link>
+            </span>
             <Link
-              href={ROUTE_PATHS.REGISTER}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              href={ROUTE_PATHS.DEFAULT}
+              className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium underline cursor-pointer"
             >
-              {t("signUp")}
+              {t("guestUser")}
             </Link>
           </p>
         </div>

@@ -560,7 +560,8 @@
       "passwordMinLength8": "パスワードは少なくとも8文字である必要があります",
       "orContinueWith": "または次で続行",
       "continueWithGoogle": "Googleで続行",
-      "continueWithApple": "Appleで続行"
+      "continueWithApple": "Appleで続行",
+      "guestUser": "ゲストユーザー"
     },
     "passwordInvalidFormat": "パスワードは8文字以上で、大文字、小文字、数字、特殊文字を含む必要があります。",
     "registerPage": {
