@@ -1126,6 +1126,20 @@ export type ContactSubmissionDto = {
   resolvedAt: string | null;
 };
 
+export type ContactSubmissionStatus = ContactSubmissionDto["status"];
+export type ContactSubmissionPriority = ContactSubmissionDto["priority"];
+
+export type ContactSubmissionsResponse = {
+  data: ContactSubmissionDto[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+};
+
+export type UpdateContactSubmissionDto = {
+  status?: ContactSubmissionStatus;
+  priority?: ContactSubmissionPriority;
+  assignedToId?: string;
+};
+
 export const contactSubmissionsApi = {
   create: async (data: CreateContactSubmissionDto): Promise<ContactSubmissionDto> => {
     const response = await api.post<ApiResponse<ContactSubmissionDto>>(
@@ -1133,6 +1147,46 @@ export const contactSubmissionsApi = {
       data,
     );
     return response.data;
+  },
+  getAll: async (
+    page: number = 1,
+    limit: number = 20,
+    filters?: {
+      status?: ContactSubmissionStatus;
+      priority?: ContactSubmissionPriority;
+      assignedToId?: string;
+      search?: string;
+    },
+  ): Promise<ContactSubmissionsResponse> => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (filters?.status) params.append("status", filters.status);
+    if (filters?.priority) params.append("priority", filters.priority);
+    if (filters?.assignedToId) params.append("assignedToId", filters.assignedToId);
+    if (filters?.search) params.append("search", filters.search);
+
+    const response = await api.get<ApiResponse<ContactSubmissionsResponse>>(
+      `${API_END_POINT.CONTACT_SUBMISSIONS}?${params.toString()}`,
+    );
+    return response.data;
+  },
+  getById: async (id: string): Promise<ContactSubmissionDto> => {
+    const response = await api.get<ApiResponse<ContactSubmissionDto>>(
+      `${API_END_POINT.CONTACT_SUBMISSIONS}/${id}`,
+    );
+    return response.data;
+  },
+  update: async (id: string, dto: UpdateContactSubmissionDto): Promise<ContactSubmissionDto> => {
+    const response = await api.patch<ApiResponse<ContactSubmissionDto>>(
+      `${API_END_POINT.CONTACT_SUBMISSIONS}/${id}`,
+      dto,
+    );
+    return response.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`${API_END_POINT.CONTACT_SUBMISSIONS}/${id}`);
   },
 };
 

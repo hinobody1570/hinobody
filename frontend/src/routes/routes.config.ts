@@ -119,6 +119,11 @@ export const routesConfig: RouteConfig[] = [
     access: ROUTE_ACCESS.PRIVATE,
     redirectTo: ROUTE_PATHS.DEFAULT,
   },
+  {
+    path: ROUTE_PATHS.ADMIN_CONTACT_SUBMISSIONS,
+    access: ROUTE_ACCESS.PRIVATE,
+    redirectTo: ROUTE_PATHS.DEFAULT,
+  },
 ];
 
 /**

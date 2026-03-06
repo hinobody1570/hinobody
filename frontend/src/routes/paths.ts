@@ -37,5 +37,6 @@ export const ROUTE_PATHS = {
     ADMIN_EYE_MASKING: "/admin/eye-masking",
     ADMIN_REPORTS: "/admin/reports",
     ADMIN_BLOCKS: "/admin/blocks",
-    ADMIN_MEMBERSHIPS: "/admin/memberships"
+    ADMIN_MEMBERSHIPS: "/admin/memberships",
+    ADMIN_CONTACT_SUBMISSIONS: "/admin/contact-submissions"
 }
