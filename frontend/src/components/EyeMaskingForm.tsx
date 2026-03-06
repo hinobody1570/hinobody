@@ -116,28 +116,28 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
 
     // Close camera if open
     if (isCameraOpen) {
-        closeCamera();
-      }
+      closeCamera();
+    }
 
-      setImageFile(file);
-      setMasks([]); // Reset masks when new image is selected
-      setCroppedMasks([]); // Reset cropped masks
-      setUploadStatus("");
-      setDebugInfo((prev: any) => ({
-        ...prev,
-        imageLoaded: true,
-        imageName: file.name,
-        imageSize: file.size,
-        croppedMasksCount: 0,
-        croppedMasks: [],
-      }));
+    setImageFile(file);
+    setMasks([]); // Reset masks when new image is selected
+    setCroppedMasks([]); // Reset cropped masks
+    setUploadStatus("");
+    setDebugInfo((prev: any) => ({
+      ...prev,
+      imageLoaded: true,
+      imageName: file.name,
+      imageSize: file.size,
+      croppedMasksCount: 0,
+      croppedMasks: [],
+    }));
 
-      // Create preview URL (will be revoked after processing)
-      const reader = new FileReader();
-      reader.onload = (event: any) => {
-        setImagePreview(event.target.result);
-      };
-      reader.readAsDataURL(file);
+    // Create preview URL (will be revoked after processing)
+    const reader = new FileReader();
+    reader.onload = (event: any) => {
+      setImagePreview(event.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   // Open camera
@@ -922,10 +922,12 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
 
   const handlePointerDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (mode !== "manual") return;
+    e.preventDefault();
     const pos = getCanvasCoordinates(e);
     setIsDrawing(true);
     setStartPos(pos);
     setCurrentMask({ x: pos.x, y: pos.y, width: 0, height: 0 });
+    // (e.target as HTMLCanvasElement).setPointerCapture(e?.pointerId);
   };
 
   const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
@@ -1313,7 +1315,6 @@ const EyeMaskingForm = ({ onPostImagesReady, compact = false, initialAction = nu
         )}
 
         {!model && !debugInfo.modelError && <div className="loading-model">{t("loadingModel")}</div>}
-
       </form>
 
       {/* Debug Panel - Remove in production */}

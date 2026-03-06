@@ -1,17 +1,15 @@
-import MainLayout from "@/layouts/MainLayout";
+import MainLayoutWrapper from "@/layouts/MainLayoutWrapper";
 
 /**
- * Layout for routes that need Sidebar and TopHeader
- * 
- * Routes in the main folder will automatically use this layout.
- * The main content area will change based on the route.
+ * Layout for routes that need Sidebar and TopHeader.
+ * Chat (/main/chat) uses a different full-screen layout and is not wrapped.
  * Note: URLs will include /main/ prefix (e.g., /main/home, /main/dashboard)
  */
-export default function MainLayoutWrapper({
+export default function MainLayoutRoot({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <MainLayout>{children}</MainLayout>;
+  return <MainLayoutWrapper>{children}</MainLayoutWrapper>;
 }
 

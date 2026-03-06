@@ -321,9 +321,7 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
       </div>
 
       {/* Post Image/Content */}
-      {post.images && post.images.length > 0 && (
-        <ImageSlider images={post.images} alt={post.title} />
-      )}
+      {post.images && post.images.length > 0 && <ImageSlider images={post.images} alt={post.title} />}
 
       {post?.body && (
         <div className="px-3 pb-2 [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800" dangerouslySetInnerHTML={{ __html: post?.body }} />
