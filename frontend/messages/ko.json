@@ -679,7 +679,55 @@
   },
   "contact": {
     "title": "문의하기",
-    "intro": "문의 사항이나 지원이 필요하시면 애플리케이션 또는 아래 채널을 통해 연락해 주세요.",
+    "intro": "문의 사항이나 지원이 필요하시면 아래 양식을 통해 연락해 주세요.",
+    "cardTitle": "메시지 보내기",
+    "cardSubtitle": "최대한 빠르게 답변드리겠습니다.",
+    "nameLabel": "이름",
+    "namePlaceholder": "이름을 입력하세요",
+    "emailLabel": "이메일",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "제목",
+    "subjectPlaceholder": "무엇에 대한 문의인가요?",
+    "messageLabel": "메시지",
+    "messagePlaceholder": "가능한 한 자세히 작성해 주세요.",
+    "requiredFields": "필수 입력 항목",
+    "sendButton": "보내기",
+    "categories": {
+      "label": "카테고리(선택)",
+      "placeholder": "카테고리 선택",
+      "general": "일반",
+      "support": "지원",
+      "policy": "정책",
+      "report": "신고",
+      "other": "기타"
+    },
+    "errors": {
+      "nameRequired": "이름은 필수입니다",
+      "emailRequired": "이메일은 필수입니다",
+      "emailInvalid": "유효한 이메일 주소를 입력해주세요",
+      "subjectRequired": "제목은 필수입니다",
+      "messageRequired": "메시지는 필수입니다",
+      "messageTooShort": "메시지는 최소 10자 이상이어야 합니다",
+      "messageTooLong": "메시지는 {max}자 이하여야 합니다"
+    },
+    "mail": {
+      "subjectFallback": "문의",
+      "name": "이름",
+      "email": "이메일",
+      "category": "카테고리",
+      "message": "메시지"
+    },
+    "success": {
+      "title": "보낼 준비가 완료되었습니다",
+      "body": "일반적으로 이메일 앱이 자동으로 열립니다. 열리지 않으면 아래 버튼으로 수동으로 열어주세요. {email}(으)로 직접 보내셔도 됩니다.",
+      "openEmail": "이메일 앱 열기",
+      "copy": "메시지 복사",
+      "copied": "복사됨",
+      "sendAnother": "다른 메시지 보내기"
+    },
+    "footer": {
+      "emailUs": "또는 다음 이메일로 연락해주세요"
+    },
     "backToHome": "홈으로 돌아가기"
   },
   "dummyExample": {

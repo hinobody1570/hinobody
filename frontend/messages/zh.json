@@ -680,7 +680,55 @@
   },
   "contact": {
     "title": "联系我们",
-    "intro": "如有疑问或需要支持，请通过应用程序或以下渠道与我们联系。",
+    "intro": "如有疑问或需要支持，请通过下面的表单与我们联系。",
+    "cardTitle": "发送消息",
+    "cardSubtitle": "我们会尽快回复你。",
+    "nameLabel": "姓名",
+    "namePlaceholder": "请输入你的姓名",
+    "emailLabel": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "主题",
+    "subjectPlaceholder": "这条消息是关于什么？",
+    "messageLabel": "内容",
+    "messagePlaceholder": "请尽量提供详细信息。",
+    "requiredFields": "必填项",
+    "sendButton": "发送",
+    "categories": {
+      "label": "分类（可选）",
+      "placeholder": "选择分类",
+      "general": "一般",
+      "support": "支持",
+      "policy": "政策",
+      "report": "举报",
+      "other": "其他"
+    },
+    "errors": {
+      "nameRequired": "姓名为必填项",
+      "emailRequired": "邮箱为必填项",
+      "emailInvalid": "请输入有效的邮箱地址",
+      "subjectRequired": "主题为必填项",
+      "messageRequired": "内容为必填项",
+      "messageTooShort": "内容至少需要10个字符",
+      "messageTooLong": "内容不能超过 {max} 个字符"
+    },
+    "mail": {
+      "subjectFallback": "联系请求",
+      "name": "姓名",
+      "email": "邮箱",
+      "category": "分类",
+      "message": "内容"
+    },
+    "success": {
+      "title": "已准备好发送",
+      "body": "通常会自动打开你的邮箱应用。如果没有打开，请使用下面的按钮手动打开。你也可以直接发送到 {email}。",
+      "openEmail": "打开邮箱应用",
+      "copy": "复制内容",
+      "copied": "已复制",
+      "sendAnother": "再发一条"
+    },
+    "footer": {
+      "emailUs": "或者发送邮件到"
+    },
     "backToHome": "返回首页"
   },
   "dummyExample": {

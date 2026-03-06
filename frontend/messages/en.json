@@ -681,7 +681,55 @@
   },
   "contact": {
     "title": "Contact Us",
-    "intro": "For inquiries or support, please reach out through the application or the channels below.",
+    "intro": "For inquiries or support, please reach out through the form below.",
+    "cardTitle": "Send us a message",
+    "cardSubtitle": "We’ll get back to you as soon as possible.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "What is this about?",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Please include as much detail as possible.",
+    "requiredFields": "Required fields",
+    "sendButton": "Send",
+    "categories": {
+      "label": "Category (optional)",
+      "placeholder": "Select a category",
+      "general": "General",
+      "support": "Support",
+      "policy": "Policy",
+      "report": "Report",
+      "other": "Other"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "subjectRequired": "Subject is required",
+      "messageRequired": "Message is required",
+      "messageTooShort": "Message must be at least 10 characters",
+      "messageTooLong": "Message must be {max} characters or less"
+    },
+    "mail": {
+      "subjectFallback": "Contact request",
+      "name": "Name",
+      "email": "Email",
+      "category": "Category",
+      "message": "Message"
+    },
+    "success": {
+      "title": "Ready to send",
+      "body": "Your email app should open automatically. If it doesn’t, use the button below to open it manually. You can also send directly to {email}.",
+      "openEmail": "Open email app",
+      "copy": "Copy message",
+      "copied": "Copied",
+      "sendAnother": "Send another message"
+    },
+    "footer": {
+      "emailUs": "Or email us at"
+    },
     "backToHome": "Back to Home"
   },
   "dummyExample": {

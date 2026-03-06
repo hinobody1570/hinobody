@@ -680,7 +680,55 @@
   },
   "contact": {
     "title": "お問い合わせ",
-    "intro": "お問い合わせやサポートが必要な場合は、アプリケーションまたは以下のチャネルからご連絡ください。",
+    "intro": "お問い合わせやサポートが必要な場合は、以下のフォームからご連絡ください。",
+    "cardTitle": "メッセージを送信",
+    "cardSubtitle": "できるだけ早くご返信いたします。",
+    "nameLabel": "お名前",
+    "namePlaceholder": "お名前を入力",
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "件名",
+    "subjectPlaceholder": "お問い合わせ内容の概要",
+    "messageLabel": "メッセージ",
+    "messagePlaceholder": "できるだけ詳しくご記入ください。",
+    "requiredFields": "必須項目です",
+    "sendButton": "送信",
+    "categories": {
+      "label": "カテゴリ（任意）",
+      "placeholder": "カテゴリを選択",
+      "general": "一般",
+      "support": "サポート",
+      "policy": "ポリシー",
+      "report": "報告",
+      "other": "その他"
+    },
+    "errors": {
+      "nameRequired": "お名前は必須です",
+      "emailRequired": "メールアドレスは必須です",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "subjectRequired": "件名は必須です",
+      "messageRequired": "メッセージは必須です",
+      "messageTooShort": "メッセージは10文字以上で入力してください",
+      "messageTooLong": "メッセージは{max}文字以内で入力してください"
+    },
+    "mail": {
+      "subjectFallback": "お問い合わせ",
+      "name": "お名前",
+      "email": "メールアドレス",
+      "category": "カテゴリ",
+      "message": "メッセージ"
+    },
+    "success": {
+      "title": "送信の準備ができました",
+      "body": "通常はメールアプリが自動的に開きます。開かない場合は、下のボタンから手動で開いてください。{email} 宛に直接送信することもできます。",
+      "openEmail": "メールアプリを開く",
+      "copy": "メッセージをコピー",
+      "copied": "コピーしました",
+      "sendAnother": "別のメッセージを送る"
+    },
+    "footer": {
+      "emailUs": "または次のアドレスへメールしてください"
+    },
     "backToHome": "ホームに戻る"
   },
   "dummyExample": {
