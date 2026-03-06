@@ -738,11 +738,11 @@
     "requestRejected": "您加入此板块的请求已被拒绝。您无法在此板块发布。",
     "postingGuidelines": "发帖指南",
     "guidelines": {
-      "rememberHuman": "记住人性",
-      "behaveRealLife": "像在现实生活中一样行事",
-      "originalSource": "寻找内容的原始来源",
-      "searchDuplicates": "发布前搜索重复内容",
-      "readRules": "阅读社区规则"
+      "photoResponsibility": "用户对上传的照片负责，不得侵犯他人权利。",
+      "unpublishedNotStored": "未发布的上传内容不会永久存储。",
+      "noMedicalAdvice": "Hinobody 不提供医疗建议。",
+      "consultMedicalProfessional": "所有程序或治疗决定应与持照医疗专业人士共同做出。",
+      "contentResponsibility": "用户对其内容负责。"
     },
     "characters": "字符",
     "posting": "发布中...",

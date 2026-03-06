@@ -737,11 +737,11 @@
     "requestRejected": "이 보드에 가입 요청이 거부되었습니다. 이 보드에 게시할 수 없습니다.",
     "postingGuidelines": "게시 가이드라인",
     "guidelines": {
-      "rememberHuman": "사람을 기억하세요",
-      "behaveRealLife": "실생활에서처럼 행동하세요",
-      "originalSource": "콘텐츠의 원본 출처를 찾으세요",
-      "searchDuplicates": "게시하기 전에 중복을 검색하세요",
-      "readRules": "커뮤니티 규칙을 읽으세요"
+      "photoResponsibility": "업로드한 사진에 대한 책임은 사용자에게 있으며, 타인의 권리를 침해해서는 안 됩니다.",
+      "unpublishedNotStored": "미게시 업로드 내용은 영구적으로 저장되지 않습니다.",
+      "noMedicalAdvice": "Hinobody는 의료 조언을 제공하지 않습니다.",
+      "consultMedicalProfessional": "모든 절차 또는 치료 결정은 면허가 있는 의료 전문가와 상담하여 이루어져야 합니다.",
+      "contentResponsibility": "사용자는 자신의 콘텐츠에 대한 책임이 있습니다."
     },
     "characters": "자",
     "posting": "게시 중...",

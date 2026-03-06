@@ -738,11 +738,11 @@
     "requestRejected": "このボードへの参加リクエストは拒否されました。このボードには投稿できません。",
     "postingGuidelines": "投稿ガイドライン",
     "guidelines": {
-      "rememberHuman": "人間を思い出してください",
-      "behaveRealLife": "実生活のように行動してください",
-      "originalSource": "コンテンツの元のソースを探してください",
-      "searchDuplicates": "投稿前に重複を検索してください",
-      "readRules": "コミュニティのルールを読んでください"
+      "photoResponsibility": "アップロードした写真の責任はユーザーにあり、他人の権利を侵害してはなりません。",
+      "unpublishedNotStored": "未公開のアップロードは永続的に保存されません。",
+      "noMedicalAdvice": "Hinobodyは医療アドバイスを提供しません。",
+      "consultMedicalProfessional": "すべての処置や治療の決定は、資格を持つ医療専門家と相談して行ってください。",
+      "contentResponsibility": "ユーザーは自身のコンテンツに責任を負います。"
     },
     "characters": "文字",
     "posting": "投稿中...",

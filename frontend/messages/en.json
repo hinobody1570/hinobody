@@ -739,11 +739,11 @@
     "requestRejected": "Your request to join this board was rejected. You cannot post in this board.",
     "postingGuidelines": "Posting Guidelines",
     "guidelines": {
-      "rememberHuman": "Remember the human",
-      "behaveRealLife": "Behave like you would in real life",
-      "originalSource": "Look for the original source of content",
-      "searchDuplicates": "Search for duplicates before posting",
-      "readRules": "Read the community's rules"
+      "photoResponsibility": "Users are responsible for uploaded photos and must not infringe others’ rights.",
+      "unpublishedNotStored": "Unpublished uploads are not stored permanently.",
+      "noMedicalAdvice": "Hinobody does not provide medical advice.",
+      "consultMedicalProfessional": "All procedures or treatment decisions should be made with a licensed medical professional.",
+      "contentResponsibility": "Users are responsible for their content."
     },
     "characters": "characters",
     "posting": "Posting...",
