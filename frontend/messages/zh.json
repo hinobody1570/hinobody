@@ -695,6 +695,7 @@
     "messagePlaceholder": "请尽量提供详细信息。",
     "requiredFields": "必填项",
     "sendButton": "发送",
+    "sendingButton": "发送中...",
     "categories": {
       "label": "分类（可选）",
       "placeholder": "选择分类",
@@ -711,7 +712,8 @@
       "subjectRequired": "主题为必填项",
       "messageRequired": "内容为必填项",
       "messageTooShort": "内容至少需要10个字符",
-      "messageTooLong": "内容不能超过 {max} 个字符"
+      "messageTooLong": "内容不能超过 {max} 个字符",
+      "submitFailed": "发送失败，请稍后再试。"
     },
     "mail": {
       "subjectFallback": "联系请求",
@@ -721,9 +723,9 @@
       "message": "内容"
     },
     "success": {
-      "title": "已准备好发送",
-      "body": "通常会自动打开你的邮箱应用。如果没有打开，请使用下面的按钮手动打开。你也可以直接发送到 {email}。",
-      "openEmail": "打开邮箱应用",
+      "title": "已收到你的消息",
+      "body": "谢谢！我们已收到你的消息，会尽快回复。如需补充说明，请发送邮件至 {email}。",
+      "openEmail": "发送邮件",
       "copy": "复制内容",
       "copied": "已复制",
       "sendAnother": "再发一条"

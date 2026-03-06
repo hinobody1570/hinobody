@@ -696,6 +696,7 @@
     "messagePlaceholder": "Please include as much detail as possible.",
     "requiredFields": "Required fields",
     "sendButton": "Send",
+    "sendingButton": "Sending...",
     "categories": {
       "label": "Category (optional)",
       "placeholder": "Select a category",
@@ -712,7 +713,8 @@
       "subjectRequired": "Subject is required",
       "messageRequired": "Message is required",
       "messageTooShort": "Message must be at least 10 characters",
-      "messageTooLong": "Message must be {max} characters or less"
+      "messageTooLong": "Message must be {max} characters or less",
+      "submitFailed": "Failed to send. Please try again."
     },
     "mail": {
       "subjectFallback": "Contact request",
@@ -722,9 +724,9 @@
       "message": "Message"
     },
     "success": {
-      "title": "Ready to send",
-      "body": "Your email app should open automatically. If it doesn’t, use the button below to open it manually. You can also send directly to {email}.",
-      "openEmail": "Open email app",
+      "title": "Message received",
+      "body": "Thanks — we received your message. We’ll get back to you soon. If you need to follow up, email us at {email}.",
+      "openEmail": "Email us",
       "copy": "Copy message",
       "copied": "Copied",
       "sendAnother": "Send another message"

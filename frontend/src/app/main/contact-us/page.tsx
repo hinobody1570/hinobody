@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { type FormEvent, useMemo, useState } from "react";
 import { IoMailOutline, IoSend } from "react-icons/io5";
+import { contactSubmissionsApi } from "@/lib/api";
 
 type ContactCategory = "" | "general" | "support" | "policy" | "report" | "other";
 
@@ -38,6 +39,8 @@ export default function ContactUsPage() {
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [isReadyToSend, setIsReadyToSend] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validate = (data: ContactFormData): ContactFormErrors => {
     const nextErrors: ContactFormErrors = {};
@@ -98,6 +101,8 @@ export default function ContactUsPage() {
     setErrors({});
     setIsReadyToSend(false);
     setCopied(false);
+    setIsSubmitting(false);
+    setSubmitError(null);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -109,13 +114,23 @@ export default function ContactUsPage() {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    setIsReadyToSend(true);
-
-    // Best-effort: open user's email client. (No backend endpoint is configured here.)
     try {
-      window.location.href = mailtoHref;
-    } catch {
-      // If blocked, the UI still shows a button to open email manually.
+      setIsSubmitting(true);
+      setSubmitError(null);
+
+      await contactSubmissionsApi.create({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim(),
+        category: formData.category || "general",
+        message: formData.message.trim(),
+      });
+
+      setIsReadyToSend(true);
+    } catch (err: any) {
+      setSubmitError(err?.message || t("errors.submitFailed"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -192,6 +207,11 @@ export default function ContactUsPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-6 space-y-4" noValidate>
+              {submitError ? (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {submitError}
+                </div>
+              ) : null}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">
@@ -317,10 +337,12 @@ export default function ContactUsPage() {
                 </p>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white text-sm font-semibold rounded-full transition flex items-center gap-2"
+                  disabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                  className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white text-sm font-semibold rounded-full transition flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <IoSend />
-                  {t("sendButton")}
+                  {isSubmitting ? t("sendingButton") : t("sendButton")}
                 </button>
               </div>
             </form>

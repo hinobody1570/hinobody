@@ -1101,6 +1101,41 @@ export interface ChatMessagesResponse {
   meta: { total: number; page: number; limit: number; totalPages: number };
 }
 
+export type CreateContactSubmissionDto = {
+  name: string;
+  email: string;
+  category: string;
+  subject: string;
+  message: string;
+};
+
+export type ContactSubmissionDto = {
+  id: string;
+  name: string;
+  email: string;
+  category: string;
+  subject: string;
+  message: string;
+  status: "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  priority: "LOW" | "NORMAL" | "HIGH" | "CRITICAL";
+  assignedToId: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt: string | null;
+};
+
+export const contactSubmissionsApi = {
+  create: async (data: CreateContactSubmissionDto): Promise<ContactSubmissionDto> => {
+    const response = await api.post<ApiResponse<ContactSubmissionDto>>(
+      API_END_POINT.CONTACT_SUBMISSIONS,
+      data,
+    );
+    return response.data;
+  },
+};
+
 export const chatApi = {
   getContacts: async (): Promise<ChatContact[]> => {
     const response = await api.get<ApiResponse<ChatContact[]>>(API_END_POINT.CHAT_CONTACTS);

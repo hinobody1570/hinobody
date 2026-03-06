@@ -695,6 +695,7 @@
     "messagePlaceholder": "できるだけ詳しくご記入ください。",
     "requiredFields": "必須項目です",
     "sendButton": "送信",
+    "sendingButton": "送信中...",
     "categories": {
       "label": "カテゴリ（任意）",
       "placeholder": "カテゴリを選択",
@@ -711,7 +712,8 @@
       "subjectRequired": "件名は必須です",
       "messageRequired": "メッセージは必須です",
       "messageTooShort": "メッセージは10文字以上で入力してください",
-      "messageTooLong": "メッセージは{max}文字以内で入力してください"
+      "messageTooLong": "メッセージは{max}文字以内で入力してください",
+      "submitFailed": "送信に失敗しました。時間をおいて再度お試しください。"
     },
     "mail": {
       "subjectFallback": "お問い合わせ",
@@ -721,9 +723,9 @@
       "message": "メッセージ"
     },
     "success": {
-      "title": "送信の準備ができました",
-      "body": "通常はメールアプリが自動的に開きます。開かない場合は、下のボタンから手動で開いてください。{email} 宛に直接送信することもできます。",
-      "openEmail": "メールアプリを開く",
+      "title": "メッセージを受け付けました",
+      "body": "ありがとうございます。メッセージを受け付けました。できるだけ早く返信します。追記や緊急の場合は {email} までご連絡ください。",
+      "openEmail": "メールする",
       "copy": "メッセージをコピー",
       "copied": "コピーしました",
       "sendAnother": "別のメッセージを送る"
