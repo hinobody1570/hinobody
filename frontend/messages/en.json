@@ -2,7 +2,11 @@
   "common": {
     "loading": "Loading...",
     "welcome": "Welcome to HiNobody",
-    "description": "Next.js + NestJS with TypeScript"
+    "description": "Next.js + NestJS with TypeScript",
+    "close": "Close",
+    "login": "Login",
+    "loginRequiredTitle": "Login required",
+    "loginRequiredBody": "Please login first to use this functionality."
   },
   "timeAgo": {
     "secAgo": "{count} sec. ago",

@@ -13,6 +13,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { ReportModal } from "../modals/ReportModal";
+import { useRouter } from "next/navigation";
+import { ROUTE_PATHS } from "@/routes/paths";
+import { LoginRequiredModal } from "../modals/LoginRequiredModal";
 
 interface commentType {
   comment: any;
@@ -55,6 +58,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
+  const router = useRouter();
   const t = useTranslations('comments');
   const tPostCard = useTranslations('postCard');
   const [upvotes, setUpvotes] = useState(comment.upvotes || 0);
@@ -67,6 +71,12 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const [isVoting, setIsVoting] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  const goLogin = () => {
+    const current = `${window.location.pathname}${window.location.search}`;
+    router.push(`${ROUTE_PATHS.LOGIN}?redirect=${encodeURIComponent(current)}`);
+  };
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -82,7 +92,7 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const handleSubmitReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showError(t('pleaseLoginToReply'));
+      setLoginModalOpen(true);
       return;
     }
 
@@ -139,7 +149,11 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   }, [comment.id, isAuthenticated]);
 
   const handleUpvote = async () => {
-    if (!isAuthenticated || !comment.id || isVoting) return;
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!comment.id || isVoting) return;
 
     try {
       setIsVoting(true);
@@ -167,7 +181,11 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   };
 
   const handleDownvote = async () => {
-    if (!isAuthenticated || !comment.id || isVoting) return;
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!comment.id || isVoting) return;
 
     try {
       setIsVoting(true);
@@ -275,10 +293,10 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                 <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-50 rounded-full">
                   <button
                     onClick={handleUpvote}
-                    disabled={!isAuthenticated || isVoting}
+                    disabled={isVoting}
                     className={`p-1.5 sm:p-1 hover:bg-gray-100 cursor-pointer rounded-l-full transition-colors touch-manipulation ${
                       voteState === "up" ? "text-orange-500" : "text-gray-500"
-                    } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    } ${isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <HiOutlineThumbUp size={18} fill={voteState === "up" ? "currentColor" : "none"} />
                   </button>
@@ -287,10 +305,10 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                   </span>
                   <button
                     onClick={handleDownvote}
-                    disabled={!isAuthenticated || isVoting}
+                    disabled={isVoting}
                     className={`p-1.5 sm:p-1 hover:bg-gray-100 rounded-r-full cursor-pointer transition-colors touch-manipulation ${
                       voteState === "down" ? "text-blue-500" : "text-gray-500"
-                    } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    } ${isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <HiOutlineThumbDown size={18} fill={voteState === "down" ? "currentColor" : "none"} />
                   </button>
@@ -344,13 +362,16 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             placeholder={isAuthenticated ? t('enterReply') : t('loginToReply')}
-            disabled={!isAuthenticated || isSubmittingReply}
+            onFocus={() => {
+              if (!isAuthenticated) setLoginModalOpen(true);
+            }}
+            disabled={isSubmittingReply}
             className="flex-1 min-w-0 px-4 py-2.5 sm:py-2 bg-gray-50 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <div className="flex gap-2 flex-shrink-0">
             <button
               type="submit"
-              disabled={!isAuthenticated || isSubmittingReply || !replyText.trim()}
+              disabled={isSubmittingReply || !replyText.trim()}
               className="flex-1 sm:flex-initial min-h-[40px] sm:min-h-0 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               {isSubmittingReply ? '...' : t('reply')}
@@ -392,6 +413,12 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
         onSubmit={handleReportSubmit}
         title={tPostCard('reportComment')}
         isLoading={isReporting}
+      />
+
+      <LoginRequiredModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLogin={goLogin}
       />
     </div>
   );

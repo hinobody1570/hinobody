@@ -2,7 +2,11 @@
   "common": {
     "loading": "加载中...",
     "welcome": "欢迎来到 HiNobody",
-    "description": "Next.js + NestJS with TypeScript"
+    "description": "Next.js + NestJS with TypeScript",
+    "close": "关闭",
+    "login": "登录",
+    "loginRequiredTitle": "需要登录",
+    "loginRequiredBody": "使用此功能前请先登录。"
   },
   "timeAgo": {
     "secAgo": "{count} 秒前",

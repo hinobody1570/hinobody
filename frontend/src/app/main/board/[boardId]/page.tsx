@@ -113,7 +113,8 @@ export default function BoardProfilePage() {
 
   const handleJoinLeave = async () => {
     if (!user) {
-      router.push(ROUTE_PATHS.DEFAULT);
+      const current = `${window.location.pathname}${window.location.search}`;
+      router.push(`${ROUTE_PATHS.LOGIN}?redirect=${encodeURIComponent(current)}`);
       return;
     }
 

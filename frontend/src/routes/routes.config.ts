@@ -33,6 +33,11 @@ export const routesConfig: RouteConfig[] = [
     access: ROUTE_ACCESS.PUBLIC,
   },
   {
+    path: ROUTE_PATHS.LOGIN,
+    access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
+    redirectTo: ROUTE_PATHS.DEFAULT,
+  },
+  {
     path: ROUTE_PATHS.ABOUT,
     access: ROUTE_ACCESS.PUBLIC,
   },
@@ -43,14 +48,9 @@ export const routesConfig: RouteConfig[] = [
 
   // Public Routes that redirect if authenticated
   {
-    path: ROUTE_PATHS.DEFAULT,
-    access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.HOME,
-  },
-  {
     path: ROUTE_PATHS.REGISTER,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.HOME,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
     path: ROUTE_PATHS.VERIFY_EMAIL,
@@ -60,69 +60,68 @@ export const routesConfig: RouteConfig[] = [
   {
     path: ROUTE_PATHS.FORGOT_PASSWORD,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.HOME,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   {
     path: ROUTE_PATHS.RESET_PASSWORD,
     access: ROUTE_ACCESS.PUBLIC_REDIRECT_IF_AUTH,
-    redirectTo: ROUTE_PATHS.HOME,
+    redirectTo: ROUTE_PATHS.DEFAULT,
   },
   // Private Routes (require authentication)
   {
     path: ROUTE_PATHS.HOME,
-    access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    access: ROUTE_ACCESS.PUBLIC,
   },
   {
     path: ROUTE_PATHS.EYE_MASKING,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.DASHBOARD,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.PROFILE,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.SETTINGS,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.CHAT,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   // Admin Routes
   {
     path: ROUTE_PATHS.ADMIN_BOARDS,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.ADMIN_POSTS,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.ADMIN_COMMENTS,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.ADMIN_USERS,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
   {
     path: ROUTE_PATHS.ADMIN_CONTACT_SUBMISSIONS,
     access: ROUTE_ACCESS.PRIVATE,
-    redirectTo: ROUTE_PATHS.DEFAULT,
+    redirectTo: ROUTE_PATHS.LOGIN,
   },
 ];
 

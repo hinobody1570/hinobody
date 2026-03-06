@@ -155,7 +155,7 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
         <button
           onClick={() => {
             onClose?.();
-            router.push(ROUTE_PATHS.DEFAULT);
+            router.push(ROUTE_PATHS.LOGIN);
           }}
           className="w-full cursor-pointer px-4 py-2.5 hover:bg-gray-50 transition flex items-center gap-3"
         >

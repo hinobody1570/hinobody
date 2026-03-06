@@ -23,9 +23,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { QueryPostsDto } from './dto/query-posts.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 
 @ApiTags('Posts')
-@ApiBearerAuth('JWT-auth')
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -40,8 +40,7 @@ export class PostController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Get all posts with pagination and filters' })
   @ApiQuery({
     name: 'boardId',
@@ -72,23 +71,29 @@ export class PostController {
   })
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiResponse({ status: 200, description: 'List of posts with pagination' })
-  findAll(@Query() query: QueryPostsDto, @GetUser('id') userId: string, @GetUser('role') role: string) {
+  findAll(
+    @Query() query: QueryPostsDto,
+    @GetUser('id') userId?: string,
+    @GetUser('role') role?: string,
+  ) {
     return this.postService.findAll(query, userId, role === 'ADMIN');
   }
 
   @Get('feed')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Get home feed (all boards combined)' })
   @ApiResponse({ status: 200, description: 'Home feed posts' })
-  getHomeFeed(@Query() query: QueryPostsDto, @GetUser('id') userId: string, @GetUser('role') role: string) {
+  getHomeFeed(
+    @Query() query: QueryPostsDto,
+    @GetUser('id') userId?: string,
+    @GetUser('role') role?: string,
+  ) {
     return this.postService.getHomeFeed(query, userId, role === 'ADMIN');
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  findOne(@Param('id') id: string, @GetUser('id') userId: string) {
+  @UseGuards(OptionalJwtAuthGuard)
+  findOne(@Param('id') id: string, @GetUser('id') userId?: string) {
     return this.postService.findOne(id, userId);
   }
 

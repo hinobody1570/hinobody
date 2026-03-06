@@ -13,21 +13,39 @@ import { useEffect, useRef, useState } from "react";
 import ProfileDropdown from "../profileDropDown/ProfileDropdown";
 import { IoIosSearch } from "react-icons/io";
 import { LiaEdit } from "react-icons/lia";
+import { LoginRequiredModal } from "../modals/LoginRequiredModal";
 
 export const RedditHeader = () => {
   const t = useTranslations("header");
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const [profileDropdown, setProfileDropDown] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const mobileSearchRef = useRef<HTMLDivElement | null>(null);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  const goLogin = () => {
+    const current = `${window.location.pathname}${window.location.search}`;
+    router.push(`${ROUTE_PATHS.LOGIN}?redirect=${encodeURIComponent(current)}`);
+  };
 
   const headerActions = [
     // { icon: BsBadgeAd, onClick: () => console.log("Ads") },
     // { icon: LuMessageCircleMore, onClick: () => console.log("Chat") },
-    { icon: LiaEdit, iconMobile: LiaEdit , label: t("write"), onClick: () => router.push(ROUTE_PATHS.CREATE_POST) },
+    {
+      icon: LiaEdit,
+      iconMobile: LiaEdit,
+      label: t("write"),
+      onClick: () => {
+        if (!isAuthenticated) {
+          setLoginModalOpen(true);
+          return;
+        }
+        router.push(ROUTE_PATHS.CREATE_POST);
+      },
+    },
     // { icon: BsBell, onClick: () => console.log("Notifications") },
     // { icon: LuCamera, label: t("eyeMask"), onClick: () => router.push(ROUTE_PATHS.EYE_MASKING) },
   ];
@@ -102,6 +120,12 @@ export const RedditHeader = () => {
           </div>
         </div>
       )}
+
+      <LoginRequiredModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLogin={goLogin}
+      />
     </header>
   );
 };

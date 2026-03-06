@@ -2,7 +2,11 @@
   "common": {
     "loading": "로딩 중...",
     "welcome": "HiNobody에 오신 것을 환영합니다",
-    "description": "Next.js + NestJS with TypeScript"
+    "description": "Next.js + NestJS with TypeScript",
+    "close": "닫기",
+    "login": "로그인",
+    "loginRequiredTitle": "로그인이 필요합니다",
+    "loginRequiredBody": "이 기능을 사용하려면 먼저 로그인해주세요."
   },
   "timeAgo": {
     "secAgo": "{count}초 전",

@@ -2,7 +2,11 @@
   "common": {
     "loading": "読み込み中...",
     "welcome": "HiNobodyへようこそ",
-    "description": "Next.js + NestJS with TypeScript"
+    "description": "Next.js + NestJS with TypeScript",
+    "close": "閉じる",
+    "login": "ログイン",
+    "loginRequiredTitle": "ログインが必要です",
+    "loginRequiredBody": "この機能を利用するには、まずログインしてください。"
   },
   "timeAgo": {
     "secAgo": "{count}秒前",
