@@ -488,7 +488,10 @@
     "help": "帮助",
     "blog": "博客",
     "careers": "招聘",
-    "press": "新闻"
+    "press": "新闻",
+    "termsAndGuide": "条款与支持",
+    "policy": "政策",
+    "contactUs": "联系我们"
   },
   "auth": {
     "login": "登录",
@@ -668,6 +671,16 @@
     "techDescription": "使用 Next.js、React、TypeScript 和 TensorFlow.js 构建，提供尖端的 AI 功能。我们的后端使用 NestJS 和 Prisma 进行强大的数据管理。",
     "contact": "联系",
     "contactDescription": "如有疑问或需要支持，请通过应用程序联系我们。",
+    "backToHome": "返回首页"
+  },
+  "policy": {
+    "title": "政策",
+    "intro": "请查阅我们的政策和指南。",
+    "backToHome": "返回首页"
+  },
+  "contact": {
+    "title": "联系我们",
+    "intro": "如有疑问或需要支持，请通过应用程序或以下渠道与我们联系。",
     "backToHome": "返回首页"
   },
   "dummyExample": {

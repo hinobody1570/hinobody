@@ -487,7 +487,10 @@
     "help": "도움말",
     "blog": "블로그",
     "careers": "채용",
-    "press": "보도 자료"
+    "press": "보도 자료",
+    "termsAndGuide": "약관 및 지원",
+    "policy": "정책",
+    "contactUs": "문의하기"
   },
   "auth": {
     "login": "로그인",
@@ -667,6 +670,16 @@
     "techDescription": "최첨단 AI 기능을 위해 Next.js, React, TypeScript 및 TensorFlow.js로 구축되었습니다. 백엔드는 강력한 데이터 관리를 위해 Prisma와 함께 NestJS를 사용합니다.",
     "contact": "연락처",
     "contactDescription": "문의 사항이나 지원이 필요하시면 애플리케이션을 통해 문의해주세요.",
+    "backToHome": "홈으로 돌아가기"
+  },
+  "policy": {
+    "title": "정책",
+    "intro": "정책 및 가이드라인을 확인해 주세요.",
+    "backToHome": "홈으로 돌아가기"
+  },
+  "contact": {
+    "title": "문의하기",
+    "intro": "문의 사항이나 지원이 필요하시면 애플리케이션 또는 아래 채널을 통해 연락해 주세요.",
     "backToHome": "홈으로 돌아가기"
   },
   "dummyExample": {

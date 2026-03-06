@@ -488,7 +488,10 @@
     "help": "ヘルプ",
     "blog": "ブログ",
     "careers": "採用",
-    "press": "プレス"
+    "press": "プレス",
+    "termsAndGuide": "利用規約とサポート",
+    "policy": "ポリシー",
+    "contactUs": "お問い合わせ"
   },
   "auth": {
     "login": "ログイン",
@@ -668,6 +671,16 @@
     "techDescription": "最先端のAI機能のためにNext.js、React、TypeScript、TensorFlow.jsで構築されています。バックエンドは、堅牢なデータ管理のためにPrismaとともにNestJSを使用します。",
     "contact": "お問い合わせ",
     "contactDescription": "お問い合わせやサポートについては、アプリケーションを通じてお問い合わせください。",
+    "backToHome": "ホームに戻る"
+  },
+  "policy": {
+    "title": "ポリシー",
+    "intro": "ポリシーとガイドラインをご確認ください。",
+    "backToHome": "ホームに戻る"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "intro": "お問い合わせやサポートが必要な場合は、アプリケーションまたは以下のチャネルからご連絡ください。",
     "backToHome": "ホームに戻る"
   },
   "dummyExample": {

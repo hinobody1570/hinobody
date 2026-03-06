@@ -19,6 +19,8 @@ export const ROUTE_PATHS = {
     POST_DETAIL: "/main/post",
     SETTINGS: "/main/settings",
     ABOUT: "/main/about",
+    POLICY: "/main/policy",
+    CONTACT_US: "/main/contact-us",
     DUMMY_EXAMPLE : "/main/dummy-example",
     CREATE_POST: "/main/create-post",
     HOME: "/main/home",

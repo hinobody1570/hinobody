@@ -488,7 +488,10 @@
     "help": "Help",
     "blog": "Blog",
     "careers": "Careers",
-    "press": "Press"
+    "press": "Press",
+    "termsAndGuide": "Terms & support",
+    "policy": "Policy",
+    "contactUs": "Contact us"
   },
   "auth": {
     "login": "Login",
@@ -669,6 +672,16 @@
     "techDescription": "Built with Next.js, React, TypeScript, and TensorFlow.js for cutting-edge AI capabilities. Our backend uses NestJS with Prisma for robust data management.",
     "contact": "Contact",
     "contactDescription": "For inquiries or support, please contact us through the application.",
+    "backToHome": "Back to Home"
+  },
+  "policy": {
+    "title": "Policy",
+    "intro": "Please review our policies and guidelines.",
+    "backToHome": "Back to Home"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "intro": "For inquiries or support, please reach out through the application or the channels below.",
     "backToHome": "Back to Home"
   },
   "dummyExample": {
