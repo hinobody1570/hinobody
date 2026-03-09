@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EmailService } from '../email/email.service';
 import { CreateContactSubmissionDto } from './dto/create-contact-submission.dto';
 import { QueryContactSubmissionsDto } from './dto/query-contact-submissions.dto';
 import { UpdateContactSubmissionDto } from './dto/update-contact-submission.dto';
@@ -7,19 +8,39 @@ import { ContactStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ContactSubmissionService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(ContactSubmissionService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+  ) {}
 
   async create(
     dto: CreateContactSubmissionDto,
     meta: { ipAddress?: string | null; userAgent?: string | null },
   ) {
-    return this.prisma.contactSubmission.create({
+    const submission = await this.prisma.contactSubmission.create({
       data: {
         ...dto,
         ipAddress: meta.ipAddress || null,
         userAgent: meta.userAgent || null,
       },
     });
+
+    // Send full contact details to support email (non-blocking)
+    this.emailService
+      .sendContactFormNotification({
+        name: dto.name,
+        email: dto.email,
+        category: dto.category,
+        subject: dto.subject,
+        message: dto.message,
+      })
+      .catch((err) => {
+        this.logger.warn(`Failed to send contact form email to support: ${err?.message || err}`);
+      });
+
+    return submission;
   }
 
   async findAll(query: QueryContactSubmissionsDto) {
