@@ -736,9 +736,12 @@
     },
     "errors": {
       "nameRequired": "Name is required",
+      "nameTooLong": "Name must be {max} characters or less",
       "emailRequired": "Email is required",
+      "emailTooLong": "Email must be {max} characters or less",
       "emailInvalid": "Please enter a valid email address",
       "subjectRequired": "Subject is required",
+      "subjectTooLong": "Subject must be {max} characters or less",
       "messageRequired": "Message is required",
       "messageTooShort": "Message must be at least 10 characters",
       "messageTooLong": "Message must be {max} characters or less",

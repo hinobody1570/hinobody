@@ -734,9 +734,12 @@
     },
     "errors": {
       "nameRequired": "이름은 필수입니다",
+      "nameTooLong": "이름은 {max}자 이하여야 합니다",
       "emailRequired": "이메일은 필수입니다",
+      "emailTooLong": "이메일은 {max}자 이하여야 합니다",
       "emailInvalid": "유효한 이메일 주소를 입력해주세요",
       "subjectRequired": "제목은 필수입니다",
+      "subjectTooLong": "제목은 {max}자 이하여야 합니다",
       "messageRequired": "메시지는 필수입니다",
       "messageTooShort": "메시지는 최소 10자 이상이어야 합니다",
       "messageTooLong": "메시지는 {max}자 이하여야 합니다",

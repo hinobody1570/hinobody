@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { IoMailOutline, IoSend } from "react-icons/io5";
 import { contactSubmissionsApi } from "@/lib/api";
 
@@ -19,6 +19,9 @@ type ContactFormErrors = Partial<Record<keyof ContactFormData, string>>;
 type TouchedMap = Partial<Record<keyof ContactFormData, boolean>>;
 
 const SUPPORT_EMAIL = "hinobodysupport@gmail.com";
+const NAME_MAX = 100;
+const EMAIL_MAX = 255;
+const SUBJECT_MAX = 255;
 const MAX_MESSAGE_LENGTH = 1000;
 
 function isValidEmail(email: string) {
@@ -47,13 +50,16 @@ export default function ContactUsPage() {
 
     const name = data.name.trim();
     if (!name) nextErrors.name = t("errors.nameRequired");
+    else if (name.length > NAME_MAX) nextErrors.name = t("errors.nameTooLong", { max: NAME_MAX });
 
     const email = data.email.trim();
     if (!email) nextErrors.email = t("errors.emailRequired");
+    else if (email.length > EMAIL_MAX) nextErrors.email = t("errors.emailTooLong", { max: EMAIL_MAX });
     else if (!isValidEmail(email)) nextErrors.email = t("errors.emailInvalid");
 
     const subject = data.subject.trim();
     if (!subject) nextErrors.subject = t("errors.subjectRequired");
+    else if (subject.length > SUBJECT_MAX) nextErrors.subject = t("errors.subjectTooLong", { max: SUBJECT_MAX });
 
     const message = data.message.trim();
     if (!message) nextErrors.message = t("errors.messageRequired");
@@ -62,6 +68,13 @@ export default function ContactUsPage() {
 
     return nextErrors;
   };
+
+  const shouldValidate = useMemo(() => Object.values(touched).some(Boolean), [touched]);
+
+  useEffect(() => {
+    if (!shouldValidate) return;
+    setErrors(validate(formData));
+  }, [formData, shouldValidate]);
 
   const mailtoHref = useMemo(() => {
     const subject = `[Hinobody] ${formData.subject.trim() || t("mail.subjectFallback")}`;
@@ -81,18 +94,11 @@ export default function ContactUsPage() {
 
   const setField = <K extends keyof ContactFormData>(key: K, value: ContactFormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => {
-      if (!touched[key]) return prev;
-      const next = { ...prev };
-      const nextErrors = validate({ ...formData, [key]: value } as ContactFormData);
-      next[key] = nextErrors[key];
-      return next;
-    });
+    if (submitError) setSubmitError(null);
   };
 
   const markTouched = (key: keyof ContactFormData) => {
     setTouched((prev) => ({ ...prev, [key]: true }));
-    setErrors((prev) => ({ ...prev, ...validate(formData) }));
   };
 
   const reset = () => {
@@ -188,7 +194,7 @@ export default function ContactUsPage() {
                   <button
                     type="button"
                     onClick={handleCopy}
-                    className="inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-gray-800 text-sm font-semibold transition"
+                    className="inline-flex cursor-pointer justify-center items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-gray-800 text-sm font-semibold transition"
                   >
                     {copied ? t("success.copied") : t("success.copy")}
                   </button>
@@ -198,7 +204,7 @@ export default function ContactUsPage() {
                   <button
                     type="button"
                     onClick={reset}
-                    className="text-sm font-semibold text-teal-700 hover:text-teal-800"
+                    className="text-sm font-semibold cursor-pointer text-teal-700 hover:text-teal-800"
                   >
                     {t("success.sendAnother")}
                   </button>
@@ -224,7 +230,7 @@ export default function ContactUsPage() {
                     onChange={(e) => setField("name", e.target.value)}
                     onBlur={() => markTouched("name")}
                     placeholder={t("namePlaceholder")}
-                    maxLength={80}
+                    maxLength={NAME_MAX}
                     aria-invalid={hasError("name")}
                     className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-800 placeholder-gray-400 outline-none transition ${
                       hasError("name")
@@ -246,7 +252,7 @@ export default function ContactUsPage() {
                     onChange={(e) => setField("email", e.target.value)}
                     onBlur={() => markTouched("email")}
                     placeholder={t("emailPlaceholder")}
-                    maxLength={120}
+                    maxLength={EMAIL_MAX}
                     aria-invalid={hasError("email")}
                     className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-800 placeholder-gray-400 outline-none transition ${
                       hasError("email")
@@ -270,7 +276,7 @@ export default function ContactUsPage() {
                     onChange={(e) => setField("subject", e.target.value)}
                     onBlur={() => markTouched("subject")}
                     placeholder={t("subjectPlaceholder")}
-                    maxLength={120}
+                    maxLength={SUBJECT_MAX}
                     aria-invalid={hasError("subject")}
                     className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-gray-800 placeholder-gray-400 outline-none transition ${
                       hasError("subject")

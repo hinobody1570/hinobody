@@ -735,9 +735,12 @@
     },
     "errors": {
       "nameRequired": "お名前は必須です",
+      "nameTooLong": "お名前は{max}文字以内で入力してください",
       "emailRequired": "メールアドレスは必須です",
+      "emailTooLong": "メールアドレスは{max}文字以内で入力してください",
       "emailInvalid": "有効なメールアドレスを入力してください",
       "subjectRequired": "件名は必須です",
+      "subjectTooLong": "件名は{max}文字以内で入力してください",
       "messageRequired": "メッセージは必須です",
       "messageTooShort": "メッセージは10文字以上で入力してください",
       "messageTooLong": "メッセージは{max}文字以内で入力してください",

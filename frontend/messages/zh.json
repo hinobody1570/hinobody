@@ -735,9 +735,12 @@
     },
     "errors": {
       "nameRequired": "姓名为必填项",
+      "nameTooLong": "姓名不能超过 {max} 个字符",
       "emailRequired": "邮箱为必填项",
+      "emailTooLong": "邮箱不能超过 {max} 个字符",
       "emailInvalid": "请输入有效的邮箱地址",
       "subjectRequired": "主题为必填项",
+      "subjectTooLong": "主题不能超过 {max} 个字符",
       "messageRequired": "内容为必填项",
       "messageTooShort": "内容至少需要10个字符",
       "messageTooLong": "内容不能超过 {max} 个字符",
