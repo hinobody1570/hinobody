@@ -155,6 +155,7 @@ export default function SignupForm() {
               value={formData.email}
               error={errors.email}
               placeholder="you@example.com"
+              autoComplete="off"
             />
           </div>
 
@@ -171,13 +172,14 @@ export default function SignupForm() {
               value={formData.nickname}
               error={errors.nickname}
               placeholder="John"
+              autoComplete="off"
             />
           </div>
 
           {/* Password Field */}
           <div>
             <FormLabel required labelTitle={t("password")} htmlForTitle="password" />
-            <PasswordInput onChange={handleChange} onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
+            <PasswordInput onChange={handleChange} autoComplete="off" onKeyPress={handleKeyPress} value={formData.password} error={errors.password} />
           </div>
 
           {/* Submit Button */}
