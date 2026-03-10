@@ -1,0 +1,128 @@
+[
+  {
+    "id": "terms",
+    "title": "Hinobody Terms of Service",
+    "sections": [
+      { "number": 1, "title": "Purpose", "body": "These Terms of Service are intended to define the rights, obligations, responsibilities, conditions of use, and dispute resolution standards between the operator and users in relation to the use of Hinobody (the \"Service\")." },
+      { "number": 2, "title": "Definitions", "body": "\"User\" means any member or non-member who agrees to these Terms and uses the Service.\n\n\"Member\" means a user who has created an account.\n\n\"Content\" means all materials uploaded, written, or transmitted by users through the Service, including posts, comments, images, links, messages (chat), and profile information.\n\n\"Operator\" means the entity that operates and manages the Service." },
+      { "number": 3, "title": "Agreement to Terms and Changes", "body": "By using the Service, users are deemed to have agreed to these Terms.\n\nThe Operator may amend these Terms as necessary due to laws, service policies, or security needs, and will notify users through in-service notices or other reasonable methods. Reddit also operates under a policy update and notice structure." },
+      { "number": 4, "title": "Accounts and Registration", "body": "Members must provide accurate information and must not impersonate or use another person's information.\n\nAccount security, including password management, is the responsibility of the member, and the Operator shall not be liable for damages caused by unauthorized use by a third party unless caused by the Operator's intentional misconduct or gross negligence.\n\nThe Operator may restrict, reject, or terminate registration in the following cases:\n\n• False information\n• Identity theft\n• Repeated policy violations\n• Illegal purposes\n• System abuse, etc." },
+      { "number": 5, "title": "Nature of the Service and Medical/Beauty Disclaimer (Important)", "body": "This Service is a platform for sharing experiences and community discussion related to beauty, procedures, skincare, and aesthetic treatments.\n\nContent on the Service does not replace medical or professional advice, diagnosis, treatment, or prescription, and the Operator does not provide medical services.\n\nUsers must consult a licensed medical professional directly before making decisions related to medical or aesthetic procedures, and any results arising from use of the Service, including side effects, costs, or disputes, are the sole responsibility of the user.\n\nThe Operator does not guarantee the accuracy, timeliness, effectiveness, or safety of information on the Service." },
+      { "number": 6, "title": "User Content Rights and License", "body": "Copyright in Content shall, in principle, belong to the user who posts it.\n\nUsers grant the Operator a non-exclusive, worldwide, royalty-free, sublicensable license to use, display, distribute, and otherwise make available such Content to the extent necessary to operate, improve, present, and distribute the Service. This follows a general UGC platform structure.\n\nUsers represent and warrant that they do not infringe the copyrights, portrait rights, or personal information rights of any third party." },
+      { "number": 7, "title": "Responsibility for Photo/Image Uploads (Important)", "body": "Users represent and warrant the following regarding uploaded photos:\n\n• They took the photo themselves or otherwise have the right to upload it\n• The upload does not infringe portrait rights, privacy, copyright, or other rights\n• It does not unlawfully include another person's sensitive information, such as full facial images, resident registration numbers, medical records, or addresses\n\nUsers bear full responsibility for the act and consequences of uploading photos, and the Operator (and site administrators) shall not be liable absent intentional misconduct or gross negligence." },
+      { "number": 8, "title": "Uploaded File Storage Policy (Important)", "body": "The Service may process image files in order to provide features, such as eye masking.\n\nUploaded files that are not published as posts are, in principle, not stored permanently and are processed only within the period and scope necessary to perform the relevant feature.\n\nImages published as part of a post, including masking results, may be stored and transmitted for as long as the post remains available in order to provide the Service.\n\nUsers should avoid uploading photos containing sensitive personal information." },
+      { "number": 9, "title": "Prohibited Conduct", "body": "Users must not engage in the following:\n\n• Encouraging illegal acts or crimes, illegal transactions, or brokering\n• Infringing the rights of others, including copyright, trademark, portrait rights, or personal information rights\n• Hate, violence, harassment, threats, or discrimination\n• Pornographic content, child sexual exploitation material, or excessively graphic/explicit content in violation of policy\n• Spam, flooding, automation/bots, or causing service disruption\n• Account transfer/sale or bypassing authentication\n• Acts that may violate laws related to medical advertising, medical inducement, or brokering (see Section 10 below)\n\nReddit also treats illegal activity, harassment, and service disruption as core prohibited conduct." },
+      { "number": 10, "title": "Restrictions on Medical/Beauty Advertising and Marketing (Important)", "body": "Users must not post content that violates applicable laws or guidelines, including unlawful medical advertising, inducement or brokering of medical institutions or medical professionals, manipulated reviews, or undisclosed paid reviews.\n\nIn particular, Korean medical law may impose restrictions on the subjects and methods of medical advertising, and the Service may remove or block posts in order to comply.\n\nThe Operator does not make any final determination or guarantee as to whether user content constitutes medical advertising, and legal responsibility may belong to the poster." },
+      { "number": 11, "title": "Operator Actions (Content Management)", "body": "The Operator may take the following actions:\n\n• Delete, blind, or restrict access to content\n• Warn, temporarily suspend, or permanently suspend accounts\n• Restrict specific functions such as posting, commenting, or messaging\n\nThe Operator may take such actions within a reasonable scope to ensure service safety and legal compliance." },
+      { "number": 12, "title": "Messaging (Chat) Function", "body": "Users must not use messaging functions for spam, harassment, or illegal promotion.\n\nDisputes between users shall, in principle, be resolved by the parties themselves, and the Operator shall not intervene unless required by law, though reporting or blocking tools may be provided where necessary." },
+      { "number": 13, "title": "Disclaimer and Limitation of Liability (Important)", "body": "The Operator shall not be liable, to the extent permitted by law, for the following:\n\n• Accuracy or reliability of user-generated content\n• Decisions made based on medical/beauty information\n• Disputes, fraud, or rights violations between users\n• Failures of third-party services, including payment providers, social login providers, cloud services, and CDNs\n\nEven if damages are recognized against the Operator, liability may be limited to the extent permitted by law." },
+      { "number": 14, "title": "Reporting and Rights Infringement Response", "body": "Users may report illegal or rights-infringing content through the designated reporting/contact channel, and the Operator may take action in accordance with applicable law and policy." },
+      { "number": 15, "title": "Service Suspension", "body": "The Operator may temporarily suspend the Service due to maintenance, failures, third-party service issues, or operational necessity." },
+      { "number": 16, "title": "Governing Law and Disputes", "body": "These Terms shall be governed by the laws of the Republic of Korea, and disputes shall be subject to the jurisdiction of the competent court.\n\n(This clause should be adjusted depending on the actual operating entity and jurisdiction.)" }
+    ]
+  },
+  {
+    "id": "privacy",
+    "title": "Privacy Policy",
+    "sections": [
+      { "number": 1, "title": "Categories of Personal Information Collected", "body": "Required:\n• Email address\n• Username (nickname)\n• Password hash (the original password is not stored)\n• Login records\n\nOptional:\n• Profile information entered by the user, such as introduction or links\n\nAutomatically collected:\n• Access logs\n• IP address\n• Device/browser information\n• Cookies/identifiers\n• Usage records" },
+      { "number": 2, "title": "Purposes of Use", "body": "• Registration and identity verification\n• Login processing\n• Providing services such as posts, comments, and messages\n• Security and fraud/abuse prevention\n• Customer support\n• Service improvement/statistics, to the extent possible through de-identification or aggregation" },
+      { "number": 3, "title": "Retention and Use Period", "body": "Personal information is, in principle, destroyed without delay when a user withdraws membership.\n\nHowever, where retention is required by applicable law, such information may be kept for the relevant statutory period and then destroyed.\n\n(Guidelines generally emphasize principles and procedures for destruction.)" },
+      { "number": 4, "title": "Destruction Procedures and Methods", "body": "Electronic files: deleted using irreversible methods\n\nPrinted materials: shredded or incinerated" },
+      { "number": 5, "title": "Third-Party Provision and Outsourcing", "body": "Personal information is not provided to third parties without consent in principle.\n\nHowever, outsourcing to external providers may occur for service operation, including for example:\n\n• Cloud/hosting (servers)\n• Image storage (such as S3)\n• Email delivery (such as Resend)\n• Social login (Google/Apple)\n• Analytics tools (optional)\n\nAny outsourcing will be subject to contracts, management, and supervision in accordance with applicable law." },
+      { "number": 6, "title": "User Rights", "body": "Users may request access to, correction of, deletion of, or suspension of processing of their personal information. Requests may be submitted to hinobodysupport@gmail.com." },
+      { "number": 7, "title": "Children/Youth (Age) Policy", "body": "The Service may, in principle, restrict or require additional parental/legal guardian consent for users below the age that requires such consent by law (for example, under age 14).\n\nThe Operator may introduce age verification or restriction features.\n\n(Recent platforms face increasing regulation and enforcement related to protection of children's data.)" },
+      { "number": 8, "title": "Security", "body": "The Operator implements reasonable technical and administrative safeguards. However, due to the nature of the Internet, 100% security cannot be guaranteed." },
+      { "number": 9, "title": "Contact", "body": "For privacy-related inquiries: hinobodysupport@gmail.com" }
+    ]
+  },
+  {
+    "id": "cookies",
+    "title": "Cookie Notice",
+    "sections": [
+      { "number": 1, "title": "Use of Cookies", "body": "Hinobody may use cookies and similar technologies in order to maintain login sessions, provide security, store language settings, and support core service functions.\n\nRequired cookies:\n• Login sessions\n• Security tokens\n• Language settings\n\nOptional cookies (if introduced):\n• Traffic analytics\n• Performance improvement\n\nUsers may refuse cookie storage through browser settings, but some functions may be limited as a result." }
+    ]
+  },
+  {
+    "id": "content",
+    "title": "Content Policy & Community Guidelines",
+    "sections": [
+      { "number": 1, "title": "Safety and Respect", "body": "• No harassment, hate, discrimination, or incitement of violence\n• No insulting others based on appearance, illness, disability, nationality, gender, etc." },
+      { "number": 2, "title": "Protection of Personal and Sensitive Information", "body": "• No disclosure of others' real names, contact information, addresses, medical information, etc.\n• Even users posting their own content should be cautious when uploading sensitive medical images such as full-face images or medical records" },
+      { "number": 3, "title": "Guidelines for Posting Medical/Procedure Information", "body": "• Personal experience-based writing is encouraged\n• Statements that definitively prescribe treatment, medication, diagnosis, or similar content that may be mistaken for medical practice are prohibited\n• Exaggerated or false information is prohibited" },
+      { "number": 4, "title": "Advertising/Promotion/Paid Reviews", "body": "• Reviews or promotions created in exchange for compensation must clearly disclose advertisement/sponsorship\n• Illegal medical advertising, inducement/brokering, and manipulated reviews are prohibited\n• Spam links and repetitive posting are prohibited" },
+      { "number": 5, "title": "Image / Before-and-After Photo Guidelines", "body": "• Before-and-after photos may easily identify individuals and should be handled carefully\n• Uploading a third party's photo without explicit consent is prohibited\n• Use of mosaic/masking tools is recommended" },
+      { "number": 6, "title": "Reporting / Sanctions", "body": "Users may report content that violates policy.\n\nThe Operator may issue warnings, remove content, limit functions, or suspend accounts." }
+    ]
+  },
+  {
+    "id": "takedown",
+    "title": "Notice & Takedown",
+    "sections": [
+      { "number": 1, "title": "Filing a Report", "body": "A rights holder (or agent) may request action by email, including the following:\n\n• URL/location of the allegedly infringing content\n• Evidence of rights ownership (copyright, trademark, portrait rights, etc.)\n• Contact information\n• A statement of good-faith reporting and responsibility for false claims\n\nEmail: hinobodysupport@gmail.com (or support email)" },
+      { "number": 2, "title": "Actions", "body": "After review, the Operator may:\n\n• Temporarily block or remove content\n• Request additional materials\n• Provide notice and restoration/counter-notice procedures" },
+      { "number": 3, "title": "Repeat Infringers", "body": "Accounts repeatedly found to infringe rights may be restricted or terminated." }
+    ]
+  },
+  {
+    "id": "accessibility",
+    "title": "Accessibility Statement",
+    "sections": [
+      { "number": 1, "title": "Commitment", "body": "Hinobody aims to provide an accessible service for a wide range of users.\n\n• Support for mobile and desktop environments\n• Gradual improvement of keyboard accessibility, color contrast, and similar accessibility features\n\nTo report accessibility issues: hinobodysupport@gmail.com" }
+    ]
+  },
+  {
+    "id": "advertising",
+    "title": "Advertising & Marketing Policy",
+    "sections": [
+      { "number": 1, "title": "Policy", "body": "Hinobody may restrict advertising and marketing activities in order to protect users and comply with applicable law.\n\n• Promotion related to medical institutions or procedures must comply with applicable laws, and content that may violate them may be removed or sanctioned.\n• Paid content must be clearly disclosed.\n• Spam, automated promotion, and flooding are prohibited.\n• The Operator may restrict advertising accounts or content without prior notice." }
+    ]
+  },
+  {
+    "id": "moderation",
+    "title": "Community Moderation Policy",
+    "sections": [
+      { "number": 1, "title": "Moderator Powers", "body": "The Operator may exercise the following powers:\n\n• Review reported posts\n• Delete or hide posts\n• Delete comments\n• Warn users\n• Temporarily suspend accounts\n• Permanently suspend accounts\n• Restrict specific functions such as posting, commenting, or messaging\n\nThese actions are taken within a reasonable scope for policy enforcement and legal compliance." },
+      { "number": 2, "title": "Enforcement Levels", "body": "Depending on the seriousness of the violation, the Operator may take the following actions:\n\n• Level 1 — Warning\n• Level 2 — Post deletion\n• Level 3 — Temporary account restriction\n• Level 4 — Permanent account suspension\n\nSerious violations, such as illegal content, child sexual exploitation material, fraud, or exposure of personal information, may result in immediate permanent suspension." },
+      { "number": 3, "title": "Reporting System", "body": "Users may report the following content:\n\n• Illegal content\n• False medical information\n• Advertising in violation of medical law\n• Harassment / hate speech\n• Copyright infringement\n• Exposure of personal information\n\nReporting email: hinobodysupport@gmail.com" },
+      { "number": 4, "title": "Community Operating Principles", "body": "Hinobody is operated based on the following principles:\n\n• Maintaining a safe community environment\n• Protecting users\n• Sharing lawful information\n• Transparent content management" }
+    ]
+  },
+  {
+    "id": "dmca",
+    "title": "DMCA / Copyright Takedown Policy",
+    "sections": [
+      { "number": 1, "title": "Copyright Infringement Reports", "body": "A copyright owner or agent may report infringement by including the following:\n\n• URL or location of the infringing content\n• Evidence of copyright ownership\n• Contact information of the reporter\n• Good-faith statement\n\nReporting email: hinobodysupport@gmail.com" },
+      { "number": 2, "title": "Procedure", "body": "After reviewing the report, the Operator may take the following actions:\n\n• Temporarily block content\n• Delete content\n• Notify the poster\n• Request additional materials" },
+      { "number": 3, "title": "Counter Notice", "body": "A poster may submit a counter notice if they believe their content is lawful." },
+      { "number": 4, "title": "Repeat Infringer Policy", "body": "Accounts repeatedly found to infringe copyright may be subject to:\n\n• Restriction of posting functions\n• Account suspension\n• Permanent account deletion" }
+    ]
+  },
+  {
+    "id": "safety",
+    "title": "User Safety Policy",
+    "sections": [
+      { "number": 1, "title": "Prohibition of Harassment and Hate Speech", "body": "The following conduct is prohibited:\n\n• Sexual harassment\n• Harassment\n• Threats\n• Hate speech\n• Discrimination against specific groups" },
+      { "number": 2, "title": "Prohibition of Illegal Medical Advertising and Procedure Inducement", "body": "The following conduct is prohibited:\n\n• Illegal medical advertising\n• Brokering of medical institutions\n• Undisclosed compensated reviews\n• False claims about treatment effects\n• Inducing unlawful procedures\n\nPosts that may violate Korean medical law or other applicable laws may be removed." },
+      { "number": 3, "title": "Protection of Minors", "body": "Hinobody strictly prohibits the following content:\n\n• Child sexual exploitation content\n• Inappropriate content targeting minors\n• Disclosure of minors' personal information\n\nIf such content is discovered, it may be removed immediately and the account may be suspended." },
+      { "number": 4, "title": "Report Handling Standards (SLA)", "body": "The Operator aims to handle reports according to the following standards where reasonably possible:\n\n• Urgent dangerous content → Action as quickly as possible\n• General policy violations → Review within a reasonable time\n\nInquiry/report email: hinobodysupport@gmail.com" },
+      { "number": 5, "title": "User Blocking Functions", "body": "Users may protect themselves from unwanted users through the following:\n\n• Message blocking\n• User blocking" }
+    ]
+  },
+  {
+    "id": "transparency",
+    "title": "Transparency & Enforcement Policy",
+    "sections": [
+      { "number": 1, "title": "Disclosure", "body": "Hinobody seeks to maintain transparency to strengthen trust in the community.\n\nUpon request or where necessary, the Operator may disclose:\n\n• Number of removed contents\n• Number of suspended accounts\n• Statistics by policy violation type\n\nThis is intended to maintain fairness in community safety and policy enforcement.\n\nInquiry email: hinobodysupport@gmail.com" }
+    ]
+  },
+  {
+    "id": "security",
+    "title": "Security Policy",
+    "sections": [
+      { "number": 1, "title": "Vulnerability Reporting", "body": "If a security vulnerability is discovered, it may be reported to: hinobodysupport@gmail.com" },
+      { "number": 2, "title": "Responsible Disclosure", "body": "Users who discover vulnerabilities must follow these principles:\n\n• Do not exploit the vulnerability\n• Do not access user data\n• Report the vulnerability to the Operator before public disclosure" },
+      { "number": 3, "title": "Security Response", "body": "The Operator will review vulnerability reports and take corrective action within a reasonable period." }
+    ]
+  }
+]

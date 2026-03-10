@@ -17,6 +17,7 @@ import { ConfirmationModal } from "../modals/ConfirmationModal";
 import { ReportModal } from "../modals/ReportModal";
 import { DropdownMenu } from "./DropDownMenu";
 import { ImageSlider } from "./ImageSlider";
+import { LoginRequiredModal } from "../modals/LoginRequiredModal";
 
 interface PostCardProps {
   post: any;
@@ -48,8 +49,14 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [commentCount, setCommentCount] = useState(commentCountProp ?? post?.comments ?? 0);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const isAuthor = currentUser?.id && post?.authorId && currentUser.id === post.authorId;
+
+  const redirectToLogin = () => {
+    const current = `${window.location.pathname}${window.location.search}`;
+    router.push(`${ROUTE_PATHS.LOGIN}?redirect=${encodeURIComponent(current)}`);
+  };
 
   // Use prop override when provided (e.g. post detail page), otherwise sync from post
   const displayCommentCount = commentCountProp !== undefined ? commentCountProp : commentCount;
@@ -85,7 +92,11 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
   }, [post?.id, isAuthenticated]);
 
   const handleUpvote = async () => {
-    if (!isAuthenticated || !post.id || isVoting) return;
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!post.id || isVoting) return;
 
     try {
       setIsVoting(true);
@@ -114,7 +125,11 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
   };
 
   const handleDownvote = async () => {
-    if (!isAuthenticated || !post.id || isVoting) return;
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!post.id || isVoting) return;
 
     try {
       setIsVoting(true);
@@ -332,20 +347,20 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
         <div className="flex items-center bg-gray-100 rounded-full">
           <button
             onClick={handleUpvote}
-            disabled={!isAuthenticated || isVoting}
+            disabled={isVoting}
             className={`p-1.5 hover:bg-gray-200 cursor-pointer rounded-l-full transition-colors ${
               voteState === "up" ? "text-orange-500" : "text-gray-600"
-            } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
+            } ${isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <HiOutlineThumbUp size={20} fill={voteState === "up" ? "currentColor" : "none"} />
           </button>
           <span className="px-2 text-sm font-bold text-gray-800 min-w-[40px] text-center">{upvotes - downvotes}</span>
           <button
             onClick={handleDownvote}
-            disabled={!isAuthenticated || isVoting}
+            disabled={isVoting}
             className={`p-1.5 hover:bg-gray-200 cursor-pointer rounded-r-full transition-colors ${
               voteState === "down" ? "text-blue-500" : "text-gray-600"
-            } ${!isAuthenticated || isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
+            } ${isVoting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <HiOutlineThumbDown size={20} fill={voteState === "down" ? "currentColor" : "none"} />
           </button>
@@ -401,6 +416,12 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
         cancelText={tPostCard("cancel")}
         confirmButtonColor="red"
         isLoading={isDeleting}
+      />
+
+      <LoginRequiredModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLogin={redirectToLogin}
       />
     </article>
   );

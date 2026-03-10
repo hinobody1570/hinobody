@@ -10,23 +10,23 @@ const PostingGuide = () => {
       <ul className="space-y-1.5 sm:space-y-2 text-sm text-gray-600">
         <li className="flex items-start gap-2">
           <span className="text-gray-400">•</span>
-          <span>{t("guidelines.rememberHuman")}</span>
+          <span>{t("guidelines.photoResponsibility")}</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-gray-400">•</span>
-          <span>{t("guidelines.behaveRealLife")}</span>
+          <span>{t("guidelines.unpublishedNotStored")}</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-gray-400">•</span>
-          <span>{t("guidelines.originalSource")}</span>
+          <span>{t("guidelines.noMedicalAdvice")}</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-gray-400">•</span>
-          <span>{t("guidelines.searchDuplicates")}</span>
+          <span>{t("guidelines.consultMedicalProfessional")}</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-gray-400">•</span>
-          <span>{t("guidelines.readRules")}</span>
+          <span>{t("guidelines.contentResponsibility")}</span>
         </li>
       </ul>
     </div>

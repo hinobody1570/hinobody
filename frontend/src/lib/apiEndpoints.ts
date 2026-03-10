@@ -27,4 +27,5 @@ export const API_END_POINT = {
     CHAT_CONTACTS: "/chat/contacts",
     CHAT_USERS: "/chat/users",
     CHAT_MESSAGES: "/chat/messages",
+    CONTACT_SUBMISSIONS: "/contact-submissions",
 }

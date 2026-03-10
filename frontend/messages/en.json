@@ -2,7 +2,11 @@
   "common": {
     "loading": "Loading...",
     "welcome": "Welcome to HiNobody",
-    "description": "Next.js + NestJS with TypeScript"
+    "description": "Next.js + NestJS with TypeScript",
+    "close": "Close",
+    "login": "Login",
+    "loginRequiredTitle": "Login required",
+    "loginRequiredBody": "Please login first to use this functionality."
   },
   "timeAgo": {
     "secAgo": "{count} sec. ago",
@@ -241,6 +245,7 @@
     "posts": "Posts",
     "boards": "Boards",
     "memberships": "Memberships",
+    "contactSubmissions": "Contact Us",
     "backToHome": "Back to Home",
     "adminPanel": "Admin Panel",
     "adminPanelTitle": "HiNobody Admin",
@@ -268,6 +273,10 @@
     "comments": "Comments",
     "name": "Name",
     "category": "Category",
+    "subject": "Subject",
+    "message": "Message",
+    "priority": "Priority",
+    "resolvedAt": "Resolved At",
     "description": "Description",
     "visibility": "Visibility",
     "loading": "Loading...",
@@ -300,6 +309,24 @@
     "viewDetails": "View Details",
     "approve": "Approve",
     "reject": "Reject",
+    "updatePriority": "Update Priority",
+    "statusInProgress": "In Progress",
+    "statusClosed": "Closed",
+    "priorityLow": "Low",
+    "priorityNormal": "Normal",
+    "priorityHigh": "High",
+    "priorityCritical": "Critical",
+    "errorLoadingContactSubmissions": "Failed to load contact submissions",
+    "errorLoadingContactSubmission": "Failed to load contact submission",
+    "contactSubmissionNotFound": "Contact submission not found",
+    "backToContactSubmissions": "Back to Contact Us",
+    "contactSubmissionDetails": "Contact submission details",
+    "contactSubmissionUpdated": "Contact submission updated",
+    "updateContactSubmissionError": "Failed to update contact submission",
+    "deleteContactSubmission": "Delete contact submission",
+    "confirmDeleteContactSubmissionDescription": "Are you sure you want to delete this contact submission? This action cannot be undone.",
+    "contactSubmissionDeleted": "Contact submission deleted",
+    "deleteContactSubmissionError": "Failed to delete contact submission",
     "approveMembership": "Approve Membership",
     "rejectMembership": "Reject Membership",
     "deleteMembership": "Delete Membership",
@@ -490,7 +517,10 @@
     "help": "Help",
     "blog": "Blog",
     "careers": "Careers",
-    "press": "Press"
+    "press": "Press",
+    "termsAndGuide": "Terms & support",
+    "policy": "Policy",
+    "contactUs": "Contact us"
   },
   "auth": {
     "login": "Login",
@@ -530,7 +560,8 @@
       "passwordMinLength8": "Password must be at least 8 characters",
       "orContinueWith": "Or continue with",
       "continueWithGoogle": "Continue with Google",
-      "continueWithApple": "Continue with Apple"
+      "continueWithApple": "Continue with Apple",
+      "guestUser": "Guest user"
     },
     "processing": "Processing authentication...",
     "passwordInvalidFormat": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
@@ -673,6 +704,69 @@
     "contactDescription": "For inquiries or support, please contact us through the application.",
     "backToHome": "Back to Home"
   },
+  "policy": {
+    "title": "Policy",
+    "intro": "Please review our policies and guidelines.",
+    "backToHome": "Back to Home"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "intro": "For inquiries or support, please reach out through the form below.",
+    "cardTitle": "Send us a message",
+    "cardSubtitle": "We’ll get back to you as soon as possible.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "What is this about?",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Please include as much detail as possible.",
+    "requiredFields": "Required fields",
+    "sendButton": "Send",
+    "sendingButton": "Sending...",
+    "categories": {
+      "label": "Category (optional)",
+      "placeholder": "Select a category",
+      "general": "General",
+      "support": "Support",
+      "policy": "Policy",
+      "report": "Report",
+      "other": "Other"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name must be {max} characters or less",
+      "emailRequired": "Email is required",
+      "emailTooLong": "Email must be {max} characters or less",
+      "emailInvalid": "Please enter a valid email address",
+      "subjectRequired": "Subject is required",
+      "subjectTooLong": "Subject must be {max} characters or less",
+      "messageRequired": "Message is required",
+      "messageTooShort": "Message must be at least 10 characters",
+      "messageTooLong": "Message must be {max} characters or less",
+      "submitFailed": "Failed to send. Please try again."
+    },
+    "mail": {
+      "subjectFallback": "Contact request",
+      "name": "Name",
+      "email": "Email",
+      "category": "Category",
+      "message": "Message"
+    },
+    "success": {
+      "title": "Message received",
+      "body": "Thanks — we received your message. We’ll get back to you soon. If you need to follow up, email us at {email}.",
+      "openEmail": "Email us",
+      "copy": "Copy message",
+      "copied": "Copied",
+      "sendAnother": "Send another message"
+    },
+    "footer": {
+      "emailUs": "Or email us at"
+    },
+    "backToHome": "Back to Home"
+  },
   "dummyExample": {
     "title": "Dummy Example Route",
     "description": "This is a dummy route created for understanding the routing system.",
@@ -741,11 +835,11 @@
     "requestRejected": "Your request to join this board was rejected. You cannot post in this board.",
     "postingGuidelines": "Posting Guidelines",
     "guidelines": {
-      "rememberHuman": "Remember the human",
-      "behaveRealLife": "Behave like you would in real life",
-      "originalSource": "Look for the original source of content",
-      "searchDuplicates": "Search for duplicates before posting",
-      "readRules": "Read the community's rules"
+      "photoResponsibility": "Users are responsible for uploaded photos and must not infringe others’ rights.",
+      "unpublishedNotStored": "Unpublished uploads are not stored permanently.",
+      "noMedicalAdvice": "Hinobody does not provide medical advice.",
+      "consultMedicalProfessional": "All procedures or treatment decisions should be made with a licensed medical professional.",
+      "contentResponsibility": "Users are responsible for their content."
     },
     "characters": "characters",
     "posting": "Posting...",

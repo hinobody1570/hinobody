@@ -2,7 +2,11 @@
   "common": {
     "loading": "読み込み中...",
     "welcome": "HiNobodyへようこそ",
-    "description": "Next.js + NestJS with TypeScript"
+    "description": "Next.js + NestJS with TypeScript",
+    "close": "閉じる",
+    "login": "ログイン",
+    "loginRequiredTitle": "ログインが必要です",
+    "loginRequiredBody": "この機能を利用するには、まずログインしてください。"
   },
   "timeAgo": {
     "secAgo": "{count}秒前",
@@ -241,6 +245,7 @@
     "posts": "投稿",
     "boards": "ボード",
     "memberships": "メンバーシップ",
+    "contactSubmissions": "お問い合わせ",
     "backToHome": "ホームに戻る",
     "adminPanel": "管理パネル",
     "adminPanelTitle": "HiNobody 管理",
@@ -268,6 +273,10 @@
     "comments": "コメント",
     "name": "名前",
     "category": "カテゴリ",
+    "subject": "件名",
+    "message": "メッセージ",
+    "priority": "優先度",
+    "resolvedAt": "解決日時",
     "description": "説明",
     "visibility": "公開設定",
     "loading": "読み込み中...",
@@ -397,9 +406,27 @@
     "selectStatus": "ステータスを選択",
     "update": "更新",
     "statusPending": "保留中",
+    "statusInProgress": "対応中",
     "statusReviewed": "レビュー済み",
     "statusResolved": "解決済み",
     "statusDismissed": "却下",
+    "statusClosed": "クローズ",
+    "updatePriority": "優先度を更新",
+    "priorityLow": "低",
+    "priorityNormal": "通常",
+    "priorityHigh": "高",
+    "priorityCritical": "緊急",
+    "errorLoadingContactSubmissions": "お問い合わせの読み込みに失敗しました",
+    "errorLoadingContactSubmission": "お問い合わせの読み込みに失敗しました",
+    "contactSubmissionNotFound": "お問い合わせが見つかりません",
+    "backToContactSubmissions": "お問い合わせ一覧に戻る",
+    "contactSubmissionDetails": "お問い合わせの詳細",
+    "contactSubmissionUpdated": "お問い合わせを更新しました",
+    "updateContactSubmissionError": "お問い合わせの更新に失敗しました",
+    "deleteContactSubmission": "お問い合わせを削除",
+    "confirmDeleteContactSubmissionDescription": "このお問い合わせを削除してもよろしいですか？この操作は取り消せません。",
+    "contactSubmissionDeleted": "お問い合わせを削除しました",
+    "deleteContactSubmissionError": "お問い合わせの削除に失敗しました",
     "reportStatusUpdated": "報告ステータスが正常に更新されました",
     "updateReportStatusError": "報告ステータスの更新に失敗しました",
     "deleteReport": "報告を削除",
@@ -490,7 +517,10 @@
     "help": "ヘルプ",
     "blog": "ブログ",
     "careers": "採用",
-    "press": "プレス"
+    "press": "プレス",
+    "termsAndGuide": "利用規約とサポート",
+    "policy": "ポリシー",
+    "contactUs": "お問い合わせ"
   },
   "auth": {
     "login": "ログイン",
@@ -530,7 +560,8 @@
       "passwordMinLength8": "パスワードは少なくとも8文字である必要があります",
       "orContinueWith": "または次で続行",
       "continueWithGoogle": "Googleで続行",
-      "continueWithApple": "Appleで続行"
+      "continueWithApple": "Appleで続行",
+      "guestUser": "ゲストユーザー"
     },
     "passwordInvalidFormat": "パスワードは8文字以上で、大文字、小文字、数字、特殊文字を含む必要があります。",
     "registerPage": {
@@ -672,6 +703,69 @@
     "contactDescription": "お問い合わせやサポートについては、アプリケーションを通じてお問い合わせください。",
     "backToHome": "ホームに戻る"
   },
+  "policy": {
+    "title": "ポリシー",
+    "intro": "ポリシーとガイドラインをご確認ください。",
+    "backToHome": "ホームに戻る"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "intro": "お問い合わせやサポートが必要な場合は、以下のフォームからご連絡ください。",
+    "cardTitle": "メッセージを送信",
+    "cardSubtitle": "できるだけ早くご返信いたします。",
+    "nameLabel": "お名前",
+    "namePlaceholder": "お名前を入力",
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "件名",
+    "subjectPlaceholder": "お問い合わせ内容の概要",
+    "messageLabel": "メッセージ",
+    "messagePlaceholder": "できるだけ詳しくご記入ください。",
+    "requiredFields": "必須項目です",
+    "sendButton": "送信",
+    "sendingButton": "送信中...",
+    "categories": {
+      "label": "カテゴリ（任意）",
+      "placeholder": "カテゴリを選択",
+      "general": "一般",
+      "support": "サポート",
+      "policy": "ポリシー",
+      "report": "報告",
+      "other": "その他"
+    },
+    "errors": {
+      "nameRequired": "お名前は必須です",
+      "nameTooLong": "お名前は{max}文字以内で入力してください",
+      "emailRequired": "メールアドレスは必須です",
+      "emailTooLong": "メールアドレスは{max}文字以内で入力してください",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "subjectRequired": "件名は必須です",
+      "subjectTooLong": "件名は{max}文字以内で入力してください",
+      "messageRequired": "メッセージは必須です",
+      "messageTooShort": "メッセージは10文字以上で入力してください",
+      "messageTooLong": "メッセージは{max}文字以内で入力してください",
+      "submitFailed": "送信に失敗しました。時間をおいて再度お試しください。"
+    },
+    "mail": {
+      "subjectFallback": "お問い合わせ",
+      "name": "お名前",
+      "email": "メールアドレス",
+      "category": "カテゴリ",
+      "message": "メッセージ"
+    },
+    "success": {
+      "title": "メッセージを受け付けました",
+      "body": "ありがとうございます。メッセージを受け付けました。できるだけ早く返信します。追記や緊急の場合は {email} までご連絡ください。",
+      "openEmail": "メールする",
+      "copy": "メッセージをコピー",
+      "copied": "コピーしました",
+      "sendAnother": "別のメッセージを送る"
+    },
+    "footer": {
+      "emailUs": "または次のアドレスへメールしてください"
+    },
+    "backToHome": "ホームに戻る"
+  },
   "dummyExample": {
     "title": "ダミー例ルート",
     "description": "ルーティングシステムを理解するために作成されたダミールートです。",
@@ -740,11 +834,11 @@
     "requestRejected": "このボードへの参加リクエストは拒否されました。このボードには投稿できません。",
     "postingGuidelines": "投稿ガイドライン",
     "guidelines": {
-      "rememberHuman": "人間を思い出してください",
-      "behaveRealLife": "実生活のように行動してください",
-      "originalSource": "コンテンツの元のソースを探してください",
-      "searchDuplicates": "投稿前に重複を検索してください",
-      "readRules": "コミュニティのルールを読んでください"
+      "photoResponsibility": "アップロードした写真の責任はユーザーにあり、他人の権利を侵害してはなりません。",
+      "unpublishedNotStored": "未公開のアップロードは永続的に保存されません。",
+      "noMedicalAdvice": "Hinobodyは医療アドバイスを提供しません。",
+      "consultMedicalProfessional": "すべての処置や治療の決定は、資格を持つ医療専門家と相談して行ってください。",
+      "contentResponsibility": "ユーザーは自身のコンテンツに責任を負います。"
     },
     "characters": "文字",
     "posting": "投稿中...",

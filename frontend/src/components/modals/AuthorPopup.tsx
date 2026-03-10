@@ -64,9 +64,9 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
   };
 
   const handleSendMessage = () => {
-    router.push(`${ROUTE_PATHS.CHAT}`);
+    // router.push(`${ROUTE_PATHS.CHAT}`);
 
-    // showInfo(tPostCard("sendMessageComingSoon") || "Send message - Coming soon");
+    showInfo(tPostCard("sendMessageComingSoon") || "Send message - Coming soon");
     setIsOpen(false);
   };
 

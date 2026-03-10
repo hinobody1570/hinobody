@@ -17,6 +17,7 @@ import { QueryCommentsDto } from './dto/query-comments.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 
 @Controller('comments')
 export class CommentController {
@@ -52,8 +53,7 @@ export class CommentController {
   }
 
   @Get('post/:postId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Get comments by post ID with pagination and search' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
@@ -62,14 +62,13 @@ export class CommentController {
   findByPost(
     @Param('postId') postId: string,
     @Query() query: QueryCommentsDto,
-    @GetUser('id') userId: string,
+    @GetUser('id') userId?: string,
   ) {
     return this.commentService.findByPost(postId, { ...query, postId }, userId);
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
+  @UseGuards(OptionalJwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.commentService.findOne(id);
   }

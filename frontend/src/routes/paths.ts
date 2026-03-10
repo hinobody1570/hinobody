@@ -19,6 +19,8 @@ export const ROUTE_PATHS = {
     POST_DETAIL: "/main/post",
     SETTINGS: "/main/settings",
     ABOUT: "/main/about",
+    POLICY: "/main/policy",
+    CONTACT_US: "/main/contact-us",
     DUMMY_EXAMPLE : "/main/dummy-example",
     CREATE_POST: "/main/create-post",
     HOME: "/main/home",
@@ -35,5 +37,6 @@ export const ROUTE_PATHS = {
     ADMIN_EYE_MASKING: "/admin/eye-masking",
     ADMIN_REPORTS: "/admin/reports",
     ADMIN_BLOCKS: "/admin/blocks",
-    ADMIN_MEMBERSHIPS: "/admin/memberships"
+    ADMIN_MEMBERSHIPS: "/admin/memberships",
+    ADMIN_CONTACT_SUBMISSIONS: "/admin/contact-submissions"
 }

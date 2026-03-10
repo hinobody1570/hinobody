@@ -6,10 +6,13 @@ import { useToast } from '@/contexts/ToastContext';
 import { commentsApi, Comment as CommentType, Language } from '@/lib/api';
 import { formatTimestamp } from '@/utils/helperFunction';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { ROUTE_PATHS } from '@/routes/paths';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BiChevronDown, BiSearch } from 'react-icons/bi';
 import DP from '../../../public/assets/images/avatar_default_4.png';
 import Comment from './Comment';
+import { LoginRequiredModal } from '../modals/LoginRequiredModal';
 
 
 // Transform API comment to Comment component format
@@ -45,6 +48,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
+  const router = useRouter();
   const t = useTranslations('comments');
   const tRef = useRef(t);
   tRef.current = t;
@@ -61,6 +65,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
   const [observerTarget, setObserverTarget] = useState<HTMLDivElement | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -160,7 +165,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      showError(t('pleaseLoginToComment'));
+      setLoginModalOpen(true);
       return;
     }
 
@@ -200,18 +205,32 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={isAuthenticated ? t('joinConversation') : t('loginToComment')}
-            disabled={!isAuthenticated || isSubmitting}
+            onFocus={() => {
+              if (!isAuthenticated) {
+                setLoginModalOpen(true);
+              }
+            }}
+            disabled={isSubmitting}
             className="flex-1 min-w-0 px-4 py-3 bg-gray-50 border border-gray-300 rounded-full text-base sm:text-inherit focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <button
             type="submit"
-            disabled={!isAuthenticated || isSubmitting || !newComment.trim()}
+            disabled={isSubmitting || !newComment.trim()}
             className="w-full sm:w-auto min-h-[44px] sm:min-h-0 px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation flex-shrink-0"
           >
             {isSubmitting ? t('posting') : t('post')}
           </button>
         </div>
       </form>
+
+      <LoginRequiredModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLogin={() => {
+          const current = `${window.location.pathname}${window.location.search}`;
+          router.push(`${ROUTE_PATHS.LOGIN}?redirect=${encodeURIComponent(current)}`);
+        }}
+      />
 
       {/* Sort and Search - stacked on mobile, row on tablet+ */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 mb-4 sm:mb-6">

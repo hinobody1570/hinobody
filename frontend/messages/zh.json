@@ -2,7 +2,11 @@
   "common": {
     "loading": "加载中...",
     "welcome": "欢迎来到 HiNobody",
-    "description": "Next.js + NestJS with TypeScript"
+    "description": "Next.js + NestJS with TypeScript",
+    "close": "关闭",
+    "login": "登录",
+    "loginRequiredTitle": "需要登录",
+    "loginRequiredBody": "使用此功能前请先登录。"
   },
   "timeAgo": {
     "secAgo": "{count} 秒前",
@@ -242,6 +246,7 @@
     "boards": "看板",
     "memberships": "成员资格",
     "boardCategories": "看板分类",
+    "contactSubmissions": "联系消息",
     "backToHome": "返回首页",
     "adminPanel": "管理面板",
     "adminPanelTitle": "HiNobody 管理",
@@ -269,6 +274,10 @@
     "comments": "评论",
     "name": "名称",
     "category": "分类",
+    "subject": "主题",
+    "message": "内容",
+    "priority": "优先级",
+    "resolvedAt": "解决时间",
     "description": "描述",
     "visibility": "可见性",
     "loading": "加载中...",
@@ -398,9 +407,27 @@
     "selectStatus": "选择状态",
     "update": "更新",
     "statusPending": "待处理",
+    "statusInProgress": "处理中",
     "statusReviewed": "已审查",
     "statusResolved": "已解决",
     "statusDismissed": "已驳回",
+    "statusClosed": "已关闭",
+    "updatePriority": "更新优先级",
+    "priorityLow": "低",
+    "priorityNormal": "普通",
+    "priorityHigh": "高",
+    "priorityCritical": "紧急",
+    "errorLoadingContactSubmissions": "加载联系消息失败",
+    "errorLoadingContactSubmission": "加载联系消息失败",
+    "contactSubmissionNotFound": "未找到联系消息",
+    "backToContactSubmissions": "返回联系消息",
+    "contactSubmissionDetails": "联系消息详情",
+    "contactSubmissionUpdated": "联系消息已更新",
+    "updateContactSubmissionError": "更新联系消息失败",
+    "deleteContactSubmission": "删除联系消息",
+    "confirmDeleteContactSubmissionDescription": "确定要删除这条联系消息吗？此操作无法撤销。",
+    "contactSubmissionDeleted": "联系消息已删除",
+    "deleteContactSubmissionError": "删除联系消息失败",
     "reportStatusUpdated": "举报状态更新成功",
     "updateReportStatusError": "更新举报状态失败",
     "deleteReport": "删除举报",
@@ -490,7 +517,10 @@
     "help": "帮助",
     "blog": "博客",
     "careers": "招聘",
-    "press": "新闻"
+    "press": "新闻",
+    "termsAndGuide": "条款与支持",
+    "policy": "政策",
+    "contactUs": "联系我们"
   },
   "auth": {
     "login": "登录",
@@ -530,7 +560,8 @@
       "passwordMinLength8": "密码必须至少 8 个字符",
       "orContinueWith": "或使用以下方式继续",
       "continueWithGoogle": "使用 Google 继续",
-      "continueWithApple": "使用 Apple 继续"
+      "continueWithApple": "使用 Apple 继续",
+      "guestUser": "游客用户"
     },
     "passwordInvalidFormat": "密码必须至少 8 个字符，并包含大写字母、小写字母、数字和特殊字符。",
     "registerPage": {
@@ -672,6 +703,69 @@
     "contactDescription": "如有疑问或需要支持，请通过应用程序联系我们。",
     "backToHome": "返回首页"
   },
+  "policy": {
+    "title": "政策",
+    "intro": "请查阅我们的政策和指南。",
+    "backToHome": "返回首页"
+  },
+  "contact": {
+    "title": "联系我们",
+    "intro": "如有疑问或需要支持，请通过下面的表单与我们联系。",
+    "cardTitle": "发送消息",
+    "cardSubtitle": "我们会尽快回复你。",
+    "nameLabel": "姓名",
+    "namePlaceholder": "请输入你的姓名",
+    "emailLabel": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "subjectLabel": "主题",
+    "subjectPlaceholder": "这条消息是关于什么？",
+    "messageLabel": "内容",
+    "messagePlaceholder": "请尽量提供详细信息。",
+    "requiredFields": "必填项",
+    "sendButton": "发送",
+    "sendingButton": "发送中...",
+    "categories": {
+      "label": "分类（可选）",
+      "placeholder": "选择分类",
+      "general": "一般",
+      "support": "支持",
+      "policy": "政策",
+      "report": "举报",
+      "other": "其他"
+    },
+    "errors": {
+      "nameRequired": "姓名为必填项",
+      "nameTooLong": "姓名不能超过 {max} 个字符",
+      "emailRequired": "邮箱为必填项",
+      "emailTooLong": "邮箱不能超过 {max} 个字符",
+      "emailInvalid": "请输入有效的邮箱地址",
+      "subjectRequired": "主题为必填项",
+      "subjectTooLong": "主题不能超过 {max} 个字符",
+      "messageRequired": "内容为必填项",
+      "messageTooShort": "内容至少需要10个字符",
+      "messageTooLong": "内容不能超过 {max} 个字符",
+      "submitFailed": "发送失败，请稍后再试。"
+    },
+    "mail": {
+      "subjectFallback": "联系请求",
+      "name": "姓名",
+      "email": "邮箱",
+      "category": "分类",
+      "message": "内容"
+    },
+    "success": {
+      "title": "已收到你的消息",
+      "body": "谢谢！我们已收到你的消息，会尽快回复。如需补充说明，请发送邮件至 {email}。",
+      "openEmail": "发送邮件",
+      "copy": "复制内容",
+      "copied": "已复制",
+      "sendAnother": "再发一条"
+    },
+    "footer": {
+      "emailUs": "或者发送邮件到"
+    },
+    "backToHome": "返回首页"
+  },
   "dummyExample": {
     "title": "虚拟示例路由",
     "description": "这是为理解路由系统而创建的虚拟路由。",
@@ -740,11 +834,11 @@
     "requestRejected": "您加入此板块的请求已被拒绝。您无法在此板块发布。",
     "postingGuidelines": "发帖指南",
     "guidelines": {
-      "rememberHuman": "记住人性",
-      "behaveRealLife": "像在现实生活中一样行事",
-      "originalSource": "寻找内容的原始来源",
-      "searchDuplicates": "发布前搜索重复内容",
-      "readRules": "阅读社区规则"
+      "photoResponsibility": "用户对上传的照片负责，不得侵犯他人权利。",
+      "unpublishedNotStored": "未发布的上传内容不会永久存储。",
+      "noMedicalAdvice": "Hinobody 不提供医疗建议。",
+      "consultMedicalProfessional": "所有程序或治疗决定应与持照医疗专业人士共同做出。",
+      "contentResponsibility": "用户对其内容负责。"
     },
     "characters": "字符",
     "posting": "发布中...",

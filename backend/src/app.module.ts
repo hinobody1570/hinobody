@@ -19,6 +19,7 @@ import { VoteModule } from './vote/vote.module';
 import { SearchModule } from './search/search.module';
 import { BoardCategoryModule } from './board-category/board-category.module';
 import { ChatModule } from './chat/chat.module';
+import { ContactSubmissionModule } from './contact-submission/contact-submission.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ChatModule } from './chat/chat.module';
     VoteModule,
     SearchModule,
     ChatModule,
+    ContactSubmissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

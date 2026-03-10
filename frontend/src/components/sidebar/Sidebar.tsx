@@ -5,12 +5,12 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaBars, FaPlus } from "react-icons/fa6";
-import { IoChatbubbleOutline, IoHomeOutline, IoNewspaperOutline } from "react-icons/io5";
+import { IoDocumentTextOutline, IoHomeOutline, IoInformationCircleOutline, IoMailOutline, IoNewspaperOutline } from "react-icons/io5";
 import { MdOutlineRecommend } from "react-icons/md";
 import { VscPreview } from "react-icons/vsc";
 import StartCommunityPopup from "../modals/StartCommunityPopup";
 import { MenuItem } from "../reuseComponents/MenuItem";
-
+import { CollapsibleSection } from "../reuseComponents/CollapseItems";
 
 /* ---------------- DATA CONFIG ---------------- */
 
@@ -41,12 +41,10 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
     // { icon: FaPlus, label: t("startCommunity"), navigate: "" },
   ];
 
-  // const GAMES_MENU = [
-  //   { icon: IoHomeOutline, label: t("farmMergeValley"), navigate: "" },
-  //   { icon: CgArrowTopRightO, label: t("quizPlanet"), navigate: "" },
-  //   { icon: PiCirclesThree, label: t("swordSupper"), navigate: "" },
-  //   { icon: BiBarChartSquare, label: t("discoverMoreGames"), navigate: "" },
-  // ];
+  const TERMS_GUIDE_MENU = [
+    { icon: IoDocumentTextOutline, label: t("policy"), navigate: ROUTE_PATHS.POLICY },
+    { icon: IoMailOutline, label: t("contactUs"), navigate: ROUTE_PATHS.CONTACT_US },
+  ];
 
   // const RESOURCES_MENU = [
   //   { icon: LuSmilePlus, label: t("aboutReddit"), navigate: "" },
@@ -89,14 +87,27 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
             ))}
           </nav>
 
-          {/* Games Section */}
-          {/* <CollapsibleSection title={t("gamesOnReddit")}>
-            <nav className="flex flex-col gap-2 mt-4">
-              {GAMES_MENU.map((item, index) => (
-                <MenuItem key={index} {...item} />
+          {/* Terms & support section */}
+          <div className="border-t border-gray-200 pt-4">
+            <div className="flex items-center gap-2 mb-2 px-1">
+              <IoInformationCircleOutline className="text-gray-500 shrink-0" size={18} />
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                {t("termsAndGuide")}
+              </span>
+            </div>
+            <nav className="flex flex-col gap-2">
+              {TERMS_GUIDE_MENU.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  {...item}
+                  onClick={() => {
+                    router.push(item.navigate);
+                    onItemClick?.();
+                  }}
+                />
               ))}
             </nav>
-          </CollapsibleSection> */}
+          </div>
 
           {/* Custom Feeds */}
           {/* <CollapsibleSection title={t("customFeeds")}>

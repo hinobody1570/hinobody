@@ -93,10 +93,61 @@ export class EmailService {
     return this.sendEmail(email, subject, textContent, htmlContent);
   }
 
+  /** Send contact form submission to support (hinobodysupport@gmail.com) */
+  async sendContactFormNotification(payload: {
+    name: string;
+    email: string;
+    category: string;
+    subject: string;
+    message: string;
+  }): Promise<void> {
+    const toEmail = 'hinobodysupport@gmail.com';
+    const subject = `[HiNobody Contact] ${payload.subject}`;
+
+    const textContent = [
+      `New contact form submission`,
+      ``,
+      `Name: ${payload.name}`,
+      `Email: ${payload.email}`,
+      `Category: ${payload.category}`,
+      `Subject: ${payload.subject}`,
+      ``,
+      `Message:`,
+      payload.message,
+    ].join('\n');
+
+    const htmlContent = `
+      <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.5;">
+          <h2>New contact form submission</h2>
+          <table style="border-collapse: collapse;">
+            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold;">Name</td><td style="padding: 6px 0;">${escapeHtml(payload.name)}</td></tr>
+            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold;">Email</td><td style="padding: 6px 0;">${escapeHtml(payload.email)}</td></tr>
+            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold;">Category</td><td style="padding: 6px 0;">${escapeHtml(payload.category)}</td></tr>
+            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold;">Subject</td><td style="padding: 6px 0;">${escapeHtml(payload.subject)}</td></tr>
+          </table>
+          <p style="margin-top: 12px;"><strong>Message:</strong></p>
+          <p style="white-space: pre-wrap;">${escapeHtml(payload.message)}</p>
+        </body>
+      </html>
+    `;
+
+    await this.sendEmail(toEmail, subject, textContent, htmlContent);
+  }
+
   private stripHtml(html: string): string {
     return html
       .replace(/<[^>]*>/g, '')
       .replace(/\s+/g, ' ')
       .trim();
   }
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

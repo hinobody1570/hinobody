@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ROUTE_PATHS } from "@/routes/paths";
-import { FaUsers, FaFileAlt, FaLayerGroup, FaHome, FaEye, FaExclamationTriangle, FaBan, FaTags, FaUserCheck, FaComment } from "react-icons/fa";
+import { FaUsers, FaFileAlt, FaLayerGroup, FaHome, FaEye, FaExclamationTriangle, FaBan, FaTags, FaUserCheck, FaComment, FaEnvelope } from "react-icons/fa";
 
 interface SidebarItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -61,6 +61,11 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       icon: FaExclamationTriangle,
       label: t("reports"),
       path: ROUTE_PATHS.ADMIN_REPORTS,
+    },
+    {
+      icon: FaEnvelope,
+      label: t("contactSubmissions"),
+      path: ROUTE_PATHS.ADMIN_CONTACT_SUBMISSIONS,
     },
     {
       icon: FaBan,
