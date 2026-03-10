@@ -121,7 +121,7 @@ export default function EmailVerification() {
 
       // Redirect to login page after 2 seconds
       setTimeout(() => {
-        router.push(ROUTE_PATHS.DEFAULT);
+        router.push(ROUTE_PATHS.LOGIN);
       }, 1000);
     } catch (error: any) {
       // Handle API errors - stay on page
