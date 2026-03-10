@@ -7,6 +7,7 @@ import FormInput from "./FormInput";
 interface PasswordInputProps {
   value: any;
   error?: string;
+  autoComplete?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
@@ -16,6 +17,7 @@ export default function PasswordInput({
   error,
   onChange,
   onKeyPress,
+  autoComplete = "off",
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -28,6 +30,7 @@ export default function PasswordInput({
       placeholder="••••••••"
       icon={<FiLock className="h-5 w-5 text-gray-400" />}
       error={error}
+      autoComplete={autoComplete}
       onChange={onChange}
       onKeyPress={onKeyPress}
       rightElement={

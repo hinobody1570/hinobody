@@ -85,7 +85,7 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
   const handleLogout = () => {
     onClose?.();
     logout();
-    router.push(ROUTE_PATHS.DEFAULT);
+    router.push(ROUTE_PATHS.LOGIN);
   };
 
   return (

@@ -18,7 +18,7 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
     if (!loading && !isAuthenticated) {
       router.push(ROUTE_PATHS.DEFAULT);
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, router]); 
 
   if (loading) {
     return (

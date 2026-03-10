@@ -14,7 +14,7 @@ export default function ProfilePage() {
 
   const handleLogout = () => {
     logout();
-    router.push(ROUTE_PATHS.DEFAULT);
+    router.push(ROUTE_PATHS.LOGIN);
   };
 
   return (

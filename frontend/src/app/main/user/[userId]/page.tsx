@@ -345,7 +345,7 @@ export default function UserProfilePage() {
           <div className="flex gap-2 border-b border-gray-200 mb-4">
             <button
               type="button"
-              onClick={() => router.push(`/main/user/${userId}`)}
+              onClick={() => router.push(`/main/user/${userId}`, { scroll: false })}
               className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
                 tab !== 'comments'
                   ? 'border-blue-600 text-blue-600'
@@ -356,7 +356,7 @@ export default function UserProfilePage() {
             </button>
             <button
               type="button"
-              onClick={() => router.push(`/main/user/${userId}?tab=comments`)}
+              onClick={() => router.push(`/main/user/${userId}?tab=comments`, { scroll: false })}
               className={`px-4 py-2 font-semibold text-sm cursor-pointer transition-colors border-b-2 -mb-px ${
                 tab === 'comments'
                   ? 'border-blue-600 text-blue-600'

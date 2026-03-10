@@ -7,6 +7,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MdOutlineArticle, MdOutlineComment, MdOutlineMail } from "react-icons/md";
 import { useToast } from "@/contexts/ToastContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { LoginRequiredModal } from "./LoginRequiredModal";
 
 interface AuthorPopupProps {
   authorId: string;
@@ -22,6 +24,13 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
   const router = useRouter();
   const tPostCard = useTranslations("postCard");
   const { showInfo } = useToast();
+  const { isAuthenticated } = useAuth();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  const redirectToLogin = () => {
+    const current = `${window.location.pathname}${window.location.search}`;
+    router.push(`${ROUTE_PATHS.LOGIN}?redirect=${encodeURIComponent(current)}`);
+  };
 
   // Update popup position when opening - useLayoutEffect to avoid flash at (0,0)
   useLayoutEffect(() => {
@@ -53,14 +62,23 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
     };
   }, [isOpen]);
 
-  const handleViewPosts = () => {
-    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?scrollTo=posts`);
+  const handleNavigateWithAuth = (path: string) => {
+    if (!isAuthenticated) {
+      setIsOpen(false);
+      setLoginModalOpen(true);
+      return;
+    }
+
+    router.push(path);
     setIsOpen(false);
   };
 
+  const handleViewPosts = () => {
+    handleNavigateWithAuth(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?scrollTo=posts`);
+  };
+
   const handleViewComments = () => {
-    router.push(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?tab=comments&scrollTo=comments`);
-    setIsOpen(false);
+    handleNavigateWithAuth(`${ROUTE_PATHS.USER_PROFILE}/${authorId}?tab=comments&scrollTo=comments`);
   };
 
   const handleSendMessage = () => {
@@ -121,6 +139,12 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
           </div>,
           document.body,
         )}
+
+      <LoginRequiredModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onLogin={redirectToLogin}
+      />
     </div>
   );
 };
