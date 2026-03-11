@@ -62,11 +62,11 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       label: t("reports"),
       path: ROUTE_PATHS.ADMIN_REPORTS,
     },
-    {
-      icon: FaEnvelope,
-      label: t("contactSubmissions"),
-      path: ROUTE_PATHS.ADMIN_CONTACT_SUBMISSIONS,
-    },
+    // {
+    //   icon: FaEnvelope,
+    //   label: t("contactSubmissions"),
+    //   path: ROUTE_PATHS.ADMIN_CONTACT_SUBMISSIONS,
+    // },
     {
       icon: FaBan,
       label: t("blocks"),
