@@ -41,10 +41,10 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
     // { icon: FaPlus, label: t("startCommunity"), navigate: "" },
   ];
 
-  const TERMS_GUIDE_MENU = [
-    { icon: IoDocumentTextOutline, label: t("policy"), navigate: ROUTE_PATHS.POLICY },
-    { icon: IoMailOutline, label: t("contactUs"), navigate: ROUTE_PATHS.CONTACT_US },
-  ];
+  // const TERMS_GUIDE_MENU = [
+  //   { icon: IoDocumentTextOutline, label: t("policy"), navigate: ROUTE_PATHS.POLICY },
+  //   { icon: IoMailOutline, label: t("contactUs"), navigate: ROUTE_PATHS.CONTACT_US },
+  // ];
 
   // const RESOURCES_MENU = [
   //   { icon: LuSmilePlus, label: t("aboutReddit"), navigate: "" },
@@ -95,7 +95,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
                 {t("termsAndGuide")}
               </span>
             </div>
-            <nav className="flex flex-col gap-2">
+            {/* <nav className="flex flex-col gap-2">
               {TERMS_GUIDE_MENU.map((item, index) => (
                 <MenuItem
                   key={index}
@@ -106,7 +106,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
                   }}
                 />
               ))}
-            </nav>
+            </nav> */}
           </div>
 
           {/* Custom Feeds */}
