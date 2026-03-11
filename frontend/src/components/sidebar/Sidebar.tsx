@@ -88,14 +88,14 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
           </nav>
 
           {/* Terms & support section */}
-          <div className="border-t border-gray-200 pt-4">
+          {/* <div className="border-t border-gray-200 pt-4">
             <div className="flex items-center gap-2 mb-2 px-1">
               <IoInformationCircleOutline className="text-gray-500 shrink-0" size={18} />
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                 {t("termsAndGuide")}
               </span>
             </div>
-            {/* <nav className="flex flex-col gap-2">
+            <nav className="flex flex-col gap-2">
               {TERMS_GUIDE_MENU.map((item, index) => (
                 <MenuItem
                   key={index}
@@ -106,8 +106,8 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
                   }}
                 />
               ))}
-            </nav> */}
-          </div>
+            </nav>
+          </div> */}
 
           {/* Custom Feeds */}
           {/* <CollapsibleSection title={t("customFeeds")}>
