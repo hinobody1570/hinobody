@@ -561,7 +561,7 @@
       "orContinueWith": "Or continue with",
       "continueWithGoogle": "Continue with Google",
       "continueWithApple": "Continue with Apple",
-      "guestUser": "Guest user"
+      "guestUser": "Guest User"
     },
     "processing": "Processing authentication...",
     "passwordInvalidFormat": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
