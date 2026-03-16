@@ -88,21 +88,28 @@ export default function SignupForm() {
 
     try {
       // Call the real API
-      await register({
+      const result = await register({
         email: formData.email!,
         password: formData.password!,
         nickname: formData.nickname!.trim(),
         language: locale.toUpperCase() as any, // Convert to Language enum format
       });
 
-      // Success - show toast and redirect
-      showSuccess(tToast("registerSuccess"));
-      
       // Store email for verification page
+      const emailToStore = result.email ?? formData.email!;
       if (typeof window !== "undefined") {
-        localStorage.setItem("pending_verification_email", formData.email!);
+        localStorage.setItem("pending_verification_email", emailToStore);
       }
-      
+
+      // If backend resent verification (existing unverified account), go straight to verify page
+      if (result.requiresVerification) {
+        showSuccess(tToast("verificationEmailResent"));
+        router.push(`${ROUTE_PATHS.VERIFY_EMAIL}?email=${encodeURIComponent(emailToStore)}`);
+        return;
+      }
+
+      // New registration success
+      showSuccess(tToast("registerSuccess"));
       setIsSubmitted(true);
       
     } catch (error: any) {

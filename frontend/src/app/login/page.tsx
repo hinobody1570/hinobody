@@ -94,8 +94,33 @@ export default function LoginPage() {
 
       router.push(redirectTo || ROUTE_PATHS.DEFAULT);
     } catch (error: any) {
-      const errorMessage = error?.message || tToast("loginError");
-      showError(errorMessage);
+      const rawMessage = error?.message || "";
+
+      // If email is not verified yet, resend OTP and send user to verification flow
+      if (rawMessage === "Please verify your email address before logging in") {
+        try {
+          if (formData.email) {
+            // Store email for verification page (same as register flow)
+            if (typeof window !== "undefined") {
+              localStorage.setItem("pending_verification_email", formData.email);
+            }
+
+            // Trigger resend OTP so user gets a fresh code
+            await authApi.resendOtp(formData.email);
+          }
+
+          showSuccess(tToast("otpResent"));
+          router.push(`${ROUTE_PATHS.VERIFY_EMAIL}?email=${encodeURIComponent(formData.email!)}`);
+          return;
+        } catch {
+          // If resend fails, fall back to generic error toast
+          showError(tToast("resendFailed"));
+        }
+      } else {
+        const errorMessage = rawMessage || tToast("loginError");
+        showError(errorMessage);
+      }
+
       setFormData((prev) => ({ ...prev, password: "" }));
     } finally {
       setIsLoading(false);
