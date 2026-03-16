@@ -28,6 +28,7 @@
     "loginSuccess": "Login successful!",
     "loginError": "Login failed. Please check your credentials.",
     "registerSuccess": "Registration successful! Please check your email to verify your account.",
+    "verificationEmailResent": "This email is already registered. We've sent a new verification code—please check your inbox.",
     "registerError": "Registration failed. Please try again.",
     "forgotPasswordSuccess": "Password reset email sent! Please check your inbox.",
     "forgotPasswordError": "Failed to send reset email. Please try again.",

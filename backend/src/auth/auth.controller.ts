@@ -7,6 +7,7 @@ import {
   Req,
   Res,
   HttpStatus,
+  ConflictException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -38,33 +39,70 @@ export class AuthController {
     status: 201,
     description: 'User successfully registered. Verification email sent.',
   })
+  @ApiResponse({
+    status: 200,
+    description: 'Email already registered but unverified; verification email resent.',
+  })
   @ApiResponse({ status: 409, description: 'Email or nickname already exists' })
   @ApiBody({ type: CreateUserDto })
-  async register(@Body() createUserDto: CreateUserDto) {
-    const user = await this.userService.create(createUserDto);
+  async register(@Body() createUserDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
+    try {
+      const user = await this.userService.create(createUserDto);
 
-    // Get the user with OTP to send email
-    const userWithOtp = await this.userService.findByEmail(createUserDto.email);
+      // Get the user with OTP to send email
+      const userWithOtp = await this.userService.findByEmail(createUserDto.email);
 
-    // Send verification email with OTP
-    if (userWithOtp?.emailVerificationOTP) {
-      await this.emailService.sendVerificationEmail(
-        createUserDto.email,
-        userWithOtp.emailVerificationOTP,
-        user.nickname,
-      );
+      // Send verification email with OTP
+      if (userWithOtp?.emailVerificationOTP) {
+        await this.emailService.sendVerificationEmail(
+          createUserDto.email,
+          userWithOtp.emailVerificationOTP,
+          user.nickname,
+        );
+      }
+
+      return {
+        message:
+          'Registration successful. Please check your email to verify your account.',
+        user: {
+          id: user.id,
+          email: user.email,
+          nickname: user.nickname,
+          emailVerified: user.emailVerified,
+        },
+      };
+    } catch (error: any) {
+      // If email already exists, check if user is unverified and resend verification email
+      const conflictMessage = typeof error.getResponse === 'function' ? (error.getResponse() as any)?.message : error.message;
+      const isEmailConflict = error instanceof ConflictException && (conflictMessage === 'Email already exists' || error.message === 'Email already exists');
+      if (isEmailConflict) {
+        const existingUser = await this.userService.findByEmail(createUserDto.email);
+        if (existingUser && !existingUser.emailVerified) {
+          await this.userService.resendOTP(createUserDto.email);
+          const userWithOtp = await this.userService.findByEmail(createUserDto.email);
+          if (userWithOtp?.emailVerificationOTP) {
+            await this.emailService.sendVerificationEmail(
+              createUserDto.email,
+              userWithOtp.emailVerificationOTP,
+              existingUser.nickname,
+            );
+          }
+          res.status(HttpStatus.OK);
+          return {
+            message: 'This email is already registered but not verified. We have sent a new verification code to your email.',
+            requiresVerification: true,
+            email: createUserDto.email,
+            user: {
+              id: existingUser.id,
+              email: existingUser.email,
+              nickname: existingUser.nickname,
+              emailVerified: existingUser.emailVerified,
+            },
+          };
+        }
+      }
+      throw error;
     }
-
-    return {
-      message:
-        'Registration successful. Please check your email to verify your account.',
-      user: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        emailVerified: user.emailVerified,
-      },
-    };
   }
 
   @Post('login')

@@ -35,15 +35,16 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (!user.isActive) {
-      throw new UnauthorizedException('Account is inactive');
-    }
-
-    // Check if email is verified
+    // First, ensure email is verified – unverified users should go to verification flow
     if (!user.emailVerified) {
       throw new UnauthorizedException(
         'Please verify your email address before logging in',
       );
+    }
+
+    // Then, enforce active status for verified accounts
+    if (!user.isActive) {
+      throw new UnauthorizedException('Account is inactive');
     }
 
     const { passwordHash, ...result } = user;

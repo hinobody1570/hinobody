@@ -87,14 +87,17 @@ export async function register(data: {
   password: string;
   nickname: string;
   language?: string;
-}): Promise<{ message: string; user: any }> {
+}): Promise<{ message: string; user: any; requiresVerification?: boolean; email?: string }> {
   const { authApi } = await import('./api');
   
   try {
     const response = await authApi.register(data);
+    const body = (response as any).data ?? response;
     return {
-      message: response.message,
-      user: response.data.user,
+      message: body.message,
+      user: body.user,
+      requiresVerification: body.requiresVerification,
+      email: body.email,
     };
   } catch (error: any) {
     const errorMessage = error?.message || 'Registration failed. Please try again.';
