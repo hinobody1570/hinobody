@@ -3,7 +3,7 @@
 import { IoIosSearch } from "react-icons/io";
 import { PiIntersectThree } from "react-icons/pi";
 import { useTranslations } from "next-intl";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { searchApi } from "@/lib/api";
 import { SearchResultsModal } from "./SearchResultsModal";
 
@@ -15,6 +15,7 @@ export const SearchBar = ({ placeholder }: { placeholder?: string }) => {
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState<any>(null);
   const searchBarRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Debounced search
   useEffect(() => {
@@ -67,6 +68,14 @@ export const SearchBar = ({ placeholder }: { placeholder?: string }) => {
     }
   };
 
+  // Show dropdown when clicking search icon or end icon (focus input + show results if any)
+  const handleIconClick = () => {
+    inputRef.current?.focus();
+    if (searchResults) {
+      setShowResults(true);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
       // Could navigate to full search results page
@@ -76,13 +85,19 @@ export const SearchBar = ({ placeholder }: { placeholder?: string }) => {
   
   return (
     <div className="relative flex-1 max-w-2xl" ref={searchBarRef}>
-      {/* Left search icon */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+      {/* Left search icon - clickable to focus and show dropdown */}
+      <button
+        type="button"
+        onClick={handleIconClick}
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+        aria-label={t('findAnything')}
+      >
         <IoIosSearch size={20} />
-      </div>
+      </button>
 
       {/* Input */}
-      <input  
+      <input
+        ref={inputRef}
         type="text"
         value={searchQuery}
         onChange={handleInputChange}
@@ -112,9 +127,10 @@ export const SearchBar = ({ placeholder }: { placeholder?: string }) => {
         </div>
       )}
 
-      {/* Right button inside input */}
+      {/* Right button inside input - click to focus and show dropdown */}
       <button
         type="button"
+        onClick={handleIconClick}
         className="
           absolute
           right-2
