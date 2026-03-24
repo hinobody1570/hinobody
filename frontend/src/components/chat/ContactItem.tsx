@@ -8,12 +8,14 @@ interface ContactItemProps {
   contact: Contact;
   isActive: boolean;
   lastMessagePreview?: string;
+  unreadCount?: number;
   onClick: () => void;
 }
 
-export function ContactItem({ contact, isActive, lastMessagePreview, onClick }: ContactItemProps) {
+export function ContactItem({ contact, isActive, lastMessagePreview, unreadCount = 0, onClick }: ContactItemProps) {
   const t = useTranslations("chat");
   const preview = lastMessagePreview ?? contact.lastSeen ?? t("noMessagesYet");
+  const showUnread = unreadCount > 0 && !isActive;
 
   return (
     <button
@@ -36,6 +38,11 @@ export function ContactItem({ contact, isActive, lastMessagePreview, onClick }: 
         <div className="font-semibold text-sm text-black">{contact.name}</div>
         <div className={`text-xs mt-0.5 truncate ${isActive ? "text-gray-700" : "text-gray-500"}`}>{preview}</div>
       </div>
+      {showUnread && (
+        <span className="min-w-5 h-5 px-1 rounded-full bg-[#3897f0] text-white text-[11px] leading-5 font-semibold text-center">
+          {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+      )}
     </button>
   );
 }

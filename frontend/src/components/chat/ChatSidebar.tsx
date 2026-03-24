@@ -15,6 +15,7 @@ interface ChatSidebarProps {
   contacts: Contact[];
   selectedContact: Contact;
   messages: MessagesByContact;
+  unreadByContact?: Record<string, number>;
   currentUser?: CurrentUserProps | null;
   onSelectContact: (contact: Contact) => void;
   onStartNewChat?: () => void;
@@ -27,6 +28,7 @@ export function ChatSidebar({
   contacts,
   selectedContact,
   messages,
+  unreadByContact = {},
   currentUser,
   onSelectContact,
   onStartNewChat,
@@ -104,6 +106,7 @@ export function ChatSidebar({
               contact={contact}
               isActive={selectedContact.id === contact.id}
               lastMessagePreview={lastMsg ?? undefined}
+              unreadCount={unreadByContact[contact.id] ?? 0}
               onClick={() => onSelectContact(contact)}
             />
           );
