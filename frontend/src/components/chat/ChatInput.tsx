@@ -1,21 +1,30 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 
 interface ChatInputProps {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
+  autoFocus?: boolean;
 }
 
-export function ChatInput({ value, onChange, onSend }: ChatInputProps) {
+export function ChatInput({ value, onChange, onSend, autoFocus = false }: ChatInputProps) {
   const t = useTranslations("chat");
   const hasText = value.trim().length > 0;
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    inputRef.current?.focus();
+  }, [autoFocus]);
 
   return (
     <div className="py-3 px-4 border-t border-[#1a1a1a] flex items-center gap-2.5">
       <div className="flex-1 bg-gray-50 rounded-[22px] py-2.5 px-4 flex items-center gap-2 border border-[#2a2a2a] transition-colors focus-within:border-[#333]">
         <input
+          ref={inputRef}
           type="text"
           placeholder={t("messagePlaceholder")}
           value={value}

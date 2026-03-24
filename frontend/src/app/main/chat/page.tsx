@@ -30,6 +30,7 @@ export default function ChatPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [messages, setMessages] = useState<MessagesByContact>({});
+  const [unreadByContact, setUnreadByContact] = useState<Record<string, number>>({});
   const [input, setInput] = useState("");
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -42,6 +43,45 @@ export default function ChatPage() {
     (dto: ChatMessageDto) => {
       const msg = messageFromDto(dto, currentUserId);
       const otherId = dto.senderId === currentUserId ? dto.receiverId : dto.senderId;
+      const otherUser = dto.senderId === currentUserId ? dto.receiver : dto.sender;
+
+      setContacts((prev) => {
+        const incomingContact = {
+          ...contactFromUser({
+            id: otherUser.id,
+            nickname: otherUser.nickname,
+            avatar: otherUser.avatar,
+          }),
+          lastMessage: dto.isDeleted ? "" : dto.text,
+          lastMessageAt: dto.createdAt,
+        };
+
+        const existingIndex = prev.findIndex((c) => c.id === otherId);
+        if (existingIndex >= 0) {
+          const next = [...prev];
+          next[existingIndex] = {
+            ...next[existingIndex],
+            name: incomingContact.name,
+            avatar: incomingContact.avatar,
+            lastMessage: incomingContact.lastMessage,
+            lastMessageAt: incomingContact.lastMessageAt,
+          };
+          return sortContactsByRecent(next);
+        }
+
+        return sortContactsByRecent([...prev, incomingContact]);
+      });
+
+      // For first-time conversation, auto-select the new contact when none is selected.
+      setSelectedContact((prev) => {
+        if (prev && prev.id !== "__placeholder__") return prev;
+        return contactFromUser({
+          id: otherUser.id,
+          nickname: otherUser.nickname,
+          avatar: otherUser.avatar,
+        });
+      });
+
       setMessages((prev) => {
         const list = prev[otherId] ?? [];
         const idx = list.findIndex((m) => m.id === dto.id);
@@ -64,6 +104,18 @@ export default function ChatPage() {
     (event: import("@/hooks/useChatSocket").ChatSocketEvent) => {
       if (event.type === "message") {
         applyMessage(event.message);
+        const otherId =
+          event.message.senderId === currentUserId
+            ? event.message.receiverId
+            : event.message.senderId;
+        const isIncoming = event.message.senderId !== currentUserId;
+        const isOpenChat = selectedContact?.id === otherId;
+        if (isIncoming && !isOpenChat) {
+          setUnreadByContact((prev) => ({
+            ...prev,
+            [otherId]: (prev[otherId] ?? 0) + 1,
+          }));
+        }
       } else if (event.type === "message:updated") {
         applyMessage(event.message);
       } else if (event.type === "message:deleted") {
@@ -87,7 +139,7 @@ export default function ChatPage() {
         setError(event.message);
       }
     },
-    [applyMessage]
+    [applyMessage, currentUserId, selectedContact?.id]
   );
 
   const { connected, sendMessage, editMessage, deleteMessage } = useChatSocket(
@@ -140,6 +192,10 @@ export default function ChatPage() {
   useEffect(() => {
     if (!selectedContact || !currentUserId || selectedContact.id === "__placeholder__") return;
     const contactId = selectedContact.id;
+    setUnreadByContact((prev) => {
+      if (!prev[contactId]) return prev;
+      return { ...prev, [contactId]: 0 };
+    });
     setLoadingMessages(true);
     chatApi
       .getMessages(contactId)
@@ -160,6 +216,7 @@ export default function ChatPage() {
       return [...prev, contact];
     });
     setSelectedContact(contact);
+    setUnreadByContact((prev) => ({ ...prev, [contact.id]: 0 }));
     setNewChatModalOpen(false);
   }, []);
 
@@ -226,10 +283,14 @@ export default function ChatPage() {
         input={input}
         currentUserId={currentUserId}
         currentUser={user ? { nickname: user.nickname, avatar: user.avatar } : null}
+        unreadByContact={unreadByContact}
         connected={connected}
         loadingMessages={loadingMessages}
         error={error}
-        onSelectContact={(c) => setSelectedContact(c)}
+        onSelectContact={(c) => {
+          setSelectedContact(c);
+          setUnreadByContact((prev) => ({ ...prev, [c.id]: 0 }));
+        }}
         onInputChange={setInput}
         onSend={handleSend}
         onEditMessage={handleEditMessage}

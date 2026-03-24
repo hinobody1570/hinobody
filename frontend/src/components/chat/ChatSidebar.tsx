@@ -15,6 +15,7 @@ interface ChatSidebarProps {
   contacts: Contact[];
   selectedContact: Contact;
   messages: MessagesByContact;
+  unreadByContact?: Record<string, number>;
   currentUser?: CurrentUserProps | null;
   onSelectContact: (contact: Contact) => void;
   onStartNewChat?: () => void;
@@ -27,6 +28,7 @@ export function ChatSidebar({
   contacts,
   selectedContact,
   messages,
+  unreadByContact = {},
   currentUser,
   onSelectContact,
   onStartNewChat,
@@ -96,13 +98,15 @@ export function ChatSidebar({
             thread?.length && thread[thread.length - 1].text
               ? thread[thread.length - 1].text.slice(0, 28) + (thread[thread.length - 1].text.length > 28 ? "…" : "")
               : undefined;
-          const lastMsg = contact.lastMessage ?? lastFromThread;
+          // Prefer live thread state so sidebar updates instantly on send/receive.
+          const lastMsg = lastFromThread ?? contact.lastMessage;
           return (
             <ContactItem
               key={contact.id}
               contact={contact}
               isActive={selectedContact.id === contact.id}
-              lastMessagePreview={lastMsg}
+              lastMessagePreview={lastMsg ?? undefined}
+              unreadCount={unreadByContact[contact.id] ?? 0}
               onClick={() => onSelectContact(contact)}
             />
           );

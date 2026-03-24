@@ -87,7 +87,11 @@ export function MessageBubble({
   }
 
   return (
-    <div className={`flex flex-row gap-2 ${isSent ? "justify-end" : "justify-start"} ${prevSameSender ? "mt-0.5" : "mt-2"}`}>
+    <div
+      className={`relative flex flex-row gap-2 ${isSent ? "justify-end" : "justify-start"} ${prevSameSender ? "mt-0.5" : "mt-2"} ${
+        menuOpen ? "z-30" : "z-0"
+      }`}
+    >
       {!isSent && (
         <ChatAvatar letter={avatarLetter} color={senderColor} size="sm" className="flex-shrink-0 mt-0.5" />
       )}
@@ -147,7 +151,7 @@ export function MessageBubble({
               {message.editedAt && <span className="ml-1 text-[10px] opacity-80">{t("edited")}</span>}
             </div>
             {showActions && (
-              <div className="absolute top-8 -translate-y-1/2 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-8 -translate-y-1/2 right-0 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                 {/* <button
                   type="button"
                   onClick={() => setMenuOpen((o) => !o)}
@@ -159,7 +163,7 @@ export function MessageBubble({
                 {menuOpen && (
                   <div
                     ref={menuRef}
-                    className="absolute right-0 top-full cursor-pointer mt-1 py-1 bg-[#1c1c1c] rounded-lg shadow-lg border border-white/10 min-w-[100px] z-10"
+                    className="absolute right-0 top-full cursor-pointer mt-1 py-1 bg-[#1c1c1c] rounded-lg shadow-lg border border-white/10 min-w-[100px] z-50"
                   >
                     {onEdit && (
                       <button

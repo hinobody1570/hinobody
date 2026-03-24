@@ -13,6 +13,7 @@ interface ChatViewProps {
   contacts: Contact[];
   selectedContact: Contact;
   messages: MessagesByContact;
+  unreadByContact?: Record<string, number>;
   input: string;
   currentUserId: string;
   currentUser?: { nickname: string; avatar?: string | null } | null;
@@ -34,6 +35,7 @@ export function ChatView({
   contacts,
   selectedContact,
   messages,
+  unreadByContact = {},
   input,
   currentUserId,
   currentUser,
@@ -72,6 +74,7 @@ export function ChatView({
         contacts={contacts}
         selectedContact={selectedContact}
         messages={messages}
+        unreadByContact={unreadByContact}
         currentUser={currentUser}
         onSelectContact={handleSelectContact}
         onStartNewChat={onStartNewChat}
@@ -128,7 +131,13 @@ export function ChatView({
           <div ref={endRef} />
         </div>
 
-        <ChatInput value={input} onChange={onInputChange} onSend={onSend} />
+        <ChatInput
+          key={selectedContact.id}
+          value={input}
+          onChange={onInputChange}
+          onSend={onSend}
+          autoFocus={selectedContact.id !== "__placeholder__"}
+        />
       </div>
     </div>
   );
