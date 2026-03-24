@@ -179,7 +179,7 @@ export function UserProfileHeader({
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
-                {/* {!isOwnProfile && !isBlocked && (
+                {!isOwnProfile && !isBlocked && (
                   <button
                     type="button"
                     onClick={() => {
@@ -194,7 +194,7 @@ export function UserProfileHeader({
                     <HiChat size={16} />
                     <span>{t('chat')}</span>
                   </button>
-                )} */}
+                )}
                 {!isOwnProfile && currentUser && (
                   <>
                     {isBlocked ? (
