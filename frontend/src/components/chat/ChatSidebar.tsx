@@ -96,13 +96,14 @@ export function ChatSidebar({
             thread?.length && thread[thread.length - 1].text
               ? thread[thread.length - 1].text.slice(0, 28) + (thread[thread.length - 1].text.length > 28 ? "…" : "")
               : undefined;
-          const lastMsg = contact.lastMessage ?? lastFromThread;
+          // Prefer live thread state so sidebar updates instantly on send/receive.
+          const lastMsg = lastFromThread ?? contact.lastMessage;
           return (
             <ContactItem
               key={contact.id}
               contact={contact}
               isActive={selectedContact.id === contact.id}
-              lastMessagePreview={lastMsg}
+              lastMessagePreview={lastMsg ?? undefined}
               onClick={() => onSelectContact(contact)}
             />
           );

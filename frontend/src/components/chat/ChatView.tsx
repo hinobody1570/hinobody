@@ -128,7 +128,13 @@ export function ChatView({
           <div ref={endRef} />
         </div>
 
-        <ChatInput value={input} onChange={onInputChange} onSend={onSend} />
+        <ChatInput
+          key={selectedContact.id}
+          value={input}
+          onChange={onInputChange}
+          onSend={onSend}
+          autoFocus={selectedContact.id !== "__placeholder__"}
+        />
       </div>
     </div>
   );

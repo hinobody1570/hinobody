@@ -68,7 +68,7 @@ export function NewChatModal({ isOpen, onClose, onSelectUser }: NewChatModalProp
             placeholder={t("searchUsers")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
+            className="w-full text-black rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500"
           />
         </div>
         <div className="flex-1 overflow-y-auto p-2 min-h-0">
