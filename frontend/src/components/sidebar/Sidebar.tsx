@@ -41,10 +41,10 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
     // { icon: FaPlus, label: t("startCommunity"), navigate: "" },
   ];
 
-  // const TERMS_GUIDE_MENU = [
-  //   { icon: IoDocumentTextOutline, label: t("policy"), navigate: ROUTE_PATHS.POLICY },
-  //   { icon: IoMailOutline, label: t("contactUs"), navigate: ROUTE_PATHS.CONTACT_US },
-  // ];
+  const TERMS_GUIDE_MENU = [
+    { icon: IoDocumentTextOutline, label: t("policy"), navigate: ROUTE_PATHS.POLICY },
+    { icon: IoMailOutline, label: t("contactUs"), navigate: ROUTE_PATHS.CONTACT_US },
+  ];
 
   // const RESOURCES_MENU = [
   //   { icon: LuSmilePlus, label: t("aboutReddit"), navigate: "" },
@@ -88,7 +88,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
           </nav>
 
           {/* Terms & support section */}
-          {/* <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-gray-200 pt-4">
             <div className="flex items-center gap-2 mb-2 px-1">
               <IoInformationCircleOutline className="text-gray-500 shrink-0" size={18} />
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
@@ -107,7 +107,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
                 />
               ))}
             </nav>
-          </div> */}
+          </div>
 
           {/* Custom Feeds */}
           {/* <CollapsibleSection title={t("customFeeds")}>
