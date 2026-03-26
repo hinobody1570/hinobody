@@ -7,7 +7,7 @@ import { ChatHeader } from "./ChatHeader";
 import { MessageBubble } from "./MessageBubble";
 import { EmptyState } from "./EmptyState";
 import { ChatInput } from "./ChatInput";
-import type { Contact, MessagesByContact } from "./types";
+import type { Contact, Message, MessagesByContact } from "./types";
 
 interface ChatViewProps {
   contacts: Contact[];
@@ -53,6 +53,12 @@ export function ChatView({
 }: ChatViewProps) {
   const t = useTranslations("chat");
   const endRef = useRef<HTMLDivElement>(null);
+  /** Track thread shape so we only auto-scroll on new messages, not on edit/delete of older items. */
+  const prevThreadMetaRef = useRef<{
+    contactId: string;
+    length: number;
+    lastMessageId: string | undefined;
+  }>({ contactId: "", length: 0, lastMessageId: undefined });
   const currentMsgs = messages[selectedContact.id] ?? [];
   const [sidebarOpen, setSidebarOpen] = useState(initialSidebarOpen);
 
@@ -65,7 +71,39 @@ export function ChatView({
   );
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    const thread: Message[] = messages[selectedContact.id] ?? [];
+    const len = thread.length;
+    const lastId = len > 0 ? thread[len - 1]?.id : undefined;
+    const prev = prevThreadMetaRef.current;
+
+    const scrollToEnd = () => {
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    if (selectedContact.id !== prev.contactId) {
+      scrollToEnd();
+      prevThreadMetaRef.current = {
+        contactId: selectedContact.id,
+        length: len,
+        lastMessageId: lastId,
+      };
+      return;
+    }
+
+    if (len > prev.length) {
+      scrollToEnd();
+    } else if (len === prev.length && len > 0 && lastId && prev.lastMessageId && lastId !== prev.lastMessageId) {
+      const wasOptimistic = String(prev.lastMessageId).startsWith("temp-");
+      if (wasOptimistic) {
+        scrollToEnd();
+      }
+    }
+
+    prevThreadMetaRef.current = {
+      contactId: selectedContact.id,
+      length: len,
+      lastMessageId: lastId,
+    };
   }, [messages, selectedContact.id]);
 
   return (

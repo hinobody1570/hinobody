@@ -29,10 +29,21 @@ export function MessageBubble({
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(message.text);
   const menuRef = useRef<HTMLDivElement>(null);
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setEditText(message.text);
   }, [message.text]);
+
+  useEffect(() => {
+    if (!editing) return;
+    const ta = editTextareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    const maxPx = Math.min(typeof window !== "undefined" ? window.innerHeight * 0.7 : 560, 560);
+    const next = Math.min(ta.scrollHeight, maxPx);
+    ta.style.height = `${next}px`;
+  }, [editing, editText]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -88,26 +99,31 @@ export function MessageBubble({
 
   return (
     <div
-      className={`relative flex flex-row gap-2 ${isSent ? "justify-end" : "justify-start"} ${prevSameSender ? "mt-0.5" : "mt-2"} ${
+      className={`relative flex min-w-0 flex-row gap-2 ${isSent ? "justify-end" : "justify-start"} ${prevSameSender ? "mt-0.5" : "mt-2"} ${
         menuOpen ? "z-30" : "z-0"
       }`}
     >
       {!isSent && (
         <ChatAvatar letter={avatarLetter} color={senderColor} size="sm" className="flex-shrink-0 mt-0.5" />
       )}
-      <div className="flex flex-col max-w-[65%] relative group">
+      <div
+        className={`flex flex-col relative group min-w-0 ${
+          editing ? "flex-1 basis-0 max-w-[65%]" : "max-w-[65%]"
+        }`}
+      >
         {editing ? (
           <div
             className={`
-              max-w-[65%] py-2.5 px-3.5 rounded-[22px] text-sm
+              w-full min-w-0 max-w-full py-2.5 px-3.5 rounded-[22px] text-sm leading-snug
               bg-[#3897f0] text-white rounded-br-[6px]
             `}
           >
             <textarea
+              ref={editTextareaRef}
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="w-full bg-transparent resize-none outline-none min-h-[24px]"
-              rows={2}
+              className="block w-full min-w-0 max-w-full min-h-0 max-h-[min(70vh,560px)] bg-transparent resize-none outline-none text-inherit placeholder:text-white/70 break-words overflow-x-hidden overflow-y-auto"
+              rows={1}
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -127,11 +143,11 @@ export function MessageBubble({
                   setEditText(message.text);
                   setEditing(false);
                 }}
-                className="text-xs opacity-80 hover:opacity-100"
+                className="text-xs opacity-80 hover:opacity-100 cursor-pointer"
               >
                 {t("cancel")}
               </button>
-              <button type="button" onClick={handleSaveEdit} className="text-xs font-medium opacity-80 hover:opacity-100">
+              <button type="button" onClick={handleSaveEdit} className="text-xs cursor-pointer font-medium opacity-80 hover:opacity-100">
                 {t("save")}
               </button>
             </div>
