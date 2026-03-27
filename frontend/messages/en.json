@@ -239,7 +239,9 @@
   "postDetail": {
     "backToHome": "Back to Home",
     "loadingPost": "Loading post...",
-    "postNotFound": "Post not found"
+    "postNotFound": "Post Not Found",
+    "notFoundDescription": "This post may have been deleted or the link is incorrect.",
+    "goBack": "Go Back"
   },
   "admin": {
     "users": "Users",

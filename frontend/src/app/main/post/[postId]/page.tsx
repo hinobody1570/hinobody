@@ -42,6 +42,7 @@ export default function PostDetailPage() {
   const [rawPost, setRawPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
@@ -49,11 +50,18 @@ export default function PostDetailPage() {
       try {
         setLoading(true);
         setError(null);
+        setNotFound(false);
         const postData = await postsApi.getById(postId);
         setRawPost(postData);
       } catch (err: any) {
         console.error('Error fetching post:', err);
-        setError(err.message || t('postNotFound'));
+        if (err?.statusCode === 404) {
+          setNotFound(true);
+          setRawPost(null);
+          setError(null);
+          return;
+        }
+        setError(err?.message || t('postNotFound'));
       } finally {
         setLoading(false);
       }
@@ -79,6 +87,39 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <Loading />
+    );
+  }
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-6">
+        <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8 text-center">
+          <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <span className="text-xl font-semibold text-gray-700">?</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+            {t('postNotFound')}
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">
+            {t('notFoundDescription')}
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => router.back()}
+              className="min-h-[44px] px-4 py-2.5 sm:py-2 bg-white border border-gray-300 text-gray-800 rounded-lg hover:bg-gray-50 cursor-pointer touch-manipulation"
+            >
+              {t('goBack')}
+            </button>
+            <button
+              onClick={() => router.push(ROUTE_PATHS.HOME)}
+              className="min-h-[44px] px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer touch-manipulation"
+            >
+              {t('backToHome')}
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 
