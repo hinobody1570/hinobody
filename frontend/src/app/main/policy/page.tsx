@@ -18,6 +18,29 @@ const POLICY_DOCUMENTS_BY_LOCALE: Record<string, PolicyDocument[]> = {
   ja: policyDocumentsJa as PolicyDocument[],
 };
 
+function linkifyEmails(text: string) {
+  const emailRegex = /([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi;
+  const parts = text.split(emailRegex);
+
+  if (parts.length <= 1) return text;
+
+  return parts.map((part, idx) => {
+    if (!emailRegex.test(part)) return <span key={idx}>{part}</span>;
+    const email = part;
+    return (
+      <a
+        key={idx}
+        href={`mailto:${email}`}
+        target="_blank"
+        rel="noreferrer"
+        className="font-semibold text-teal-700 hover:text-teal-800 underline underline-offset-2"
+      >
+        {email}
+      </a>
+    );
+  });
+}
+
 function formatBody(body: string) {
   const lines = body.split("\n");
   const elements: React.ReactNode[] = [];
@@ -29,7 +52,7 @@ function formatBody(body: string) {
       elements.push(
         <ul key={elements.length} className="list-disc list-inside ml-4 my-2 space-y-1 text-gray-600">
           {listItems.map((item, i) => (
-            <li key={i}>{item.trim().replace(/^[•\-]\s*/, "")}</li>
+            <li key={i}>{linkifyEmails(item.trim().replace(/^[•\-]\s*/, ""))}</li>
           ))}
         </ul>
       );
@@ -43,7 +66,7 @@ function formatBody(body: string) {
       if (text) {
         elements.push(
           <p key={elements.length} className="my-2 text-gray-600 leading-relaxed">
-            {text}
+            {linkifyEmails(text)}
           </p>
         );
       }
