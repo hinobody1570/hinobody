@@ -10,6 +10,7 @@ import { RecentPostCard } from "../reuseComponents/RecentPostCard";
 import { postsApi, Post, PostSortBy } from "@/lib/api";
 import DP from "./../../../public/assets/images/avatar_default_4.png";
 import { formatTimestamp } from "@/utils/helperFunction";
+import { ROUTE_PATHS } from "@/routes/paths";
 
 // Transform API post to PostCard format
 const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
@@ -366,13 +367,13 @@ export const RedditFeed = () => {
                     {/* <a href="#" className="hover:underline">
                       {t('redditRules')}
                     </a> */}
-                    <a href="#" className="hover:underline">
+                    <a href={ROUTE_PATHS.POLICY} className="hover:underline">
                       {t('privacyPolicy')}
                     </a>
-                    <a href="#" className="hover:underline">
+                    <a href={ROUTE_PATHS.POLICY} className="hover:underline">
                       {t('userAgreement')}
                     </a>
-                    <a href="#" className="hover:underline">
+                    <a href={ROUTE_PATHS.POLICY} className="hover:underline">
                       {t('accessibility')}
                     </a>
                   </div>
