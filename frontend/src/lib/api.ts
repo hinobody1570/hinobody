@@ -834,6 +834,13 @@ export const commentsApi = {
   delete: async (id: string): Promise<void> => {
     await api.delete(`${API_END_POINT.COMMENTS}/${id}`);
   },
+  updateStatusAdmin: async (id: string, isActive: boolean): Promise<Comment> => {
+    const response = await api.patch<ApiResponse<Comment>>(
+      `${API_END_POINT.COMMENTS}/admin/${id}/status`,
+      { isActive },
+    );
+    return (response as any)?.data ?? response;
+  },
 };
 
 // Reports API endpoints

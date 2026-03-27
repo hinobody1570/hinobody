@@ -14,6 +14,7 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { QueryCommentsDto } from './dto/query-comments.dto';
+import { UpdateCommentStatusDto } from './dto/update-comment-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
@@ -50,6 +51,21 @@ export class CommentController {
       throw new ForbiddenException('Only admins can access all comments');
     }
     return this.commentService.findAllForAdmin(query);
+  }
+
+  @Patch('admin/:id/status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Admin: update comment active/inactive status' })
+  updateStatusByAdmin(
+    @Param('id') id: string,
+    @Body() dto: UpdateCommentStatusDto,
+    @GetUser('role') role: string,
+  ) {
+    if (role !== 'ADMIN') {
+      throw new ForbiddenException('Only admins can update comment status');
+    }
+    return this.commentService.updateStatusByAdmin(id, dto.isActive);
   }
 
   @Get('post/:postId')

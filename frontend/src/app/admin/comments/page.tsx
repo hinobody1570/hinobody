@@ -7,13 +7,13 @@ import { DataTable } from "@/components/admin/DataTable";
 import { commentsApi, Comment } from "@/lib/api";
 import { formatTimestamp } from "@/utils/helperFunction";
 import { useToast } from "@/contexts/ToastContext";
-import { FaTrash, FaEye } from "react-icons/fa";
+import { FaTrash, FaEye, FaBan, FaCheck } from "react-icons/fa";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Loading from "@/components/reuseComponents/Loading";
 import ErrorSection from "@/components/reuseComponents/ErrorSection";
 
-type ActionType = "delete" | null;
+type ActionType = "delete" | "toggleStatus" | null;
 
 export default function AdminCommentsPage() {
   const t = useTranslations("admin");
@@ -31,11 +31,13 @@ export default function AdminCommentsPage() {
     action: ActionType;
     commentId: string | null;
     commentBody: string | null;
+    nextIsActive: boolean | null;
   }>({
     isOpen: false,
     action: null,
     commentId: null,
     commentBody: null,
+    nextIsActive: null,
   });
 
   const fetchComments = async (page: number = 1) => {
@@ -57,12 +59,18 @@ export default function AdminCommentsPage() {
     fetchComments(currentPage);
   }, [currentPage]);
 
-  const openConfirmationModal = (action: ActionType, commentId: string, commentBody: string) => {
+  const openConfirmationModal = (
+    action: ActionType,
+    commentId: string,
+    commentBody: string,
+    nextIsActive: boolean | null = null,
+  ) => {
     setConfirmationModal({
       isOpen: true,
       action,
       commentId,
       commentBody,
+      nextIsActive,
     });
   };
 
@@ -72,13 +80,14 @@ export default function AdminCommentsPage() {
       action: null,
       commentId: null,
       commentBody: null,
+      nextIsActive: null,
     });
   };
 
   const handleAction = async () => {
     if (!confirmationModal.commentId || !confirmationModal.action) return;
 
-    const { commentId, action } = confirmationModal;
+    const { commentId, action, nextIsActive } = confirmationModal;
 
     try {
       setActionLoading(commentId);
@@ -86,6 +95,13 @@ export default function AdminCommentsPage() {
       if (action === "delete") {
         await commentsApi.delete(commentId);
         showSuccess(t("commentDeleted"));
+      }
+      if (action === "toggleStatus") {
+        if (typeof nextIsActive !== "boolean") {
+          throw new Error("Invalid status update");
+        }
+        await commentsApi.updateStatusAdmin(commentId, nextIsActive);
+        showSuccess(nextIsActive ? t("commentActivated") : t("commentDeactivated"));
       }
 
       const response = await commentsApi.getAllAdmin({ page: currentPage, limit: 20 });
@@ -116,6 +132,17 @@ export default function AdminCommentsPage() {
           confirmText: t("delete"),
           confirmButtonColor: "red" as const,
         };
+      case "toggleStatus": {
+        const nextActive = confirmationModal.nextIsActive === true;
+        return {
+          title: nextActive ? t("activateComment") : t("deactivateComment"),
+          description: nextActive
+            ? t("confirmActivateCommentDescription", { body: bodyPreview })
+            : t("confirmDeactivateCommentDescription", { body: bodyPreview }),
+          confirmText: nextActive ? t("activate") : t("deactivate"),
+          confirmButtonColor: nextActive ? ("green" as const) : ("red" as const),
+        };
+      }
       default:
         return { title: "", description: "" };
     }
@@ -155,6 +182,20 @@ export default function AdminCommentsPage() {
       header: t("upvotes"),
     },
     {
+      key: "isActive",
+      header: t("status"),
+      render: (value: boolean) => (
+        <span
+          className={[
+            "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
+            value ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-700",
+          ].join(" ")}
+        >
+          {value ? t("active") : t("inactive")}
+        </span>
+      ),
+    },
+    {
       key: "createdAt",
       header: t("createdAt"),
       render: (value: string) => formatTimestamp(value, tTime),
@@ -171,6 +212,17 @@ export default function AdminCommentsPage() {
             title={t("viewDetails")}
           >
             <FaEye size={16} />
+          </button>
+          <button
+            onClick={() => openConfirmationModal("toggleStatus", row.id, row.body, !row.isActive)}
+            disabled={actionLoading === row.id || row.isDeleted}
+            className={[
+              "p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+              row.isActive ? "text-red-600 hover:bg-red-50" : "text-green-600 hover:bg-green-50",
+            ].join(" ")}
+            title={row.isActive ? t("deactivate") : t("activate")}
+          >
+            {row.isActive ? <FaBan size={16} /> : <FaCheck size={16} />}
           </button>
           <button
             onClick={() => openConfirmationModal("delete", row.id, row.body)}
