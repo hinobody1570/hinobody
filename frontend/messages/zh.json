@@ -743,6 +743,7 @@
     "errors": {
       "nameRequired": "姓名为必填项",
       "nameTooLong": "姓名不能超过 {max} 个字符",
+      "nameInvalid": "姓名仅支持英文字母（A–Z, a–z）和空格",
       "emailRequired": "邮箱为必填项",
       "emailTooLong": "邮箱不能超过 {max} 个字符",
       "emailInvalid": "请输入有效的邮箱地址",

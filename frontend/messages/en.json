@@ -744,6 +744,7 @@
     "errors": {
       "nameRequired": "Name is required",
       "nameTooLong": "Name must be {max} characters or less",
+      "nameInvalid": "Name can only contain letters (A–Z, a–z) and spaces",
       "emailRequired": "Email is required",
       "emailTooLong": "Email must be {max} characters or less",
       "emailInvalid": "Please enter a valid email address",

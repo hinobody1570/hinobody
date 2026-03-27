@@ -743,6 +743,7 @@
     "errors": {
       "nameRequired": "お名前は必須です",
       "nameTooLong": "お名前は{max}文字以内で入力してください",
+      "nameInvalid": "お名前は英字（A–Z, a–z）とスペースのみ入力できます",
       "emailRequired": "メールアドレスは必須です",
       "emailTooLong": "メールアドレスは{max}文字以内で入力してください",
       "emailInvalid": "有効なメールアドレスを入力してください",

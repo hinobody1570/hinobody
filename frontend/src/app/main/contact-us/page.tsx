@@ -24,6 +24,10 @@ const EMAIL_MAX = 255;
 const SUBJECT_MAX = 255;
 const MAX_MESSAGE_LENGTH = 1000;
 
+function isValidContactName(name: string) {
+  return /^[A-Za-z ]+$/.test(name);
+}
+
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -51,6 +55,7 @@ export default function ContactUsPage() {
     const name = data.name.trim();
     if (!name) nextErrors.name = t("errors.nameRequired");
     else if (name.length > NAME_MAX) nextErrors.name = t("errors.nameTooLong", { max: NAME_MAX });
+    else if (!isValidContactName(name)) nextErrors.name = t("errors.nameInvalid");
 
     const email = data.email.trim();
     if (!email) nextErrors.email = t("errors.emailRequired");
@@ -227,7 +232,7 @@ export default function ContactUsPage() {
                     name="name"
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setField("name", e.target.value)}
+                    onChange={(e) => setField("name", e.target.value.replace(/[^A-Za-z ]+/g, ""))}
                     onBlur={() => markTouched("name")}
                     placeholder={t("namePlaceholder")}
                     maxLength={NAME_MAX}
