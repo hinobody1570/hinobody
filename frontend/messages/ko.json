@@ -239,7 +239,9 @@
   "postDetail": {
     "backToHome": "홈으로 돌아가기",
     "loadingPost": "게시물 로딩 중...",
-    "postNotFound": "게시물을 찾을 수 없습니다"
+    "postNotFound": "게시물을 찾을 수 없습니다",
+    "notFoundDescription": "게시물이 삭제되었거나 링크가 올바르지 않습니다.",
+    "goBack": "뒤로 가기"
   },
   "admin": {
     "users": "사용자",
@@ -355,6 +357,12 @@
     "commentDeleted": "댓글이 성공적으로 삭제되었습니다",
     "confirmDeleteCommentDescription": "이 댓글을 삭제하시겠습니까? \"{body}\" 이 작업은 취소할 수 없습니다.",
     "deleteCommentError": "댓글 삭제에 실패했습니다",
+    "activateComment": "댓글 활성화",
+    "deactivateComment": "댓글 비활성화",
+    "confirmActivateCommentDescription": "이 댓글을 활성화하시겠습니까? \"{body}\" 사용자에게 표시됩니다.",
+    "confirmDeactivateCommentDescription": "이 댓글을 비활성화하시겠습니까? \"{body}\" 사용자에게 숨겨집니다.",
+    "commentActivated": "댓글이 성공적으로 활성화되었습니다",
+    "commentDeactivated": "댓글이 성공적으로 비활성화되었습니다",
     "body": "내용",
     "activatePostError": "게시물 활성화 실패",
     "deactivatePostError": "게시물 비활성화 실패",
@@ -474,7 +482,7 @@
     "privacyPolicy": "개인정보 보호 정책",
     "userAgreement": "사용자 계약",
     "accessibility": "접근성",
-    "redditCopyright": "Reddit, Inc. © 2025. 모든 권리 보유.",
+    "redditCopyright": "HiNobody, Inc. © 2025. 모든 권리 보유.",
     "join": "가입",
     "joined": "가입됨",
     "share": "공유",
@@ -736,6 +744,7 @@
     "errors": {
       "nameRequired": "이름은 필수입니다",
       "nameTooLong": "이름은 {max}자 이하여야 합니다",
+      "nameInvalid": "이름은 영문자(A–Z, a–z)와 공백만 입력할 수 있습니다",
       "emailRequired": "이메일은 필수입니다",
       "emailTooLong": "이메일은 {max}자 이하여야 합니다",
       "emailInvalid": "유효한 이메일 주소를 입력해주세요",

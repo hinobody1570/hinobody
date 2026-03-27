@@ -239,7 +239,9 @@
   "postDetail": {
     "backToHome": "ホームに戻る",
     "loadingPost": "投稿を読み込み中...",
-    "postNotFound": "投稿が見つかりません"
+    "postNotFound": "投稿が見つかりません",
+    "notFoundDescription": "投稿は削除された可能性があるか、リンクが正しくありません。",
+    "goBack": "戻る"
   },
   "admin": {
     "users": "ユーザー",
@@ -355,6 +357,12 @@
     "commentDeleted": "コメントが正常に削除されました",
     "confirmDeleteCommentDescription": "このコメントを削除してもよろしいですか？「{body}」この操作は元に戻せません。",
     "deleteCommentError": "コメントの削除に失敗しました",
+    "activateComment": "コメントを有効化",
+    "deactivateComment": "コメントを無効化",
+    "confirmActivateCommentDescription": "このコメント「{body}」を有効化してもよろしいですか？ユーザーに表示されます。",
+    "confirmDeactivateCommentDescription": "このコメント「{body}」を無効化してもよろしいですか？ユーザーに非表示になります。",
+    "commentActivated": "コメントが正常に有効化されました",
+    "commentDeactivated": "コメントが正常に無効化されました",
     "body": "内容",
     "activatePostError": "投稿の有効化に失敗しました",
     "deactivatePostError": "投稿の無効化に失敗しました",
@@ -475,7 +483,7 @@
     "privacyPolicy": "プライバシーポリシー",
     "userAgreement": "利用規約",
     "accessibility": "アクセシビリティ",
-    "redditCopyright": "Reddit, Inc. © 2025. 全著作権所有。",
+    "redditCopyright": "HiNobody, Inc. © 2025. 全著作権所有。",
     "join": "参加",
     "joined": "参加済み",
     "share": "共有",
@@ -737,6 +745,7 @@
     "errors": {
       "nameRequired": "お名前は必須です",
       "nameTooLong": "お名前は{max}文字以内で入力してください",
+      "nameInvalid": "お名前は英字（A–Z, a–z）とスペースのみ入力できます",
       "emailRequired": "メールアドレスは必須です",
       "emailTooLong": "メールアドレスは{max}文字以内で入力してください",
       "emailInvalid": "有効なメールアドレスを入力してください",

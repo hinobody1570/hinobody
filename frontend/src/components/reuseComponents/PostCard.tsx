@@ -53,6 +53,16 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
 
   const isAuthor = currentUser?.id && post?.authorId && currentUser.id === post.authorId;
 
+  const handleOpenBoard = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!post?.boardId) return;
+
+    const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+    const targetBase = pathname.startsWith("/admin") ? ROUTE_PATHS.ADMIN_BOARDS : ROUTE_PATHS.BOARD_PROFILE;
+    router.push(`${targetBase}/${post.boardId}`);
+  };
+
   const redirectToLogin = () => {
     const current = `${window.location.pathname}${window.location.search}`;
     router.push(`${ROUTE_PATHS.LOGIN}?redirect=${encodeURIComponent(current)}`);
@@ -284,9 +294,20 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
           <Image src={post?.communityAvatar} alt={post?.community} className="w-8 h-8 rounded-full flex-shrink-0" />
           <div className="flex gap-1.5 sm:gap-2 min-w-0 flex-1 overflow-hidden">
             <div className="flex flex-col min-w-0">
-              <span className="font-bold text-sm hover:underline cursor-pointer truncate min-w-0" title={post?.community}>
-                {post?.community}
-              </span>
+              {post?.boardId ? (
+                <button
+                  type="button"
+                  onClick={handleOpenBoard}
+                  className="text-left font-bold text-sm hover:underline cursor-pointer truncate min-w-0"
+                  title={post?.community}
+                >
+                  {post?.community}
+                </button>
+              ) : (
+                <span className="font-bold text-sm truncate min-w-0" title={post?.community}>
+                  {post?.community}
+                </span>
+              )}
               {post?.authorId ? (
                 <AuthorPopup authorId={post.authorId} authorName={post?.authorName ?? ""}>
                   {post?.authorName}

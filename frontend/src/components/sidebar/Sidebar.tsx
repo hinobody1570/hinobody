@@ -2,7 +2,7 @@
 
 import { ROUTE_PATHS } from "@/routes/paths";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FaBars, FaPlus } from "react-icons/fa6";
 import { IoChatbubbleOutline, IoDocumentTextOutline, IoHomeOutline, IoInformationCircleOutline, IoMailOutline, IoNewspaperOutline } from "react-icons/io5";
@@ -26,6 +26,23 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
   const [isCommunityPopupOpen, setIsCommunityPopupOpen] = useState(false);
   const t = useTranslations("sidebar");
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const isActiveNavigate = (navigate: string) => {
+    try {
+      const url = new URL(navigate, "http://local");
+      if (pathname !== url.pathname) return false;
+
+      for (const [key, value] of url.searchParams.entries()) {
+        if (searchParams.get(key) !== value) return false;
+      }
+
+      return true;
+    } catch {
+      return pathname === navigate;
+    }
+  };
 
   const MAIN_MENU = [
     { icon: IoHomeOutline, label: t("home"), navigate: ROUTE_PATHS.HOME },
@@ -75,6 +92,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
               <MenuItem
                 key={index}
                 {...item}
+                isActive={isActiveNavigate(item.navigate)}
                 onClick={() => {
                   if (item.label === t("startCommunity")) {
                     setIsCommunityPopupOpen(true);
@@ -100,6 +118,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
                 <MenuItem
                   key={index}
                   {...item}
+                  isActive={isActiveNavigate(item.navigate)}
                   onClick={() => {
                     router.push(item.navigate);
                     onItemClick?.();

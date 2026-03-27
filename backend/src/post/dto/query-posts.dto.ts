@@ -79,4 +79,8 @@ export class QueryPostsDto {
   @IsString()
   @IsIn(['News', 'Reviews', 'Recommend', 'Free Board'])
   category?: string;
+  
+  @ApiPropertyOptional()
+  @IsOptional()
+  isActive?: boolean
 }

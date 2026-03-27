@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -490,6 +491,37 @@ export class CommentService {
     await this.prisma.post.update({
       where: { id: postId },
       data: { commentCount: { decrement: 1 } },
+    });
+  }
+
+  async updateStatusByAdmin(id: string, isActive: boolean): Promise<Comment> {
+    const comment = await this.prisma.comment.findUnique({ where: { id } });
+
+    if (!comment) {
+      throw new NotFoundException(`Comment with ID ${id} not found`);
+    }
+
+    if (comment.isDeleted && isActive) {
+      throw new BadRequestException('Cannot activate a deleted comment');
+    }
+
+    return this.prisma.comment.update({
+      where: { id },
+      data: { isActive },
+      include: {
+        author: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+        post: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
     });
   }
 }

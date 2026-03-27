@@ -239,7 +239,9 @@
   "postDetail": {
     "backToHome": "Back to Home",
     "loadingPost": "Loading post...",
-    "postNotFound": "Post not found"
+    "postNotFound": "Post Not Found",
+    "notFoundDescription": "This post may have been deleted or the link is incorrect.",
+    "goBack": "Go Back"
   },
   "admin": {
     "users": "Users",
@@ -373,6 +375,12 @@
     "commentDeleted": "Comment deleted successfully",
     "confirmDeleteCommentDescription": "Are you sure you want to delete this comment? \"{body}\" This action cannot be undone.",
     "deleteCommentError": "Failed to delete comment",
+    "activateComment": "Activate Comment",
+    "deactivateComment": "Deactivate Comment",
+    "confirmActivateCommentDescription": "Are you sure you want to activate this comment? \"{body}\" It will be visible to users.",
+    "confirmDeactivateCommentDescription": "Are you sure you want to deactivate this comment? \"{body}\" It will be hidden from users.",
+    "commentActivated": "Comment activated successfully",
+    "commentDeactivated": "Comment deactivated successfully",
     "body": "Content",
     "activatePostError": "Failed to activate post",
     "deactivatePostError": "Failed to deactivate post",
@@ -475,7 +483,7 @@
     "privacyPolicy": "Privacy Policy",
     "userAgreement": "User Agreement",
     "accessibility": "Accessibility",
-    "redditCopyright": "Reddit, Inc. © 2025. All rights reserved.",
+    "redditCopyright": "HiNobody, Inc. © 2025. All rights reserved.",
     "join": "Join",
     "joined": "Joined",
     "share": "Share",
@@ -738,6 +746,7 @@
     "errors": {
       "nameRequired": "Name is required",
       "nameTooLong": "Name must be {max} characters or less",
+      "nameInvalid": "Name can only contain letters (A–Z, a–z) and spaces",
       "emailRequired": "Email is required",
       "emailTooLong": "Email must be {max} characters or less",
       "emailInvalid": "Please enter a valid email address",

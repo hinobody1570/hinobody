@@ -834,6 +834,13 @@ export const commentsApi = {
   delete: async (id: string): Promise<void> => {
     await api.delete(`${API_END_POINT.COMMENTS}/${id}`);
   },
+  updateStatusAdmin: async (id: string, isActive: boolean): Promise<Comment> => {
+    const response = await api.patch<ApiResponse<Comment>>(
+      `${API_END_POINT.COMMENTS}/admin/${id}/status`,
+      { isActive },
+    );
+    return (response as any)?.data ?? response;
+  },
 };
 
 // Reports API endpoints
@@ -1195,8 +1202,20 @@ export const chatApi = {
     const response = await api.get<ApiResponse<ChatContact[]>>(API_END_POINT.CHAT_CONTACTS);
     return response.data;
   },
-  getUsers: async (limit = 50): Promise<Array<{ id: string; nickname: string; avatar: string | null }>> => {
-    const response = await api.get<ApiResponse<Array<{ id: string; nickname: string; avatar: string | null }>>>(
+  getUsers: async (limit = 50): Promise<Array<{
+    id: string;
+    nickname: string;
+    avatar: string | null;
+    isActive?: boolean;
+    emailVerified?: boolean;
+  }>> => {
+    const response = await api.get<ApiResponse<Array<{
+      id: string;
+      nickname: string;
+      avatar: string | null;
+      isActive?: boolean;
+      emailVerified?: boolean;
+    }>>>(
       `${API_END_POINT.CHAT_USERS}?limit=${limit}`
     );
     return response.data;

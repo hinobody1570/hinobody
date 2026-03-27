@@ -34,12 +34,14 @@ export default function AdminPostDetailPage() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations("admin");
+  const tPostDetail = useTranslations("postDetail");
   const tTime = useTranslations("timeAgo");
   const postId = params?.postId as string;
 
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     if (!postId) return;
@@ -47,11 +49,18 @@ export default function AdminPostDetailPage() {
     const fetchPostData = async () => {
       try {
         setLoading(true);
+        setNotFound(false);
+        setError(null);
         const postData = await postsApi.getById(postId);
         setPost(postData);
       } catch (err: any) {
         console.error("Error fetching post:", err);
-        setError(err.message || t("errorLoadingPost"));
+        if (err?.statusCode === 404) {
+          setNotFound(true);
+          setPost(null);
+          return;
+        }
+        setError(err?.message || t("errorLoadingPost"));
       } finally {
         setLoading(false);
       }
@@ -62,6 +71,28 @@ export default function AdminPostDetailPage() {
 
   if (loading) {
     return <Loading />;
+  }
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-6">
+        <div className="max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8 text-center">
+          <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <span className="text-xl font-semibold text-gray-700">?</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{tPostDetail("postNotFound")}</h1>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">
+            {tPostDetail("notFoundDescription")}
+          </p>
+          <button
+            onClick={() => router.push(ROUTE_PATHS.ADMIN_POSTS)}
+            className="min-h-[44px] px-4 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer touch-manipulation"
+          >
+            {t("backToPosts")}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (error || !post) {

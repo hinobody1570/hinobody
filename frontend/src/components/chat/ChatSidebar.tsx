@@ -94,10 +94,14 @@ export function ChatSidebar({
       <div className="flex-1 overflow-y-auto py-2 px-2 chat-scrollbar flex flex-col">
         {filteredContacts.map((contact) => {
           const thread = messages[contact.id];
-          const lastFromThread =
-            thread?.length && thread[thread.length - 1].text
-              ? thread[thread.length - 1].text.slice(0, 28) + (thread[thread.length - 1].text.length > 28 ? "…" : "")
-              : undefined;
+          const latest = thread?.length ? thread[thread.length - 1] : undefined;
+          const lastFromThread = latest
+            ? latest.isDeleted
+              ? t("messageDeleted")
+              : latest.text
+                ? latest.text.slice(0, 28) + (latest.text.length > 28 ? "…" : "")
+                : undefined
+            : undefined;
           // Prefer live thread state so sidebar updates instantly on send/receive.
           const lastMsg = lastFromThread ?? contact.lastMessage;
           return (

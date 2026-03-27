@@ -239,7 +239,9 @@
   "postDetail": {
     "backToHome": "返回首页",
     "loadingPost": "加载帖子中...",
-    "postNotFound": "未找到帖子"
+    "postNotFound": "未找到帖子",
+    "notFoundDescription": "该帖子可能已被删除，或链接不正确。",
+    "goBack": "返回"
   },
   "admin": {
     "users": "用户",
@@ -356,6 +358,12 @@
     "commentDeleted": "评论已成功删除",
     "confirmDeleteCommentDescription": "您确定要删除此评论吗？「{body}」此操作无法撤销。",
     "deleteCommentError": "删除评论失败",
+    "activateComment": "激活评论",
+    "deactivateComment": "停用评论",
+    "confirmActivateCommentDescription": "您确定要激活此评论吗？「{body}」它将对用户可见。",
+    "confirmDeactivateCommentDescription": "您确定要停用此评论吗？「{body}」它将对用户隐藏。",
+    "commentActivated": "评论激活成功",
+    "commentDeactivated": "评论停用成功",
     "body": "内容",
     "activatePostError": "激活帖子失败",
     "deactivatePostError": "停用帖子失败",
@@ -475,7 +483,7 @@
     "privacyPolicy": "隐私政策",
     "userAgreement": "用户协议",
     "accessibility": "无障碍",
-    "redditCopyright": "Reddit, Inc. © 2025. 保留所有权利。",
+    "redditCopyright": "HiNobody, Inc. © 2025. 保留所有权利。",
     "join": "加入",
     "joined": "已加入",
     "share": "分享",
@@ -737,6 +745,7 @@
     "errors": {
       "nameRequired": "姓名为必填项",
       "nameTooLong": "姓名不能超过 {max} 个字符",
+      "nameInvalid": "姓名仅支持英文字母（A–Z, a–z）和空格",
       "emailRequired": "邮箱为必填项",
       "emailTooLong": "邮箱不能超过 {max} 个字符",
       "emailInvalid": "请输入有效的邮箱地址",
