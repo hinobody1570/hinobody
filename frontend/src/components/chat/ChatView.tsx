@@ -53,6 +53,7 @@ export function ChatView({
 }: ChatViewProps) {
   const t = useTranslations("chat");
   const endRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   /** Track thread shape so we only auto-scroll on new messages, not on edit/delete of older items. */
   const prevThreadMetaRef = useRef<{
     contactId: string;
@@ -62,12 +63,24 @@ export function ChatView({
   const currentMsgs = messages[selectedContact.id] ?? [];
   const [sidebarOpen, setSidebarOpen] = useState(initialSidebarOpen);
 
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior });
+      return;
+    }
+    endRef.current?.scrollIntoView({ behavior });
+  }, []);
+
   const handleSelectContact = useCallback(
     (contact: Contact) => {
       onSelectContact(contact);
+      // Even if user reopens the same chat, always show latest messages.
+      scrollToBottom("auto");
+      requestAnimationFrame(() => scrollToBottom("auto"));
       if (contact.id !== "__placeholder__") setSidebarOpen(false);
     },
-    [onSelectContact]
+    [onSelectContact, scrollToBottom]
   );
 
   useEffect(() => {
@@ -76,12 +89,10 @@ export function ChatView({
     const lastId = len > 0 ? thread[len - 1]?.id : undefined;
     const prev = prevThreadMetaRef.current;
 
-    const scrollToEnd = () => {
-      endRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
     if (selectedContact.id !== prev.contactId) {
-      scrollToEnd();
+      // Always jump to latest when (re)opening another chat thread.
+      scrollToBottom("auto");
+      requestAnimationFrame(() => scrollToBottom("auto"));
       prevThreadMetaRef.current = {
         contactId: selectedContact.id,
         length: len,
@@ -91,11 +102,11 @@ export function ChatView({
     }
 
     if (len > prev.length) {
-      scrollToEnd();
+      scrollToBottom();
     } else if (len === prev.length && len > 0 && lastId && prev.lastMessageId && lastId !== prev.lastMessageId) {
       const wasOptimistic = String(prev.lastMessageId).startsWith("temp-");
       if (wasOptimistic) {
-        scrollToEnd();
+        scrollToBottom();
       }
     }
 
@@ -104,7 +115,14 @@ export function ChatView({
       length: len,
       lastMessageId: lastId,
     };
-  }, [messages, selectedContact.id]);
+  }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    if (sidebarOpen) return;
+    // Mobile/visibility reopen case: ensure thread opens at bottom.
+    scrollToBottom("auto");
+    requestAnimationFrame(() => scrollToBottom("auto"));
+  }, [sidebarOpen, selectedContact.id, scrollToBottom]);
 
   return (
     <div className="h-full flex overflow-hidden bg-black text-white font-[inherit]">
@@ -138,7 +156,7 @@ export function ChatView({
             )}
           </div>
         )} */}
-        <div className="flex-1 overflow-y-auto py-5 px-5 pb-3 flex flex-col gap-1 chat-scrollbar">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto py-5 px-5 pb-3 flex flex-col gap-1 chat-scrollbar">
           {loadingMessages ? (
             <div className="flex-1 flex items-center justify-center text-gray-500">
               {t("loadingMessages")}
