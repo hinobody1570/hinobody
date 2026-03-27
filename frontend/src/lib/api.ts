@@ -1195,8 +1195,20 @@ export const chatApi = {
     const response = await api.get<ApiResponse<ChatContact[]>>(API_END_POINT.CHAT_CONTACTS);
     return response.data;
   },
-  getUsers: async (limit = 50): Promise<Array<{ id: string; nickname: string; avatar: string | null }>> => {
-    const response = await api.get<ApiResponse<Array<{ id: string; nickname: string; avatar: string | null }>>>(
+  getUsers: async (limit = 50): Promise<Array<{
+    id: string;
+    nickname: string;
+    avatar: string | null;
+    isActive?: boolean;
+    emailVerified?: boolean;
+  }>> => {
+    const response = await api.get<ApiResponse<Array<{
+      id: string;
+      nickname: string;
+      avatar: string | null;
+      isActive?: boolean;
+      emailVerified?: boolean;
+    }>>>(
       `${API_END_POINT.CHAT_USERS}?limit=${limit}`
     );
     return response.data;

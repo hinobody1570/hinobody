@@ -14,7 +14,13 @@ interface NewChatModalProps {
 }
 
 export function NewChatModal({ isOpen, onClose, onSelectUser }: NewChatModalProps) {
-  const [users, setUsers] = useState<Array<{ id: string; nickname: string; avatar: string | null }>>([]);
+  const [users, setUsers] = useState<Array<{
+    id: string;
+    nickname: string;
+    avatar: string | null;
+    isActive?: boolean;
+    emailVerified?: boolean;
+  }>>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -24,7 +30,13 @@ export function NewChatModal({ isOpen, onClose, onSelectUser }: NewChatModalProp
     setSearch("");
     chatApi
       .getUsers(100)
-      .then(setUsers)
+      .then((list) =>
+        setUsers(
+          list.filter(
+            (u) => u.isActive !== false && u.emailVerified !== false
+          )
+        )
+      )
       .finally(() => setLoading(false));
   }, [isOpen]);
 

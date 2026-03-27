@@ -199,6 +199,7 @@ export class ChatService {
       where: {
         id: { not: userId },
         isActive: true,
+        emailVerified: true,
       },
       take: limit,
       select: { id: true, nickname: true, avatar: true },
