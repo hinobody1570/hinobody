@@ -85,7 +85,7 @@ export class BoardService {
     }
 
     const where: Prisma.BoardWhereInput = {
-      isActive: true,
+      // isActive: true,
     };
 
     const [boards, total] = await Promise.all([
