@@ -784,6 +784,7 @@ export class PostService {
     return this.findAll(
       {
         ...query,
+        isActive: true,
         boardId: undefined, // Remove board filter for home feed
       },
       userId,
