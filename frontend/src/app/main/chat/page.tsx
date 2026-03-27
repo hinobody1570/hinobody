@@ -260,7 +260,7 @@ export default function ChatPage() {
 
   if (loadingContacts && contacts.length === 0) {
     return (
-      <div className="h-full flex items-center justify-center bg-black text-white">
+      <div className="h-full flex items-center justify-center bg-white text-black">
         <p>{t("loading")}</p>
       </div>
     );
