@@ -772,11 +772,18 @@ export class PostService {
       }
     }
 
-    // Soft delete the post
-    await this.prisma.post.update({
-      where: { id },
-      data: { isDeleted: true, isActive: false },
-    });
+    // Soft-delete associated comments (including nested replies)
+    // and soft-delete the post in the same transaction.
+    await this.prisma.$transaction([
+      this.prisma.comment.updateMany({
+        where: { postId: id },
+        data: { isDeleted: true, isActive: false },
+      }),
+      this.prisma.post.update({
+        where: { id },
+        data: { isDeleted: true, isActive: false },
+      }),
+    ]);
   }
 
   // Get home feed (all boards combined)
