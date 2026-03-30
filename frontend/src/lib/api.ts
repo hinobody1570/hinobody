@@ -468,6 +468,8 @@ export interface QueryPostsParams {
   search?: string;
   sortBy?: PostSortBy;
   category?: string;
+  /** Admin only: backend includes soft-deleted posts when true */
+  includeDeleted?: boolean;
 }
 
 export const postsApi = {
@@ -477,7 +479,7 @@ export const postsApi = {
     return response.data;
   },
   getAll: async (params: QueryPostsParams = {}): Promise<PostsResponse> => {
-    const { page = 1, limit = 20, boardId, authorId, commenterId, search, sortBy, category } = params;
+    const { page = 1, limit = 20, boardId, authorId, commenterId, search, sortBy, category, includeDeleted } = params;
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -499,6 +501,9 @@ export const postsApi = {
     }
     if (category) {
       queryParams.append('category', category);
+    }
+    if (includeDeleted === true) {
+      queryParams.append('includeDeleted', 'true');
     }
     const response = await api.get<ApiResponse<PostsResponse>>(`${API_END_POINT.POSTS}?${queryParams.toString()}`);
     // API returns { statusCode, message, error, data: { data: Post[], meta: {...} } }

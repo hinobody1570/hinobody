@@ -130,7 +130,11 @@ export default function AdminPostDetailPage() {
               </span>
               <span>
                 <strong>{t("status")}:</strong>{" "}
-                <span className={post.isActive ? "text-green-600" : "text-red-600"}>{post.isActive ? t("active") : t("inactive")}</span>
+                {post.isDeleted ? (
+                  <span className="text-slate-700 font-medium">{t("deleted")}</span>
+                ) : (
+                  <span className={post.isActive ? "text-green-600" : "text-red-600"}>{post.isActive ? t("active") : t("inactive")}</span>
+                )}
               </span>
               <span>
                 <strong>{t("createdAt")}:</strong> {formatTimestamp(post.createdAt, tTime)}

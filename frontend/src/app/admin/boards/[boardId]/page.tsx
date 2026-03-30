@@ -69,7 +69,7 @@ export default function AdminBoardDetailPage() {
     const fetchPosts = async () => {
       try {
         setLoadingPosts(true);
-        const response = await postsApi.getAll({ boardId, page: 1, limit: 10 });
+        const response = await postsApi.getAll({ boardId, page: 1, limit: 10, includeDeleted: true });
         setPosts(response.data);
       } catch (err: any) {
         console.error("Error fetching posts:", err);

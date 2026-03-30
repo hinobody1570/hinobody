@@ -264,6 +264,8 @@
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
+    "deleted": "Deleted",
+    "alreadyDeleted": "Already deleted",
     "emailVerified": "Email Verified",
     "verified": "Verified",
     "nonVerified": "Non Verified",

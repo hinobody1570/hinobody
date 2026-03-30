@@ -42,7 +42,7 @@ export default function AdminPostsPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await postsApi.getAll({ page, limit: 20 });
+      const response = await postsApi.getAll({ page, limit: 20, includeDeleted: true });
       setPosts(response.data ?? []);
       setMeta(response.meta ?? { total: 0, page, limit: 20, totalPages: 0 });
     } catch (err: any) {
@@ -95,7 +95,7 @@ export default function AdminPostsPage() {
       }
 
       // Refresh posts list (stay on current page)
-      const response = await postsApi.getAll({ page: currentPage, limit: 20 });
+      const response = await postsApi.getAll({ page: currentPage, limit: 20, includeDeleted: true });
       setPosts(response.data ?? []);
       setMeta(response.meta ?? { total: 0, page: currentPage, limit: 20, totalPages: 0 });
 
@@ -193,30 +193,31 @@ export default function AdminPostsPage() {
       header: "",
       actions: (row: Post) => (
         <div className="flex items-center gap-2">
-          {row.isActive ? (
-            <button
-              onClick={() => openConfirmationModal("deactivate", row.id, row.title)}
-              disabled={actionLoading === row.id}
-              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              title={t("deactivate")}
-            >
-              <FaBan size={16} />
-            </button>
-          ) : (
-            <button
-              onClick={() => openConfirmationModal("activate", row.id, row.title)}
-              disabled={actionLoading === row.id}
-              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              title={t("activate")}
-            >
-              <FaCheck size={16} />
-            </button>
-          )}
+          {!row.isDeleted &&
+            (row.isActive ? (
+              <button
+                onClick={() => openConfirmationModal("deactivate", row.id, row.title)}
+                disabled={actionLoading === row.id}
+                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                title={t("deactivate")}
+              >
+                <FaBan size={16} />
+              </button>
+            ) : (
+              <button
+                onClick={() => openConfirmationModal("activate", row.id, row.title)}
+                disabled={actionLoading === row.id}
+                className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                title={t("activate")}
+              >
+                <FaCheck size={16} />
+              </button>
+            ))}
           <button
             onClick={() => openConfirmationModal("delete", row.id, row.title)}
-            disabled={actionLoading === row.id}
+            disabled={actionLoading === row.id || row.isDeleted}
             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            title={t("delete")}
+            title={row.isDeleted ? t("alreadyDeleted") : t("delete")}
           >
             <FaTrash size={16} />
           </button>

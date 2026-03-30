@@ -93,8 +93,12 @@ export class PostController {
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
-  findOne(@Param('id') id: string, @GetUser('id') userId?: string) {
-    return this.postService.findOne(id, userId);
+  findOne(
+    @Param('id') id: string,
+    @GetUser('id') userId?: string,
+    @GetUser('role') role?: string,
+  ) {
+    return this.postService.findOne(id, userId, role === 'ADMIN');
   }
 
   @Patch(':id')
