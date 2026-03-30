@@ -12,7 +12,7 @@ export class SearchService {
     private boardService: BoardService,
   ) {}
 
-  async searchAll(searchDto: SearchDto) {
+  async searchAll(searchDto: SearchDto, userId: string, isAdmin: boolean = false) {
     const { q, page = 1, limit = 10 } = searchDto;
 
     if (!q || !q.trim()) {
@@ -26,10 +26,11 @@ export class SearchService {
     const normalizedQuery = q.trim();
     const skip = (page - 1) * limit;
 
-    // Search all three types in parallel
+    // Search all three types in parallel. Pass userId/isAdmin so posts respect the same rules as
+    // the feed (e.g. hide posts the user has reported, blocks, board visibility).
     const [usersResult, postsResult, boardsResult] = await Promise.all([
       this.searchUsers(normalizedQuery, page, limit, skip),
-      this.postService.findAll({ page, limit, search: normalizedQuery }),
+      this.postService.findAll({ page, limit, search: normalizedQuery }, userId, isAdmin),
       this.boardService.findAll({ page, limit, search: normalizedQuery }),
     ]);
 
