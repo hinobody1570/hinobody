@@ -265,6 +265,8 @@
     "status": "상태",
     "active": "활성",
     "inactive": "비활성",
+    "deleted": "삭제됨",
+    "alreadyDeleted": "이미 삭제됨",
     "emailVerified": "이메일 인증",
     "verified": "인증됨",
     "nonVerified": "미인증",

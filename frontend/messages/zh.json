@@ -265,6 +265,8 @@
     "status": "状态",
     "active": "活跃",
     "inactive": "非活跃",
+    "deleted": "已删除",
+    "alreadyDeleted": "已删除",
     "emailVerified": "邮箱验证",
     "verified": "已验证",
     "nonVerified": "未验证",

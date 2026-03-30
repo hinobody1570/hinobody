@@ -35,7 +35,7 @@ const RedditSidebar = ({ isOpen, onToggle, onItemClick }: RedditSidebarProps) =>
       if (pathname !== url.pathname) return false;
 
       for (const [key, value] of url.searchParams.entries()) {
-        if (searchParams.get(key) !== value) return false;
+        if (searchParams?.get(key) !== value) return false;
       }
 
       return true;

@@ -1,5 +1,5 @@
-import { IsOptional, IsString, IsInt, Min, Max, IsIn } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsInt, Min, Max, IsIn, IsBoolean } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export type PostSortBy = 'newest' | 'mostLiked' | 'trending';
@@ -82,5 +82,15 @@ export class QueryPostsDto {
   
   @ApiPropertyOptional()
   @IsOptional()
-  isActive?: boolean
+  isActive?: boolean;
+
+  /** When true and the requester is ADMIN, include soft-deleted posts in the list. Ignored for non-admins. */
+  @ApiPropertyOptional({ description: 'Admin only: include soft-deleted posts' })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') return undefined;
+    return value === true || value === 'true';
+  })
+  @IsBoolean()
+  includeDeleted?: boolean;
 }

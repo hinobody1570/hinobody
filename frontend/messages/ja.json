@@ -264,6 +264,8 @@
     "status": "ステータス",
     "active": "アクティブ",
     "inactive": "非アクティブ",
+    "deleted": "削除済み",
+    "alreadyDeleted": "すでに削除されています",
     "emailVerified": "メール認証",
     "verified": "認証済み",
     "nonVerified": "未認証",

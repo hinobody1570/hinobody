@@ -153,14 +153,24 @@ export class PostService {
    * Uses raw SQL because Prisma orderBy cannot express (upvote_count - downvote_count).
    */
   private async getOrderedPostIds(
-    params: { boardId?: string; authorId?: string; commenterId?: string; blockedUserIds: string[]; reportedPostIds?: string[]; search?: string; category?: string; isAdmin?: boolean },
+    params: {
+      boardId?: string;
+      authorId?: string;
+      commenterId?: string;
+      blockedUserIds: string[];
+      reportedPostIds?: string[];
+      search?: string;
+      category?: string;
+      isAdmin?: boolean;
+      includeDeletedPosts?: boolean;
+    },
     sortBy: 'mostLiked' | 'trending',
     limit: number,
     skip: number,
   ): Promise<string[]> {
     const conditions: Prisma.Sql[] = [
       ...(!params.isAdmin ? [Prisma.sql`"isActive" = true`] : []),
-      Prisma.sql`"isDeleted" = false`,
+      ...(!params.includeDeletedPosts ? [Prisma.sql`"isDeleted" = false`] : []),
     ];
     if (params.boardId) {
       conditions.push(Prisma.sql`"boardId" = ${params.boardId}`);
@@ -200,8 +210,9 @@ export class PostService {
   }
 
   async findAll(query: QueryPostsDto, userId?: string, isAdmin: boolean = false) {
-    const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
+    const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category, includeDeleted } = query;
     const skip = (page - 1) * limit;
+    const includeDeletedPosts = isAdmin && includeDeleted === true;
 
     // Get blocked user IDs if userId is provided
     let blockedUserIds: string[] = [];
@@ -240,7 +251,7 @@ export class PostService {
 
     // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
     if (search) {
-      return this.findAllWithFTS(query, blockedUserIds, reportedPostIds, userId, isAdmin);
+      return this.findAllWithFTS(query, blockedUserIds, reportedPostIds, userId, isAdmin, includeDeletedPosts);
     }
 
     // If authorId or commenterId is specified and that user is blocked, return empty results
@@ -261,7 +272,7 @@ export class PostService {
 
     const where: Prisma.PostWhereInput = {
       ...(!isAdmin && { isActive: true }),
-      isDeleted: false,
+      ...(!includeDeletedPosts && { isDeleted: false }),
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
       ...(commenterId && {
@@ -377,7 +388,14 @@ export class PostService {
     };
   }
 
-  private async findAllWithFTS(query: QueryPostsDto, blockedUserIds: string[] = [], reportedPostIds: string[] = [], userId?: string, isAdmin: boolean = false) {
+  private async findAllWithFTS(
+    query: QueryPostsDto,
+    blockedUserIds: string[] = [],
+    reportedPostIds: string[] = [],
+    userId?: string,
+    isAdmin: boolean = false,
+    includeDeletedPosts: boolean = false,
+  ) {
     const { boardId, authorId, commenterId, page = 1, limit = 20, search, sortBy = 'newest', category } = query;
     const skip = (page - 1) * limit;
 
@@ -426,7 +444,7 @@ export class PostService {
 
     const where: Prisma.PostWhereInput = {
       ...(!isAdmin && { isActive: true }),
-      isDeleted: false,
+      ...(!includeDeletedPosts && { isDeleted: false }),
       ...(boardId && { boardId }),
       ...(authorId && { authorId }),
       ...(commenterId && {
@@ -456,7 +474,17 @@ export class PostService {
     if (sortBy === 'mostLiked' || sortBy === 'trending') {
       const [orderedIds, totalCount] = await Promise.all([
         this.getOrderedPostIds(
-          { boardId, authorId, commenterId, blockedUserIds, reportedPostIds: reportedIds, search, category, isAdmin },
+          {
+            boardId,
+            authorId,
+            commenterId,
+            blockedUserIds,
+            reportedPostIds: reportedIds,
+            search,
+            category,
+            isAdmin,
+            includeDeletedPosts,
+          },
           sortBy,
           limit,
           skip,
@@ -544,7 +572,7 @@ export class PostService {
     };
   }
 
-  async findOne(id: string, userId?: string): Promise<Post> {
+  async findOne(id: string, userId?: string, isAdmin: boolean = false): Promise<Post> {
     let blockedUserIds: string[] = [];
     if (userId) {
       const blocks = await this.prisma.block.findMany({
@@ -618,6 +646,10 @@ export class PostService {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
+    if (post.isDeleted && !isAdmin) {
+      throw new NotFoundException(`Post with ID ${id} not found`);
+    }
+
     // Calculate comment count excluding blocked users and reported comments
     const commentCountWhere: Prisma.CommentWhereInput = {
       postId: post.id,
@@ -652,7 +684,7 @@ export class PostService {
     userId: string,
     isAdmin: boolean = false,
   ): Promise<Post> {
-    const post = await this.findOne(id, userId);
+    const post = await this.findOne(id, userId, isAdmin);
 
     // Check if user is the author or admin
     if (post.authorId !== userId && !isAdmin) {
