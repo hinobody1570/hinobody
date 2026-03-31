@@ -8,6 +8,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableShutdownHooks();
 
   // WebSocket: use Socket.IO adapter for chat
   app.useWebSocketAdapter(new IoAdapter(app));
