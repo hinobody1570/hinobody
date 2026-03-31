@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MdOutlineArticle, MdOutlineComment, MdOutlineMail } from "react-icons/md";
-import { useToast } from "@/contexts/ToastContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginRequiredModal } from "./LoginRequiredModal";
 
@@ -23,8 +22,8 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
   const popupRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const tPostCard = useTranslations("postCard");
-  const { showInfo } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user: currentUser } = useAuth();
+  const isOwnProfile = currentUser?.id === authorId;
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   const redirectToLogin = () => {
@@ -82,10 +81,7 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
   };
 
   const handleSendMessage = () => {
-    router.push(`${ROUTE_PATHS.CHAT}`);
-
-    // showInfo(tPostCard("sendMessageComingSoon") || "Send message - Coming soon");
-    setIsOpen(false);
+    handleNavigateWithAuth(`${ROUTE_PATHS.CHAT}?with=${encodeURIComponent(authorId)}`);
   };
 
   return (
@@ -128,14 +124,16 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
               <MdOutlineComment size={20} className="text-gray-700 flex-shrink-0" />
               <span className="text-sm font-medium text-gray-800">{tPostCard("viewCommentsByThisUser")}</span>
             </button>
-            <button
-              type="button"
-              onClick={handleSendMessage}
-              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 transition-colors text-left cursor-pointer"
-            >
-              <MdOutlineMail size={20} className="text-gray-700 flex-shrink-0" />
-              <span className="text-sm font-medium text-gray-800">{tPostCard("sendMessage")}</span>
-            </button>
+            {!isOwnProfile && (
+              <button
+                type="button"
+                onClick={handleSendMessage}
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-100 transition-colors text-left cursor-pointer"
+              >
+                <MdOutlineMail size={20} className="text-gray-700 flex-shrink-0" />
+                <span className="text-sm font-medium text-gray-800">{tPostCard("sendMessage")}</span>
+              </button>
+            )}
           </div>,
           document.body,
         )}
