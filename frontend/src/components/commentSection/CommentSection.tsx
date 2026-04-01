@@ -24,11 +24,13 @@ const transformComment = (
 ): any => {
   return {
     id: comment.id,
+    authorId: comment.authorId,
     username: comment.author?.nickname || (t ? t('anonymous') : 'Anonymous'),
     avatar: DP, // Default avatar
     badge: comment.authorId === postAuthorId ? 'OP' : undefined,
     timestamp: formatTimestamp(comment.createdAt, tTime),
     text: comment.body,
+    isDeleted: comment.isDeleted,
     upvotes: comment.upvoteCount || 0,
     downvotes: comment.downvoteCount || 0,
     edited: comment.updatedAt !== comment.createdAt,

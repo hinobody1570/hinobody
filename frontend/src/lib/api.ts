@@ -824,6 +824,10 @@ export const commentsApi = {
     const response = await api.post<ApiResponse<Comment>>(API_END_POINT.COMMENTS, createCommentDto);
     return (response as any)?.data ?? response;
   },
+  update: async (id: string, dto: { body?: string }): Promise<Comment> => {
+    const response = await api.patch<ApiResponse<Comment>>(`${API_END_POINT.COMMENTS}/${id}`, dto);
+    return (response as any)?.data ?? response;
+  },
   getAllAdmin: async (params: QueryCommentsParams = {}): Promise<CommentsResponse> => {
     const { page = 1, limit = 20, postId, authorId, search } = params;
     const queryParams = new URLSearchParams({

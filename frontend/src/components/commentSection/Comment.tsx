@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BiMessageSquare } from "react-icons/bi";
 import { HiOutlineThumbDown, HiOutlineThumbUp } from "react-icons/hi";
 import { PiNavigationArrow } from "react-icons/pi";
@@ -11,11 +11,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
 import { ReportModal } from "../modals/ReportModal";
 import { useRouter } from "next/navigation";
 import { ROUTE_PATHS } from "@/routes/paths";
 import { LoginRequiredModal } from "../modals/LoginRequiredModal";
+import { ConfirmationModal } from "../modals/ConfirmationModal";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 interface commentType {
   comment: any;
@@ -25,37 +26,8 @@ interface commentType {
   onReplyAdded?: () => void;
 }
 
-const getMenuItems = (t: any, onReportClick: () => void, isAuthenticated: boolean, showError: (message: string) => void) => [
-  // {
-  //   icon: FiEyeOff,
-  //   label: t("hide"),
-  //   onClick: () => console.log("Hide clicked"),
-  // },
-  {
-    icon: FaLayerGroup,
-    label: t("report"),
-    onClick: () => {
-      if (isAuthenticated) {
-        onReportClick();
-      } else {
-        showError(t("pleaseLoginToReport"));
-      }
-    },
-  },
-  // {
-  //   icon: BiInfoCircle,
-  //   label: t("aboutThisAd"),
-  //   onClick: () => console.log("About clicked"),
-  // },
-  // {
-  //   icon: BiGlobe,
-  //   label: t("tiredOfAds"),
-  //   onClick: () => console.log("Ads clicked"),
-  // },
-];
-
 const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: commentType) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user: currentUser } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
   const router = useRouter();
@@ -72,6 +44,26 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
   const [showReportModal, setShowReportModal] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(comment.text || "");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [localDeleted, setLocalDeleted] = useState<boolean>(!!comment?.isDeleted);
+  const [localText, setLocalText] = useState<string>(comment.text || "");
+
+  const isOwnComment = !!currentUser?.id && !!comment?.authorId && currentUser.id === comment.authorId;
+  const isOwnPost = !!currentUser?.id && !!postAuthorId && currentUser.id === postAuthorId;
+  const hasReplies = Array.isArray(comment?.replies) && comment.replies.length > 0;
+  const canReport = !isOwnComment && !isOwnPost;
+
+  useEffect(() => {
+    setEditText(comment?.text || "");
+    setLocalText(comment?.text || "");
+    setLocalDeleted(!!comment?.isDeleted);
+    setIsEditing(false);
+    setDeleteModalOpen(false);
+  }, [comment?.id]);
 
   const goLogin = () => {
     const current = `${window.location.pathname}${window.location.search}`;
@@ -232,6 +224,114 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
     }
   };
 
+  const handleStartEdit = () => {
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!isOwnComment || localDeleted) return;
+    setEditText(localText);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditText(localText);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!isOwnComment || !comment?.id || isUpdating || localDeleted) return;
+
+    const next = editText.trim();
+    if (!next) {
+      showError(t('pleaseEnterComment'));
+      return;
+    }
+    if (next === localText) {
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      setIsUpdating(true);
+      await commentsApi.update(comment.id, { body: next });
+      setLocalText(next);
+      setIsEditing(false);
+      showSuccess(t('commentUpdatedSuccess') || 'Comment updated');
+      onReplyAdded?.(); // refresh thread from API
+    } catch (err: any) {
+      console.error('Error updating comment:', err);
+      showError(err?.message || t('commentUpdateError') || 'Failed to update comment');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!isAuthenticated) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!isOwnComment || !comment?.id || isDeleting) return;
+
+    try {
+      setIsDeleting(true);
+      await commentsApi.delete(comment.id);
+      showSuccess(t('commentDeletedSuccess') || 'Comment deleted');
+      setDeleteModalOpen(false);
+      // If this comment has replies, keep the thread and show placeholder immediately.
+      if (hasReplies) {
+        setLocalDeleted(true);
+        setLocalText("");
+      }
+      onReplyAdded?.(); // refresh thread from API (also needed for delete-with-replies)
+    } catch (err: any) {
+      console.error('Error deleting comment:', err);
+      showError(err?.message || t('deleteCommentError') || 'Failed to delete comment');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const menuItems = useMemo(() => {
+    const items: any[] = [];
+
+    if (isOwnComment && !localDeleted) {
+      items.push(
+        {
+          icon: FiEdit2,
+          label: t('edit') || 'Edit',
+          onClick: handleStartEdit,
+        },
+        {
+          icon: FiTrash2,
+          label: t('delete') || 'Delete',
+          onClick: () => setDeleteModalOpen(true),
+        },
+      );
+    }
+
+    if (canReport) {
+      items.push({
+        icon: FaLayerGroup,
+        label: t("report"),
+        onClick: () => {
+          if (isAuthenticated) {
+            setShowReportModal(true);
+          } else {
+            showError(t("pleaseLoginToReport"));
+          }
+        },
+      });
+    }
+
+    return items;
+  }, [t, isOwnComment, localDeleted, canReport, isAuthenticated]);
+
   const replyFormMarginLeft = level > 0
     ? "ml-4 sm:ml-6 md:ml-12"
     : "ml-9 sm:ml-11 md:ml-14";
@@ -284,7 +384,38 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
           {!isCollapsed && (
             <>
               <div className={`text-sm text-gray-800 mb-2 sm:mb-3 break-words ${comment.highlighted ? "bg-yellow-50 p-2 sm:p-3 rounded" : ""}`}>
-                {comment.text}
+                {localDeleted ? (
+                  <span className="text-gray-500 italic">{t('commentDeleted') || 'Comment deleted'}</span>
+                ) : isEditing ? (
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      disabled={isUpdating}
+                      className="w-full min-h-[80px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveEdit}
+                        disabled={isUpdating || !editText.trim()}
+                        className="px-3 py-1.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {isUpdating ? '...' : (t('save') || 'Save')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        disabled={isUpdating}
+                        className="px-3 py-1.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {t('cancel') || 'Cancel'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  localText
+                )}
               </div>
 
               {/* Comment Actions - wrap on mobile */}
@@ -344,9 +475,11 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
                 )}
 
                 {/* More Options */}
-                <div className="hover:bg-gray-100 rounded-full cursor-pointer ml-auto -mr-1">
-                  <DropdownMenu items={getMenuItems(t, () => setShowReportModal(true), isAuthenticated, showError)} />
-                </div>
+                {menuItems.length > 0 && (
+                  <div className="hover:bg-gray-100 rounded-full cursor-pointer ml-auto -mr-1">
+                    <DropdownMenu items={menuItems} />
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -413,6 +546,17 @@ const Comment = ({ comment, level = 0, postId, postAuthorId, onReplyAdded }: com
         onSubmit={handleReportSubmit}
         title={tPostCard('reportComment')}
         isLoading={isReporting}
+      />
+
+      <ConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => (isDeleting ? null : setDeleteModalOpen(false))}
+        onConfirm={handleDelete}
+        title={t('deleteComment') || 'Delete comment'}
+        description={hasReplies ? (t('deleteCommentWithRepliesWarning') || 'This comment has replies. The comment will be deleted but replies will remain.') : (t('confirmDeleteCommentMessage') || 'Are you sure you want to delete this comment?')}
+        confirmText={t('delete') || 'Delete'}
+        confirmButtonColor="red"
+        isLoading={isDeleting}
       />
 
       <LoginRequiredModal

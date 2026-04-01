@@ -203,10 +203,14 @@ export class CommentService {
 
     const where: Prisma.CommentWhereInput = {
       postId,
-      isActive: true,
-      isDeleted: false,
       parentId: null, // Top-level comments only
       ...(authorId && { authorId }),
+      OR: [
+        // Normal visible comments
+        { isActive: true, isDeleted: false },
+        // Soft-deleted comments that still have visible replies (keep the thread, show placeholder in UI)
+        { isDeleted: true, replies: { some: { isActive: true, isDeleted: false } } },
+      ],
       // Exclude comments from blocked users (only if authorId is not specified)
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: {
