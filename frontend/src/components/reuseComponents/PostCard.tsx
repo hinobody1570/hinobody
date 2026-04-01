@@ -28,9 +28,11 @@ interface PostCardProps {
   onCommentAdded?: () => void;
   /** Callback when vote changes (upvoteDelta, downvoteDelta from API response) */
   onVoteChange?: (postId: string, upvoteDelta: number, downvoteDelta: number) => void;
+  /** Admin only: include deleted/inactive comments when fetching */
+  commentsIncludeDeleted?: boolean;
 }
 
-export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCommentAdded: onCommentAddedProp, onVoteChange }: PostCardProps) => {
+export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCommentAdded: onCommentAddedProp, onVoteChange, commentsIncludeDeleted = false }: PostCardProps) => {
   const t = useTranslations("feed");
   const tToast = useTranslations("toast");
   const tPostCard = useTranslations("postCard");
@@ -408,6 +410,7 @@ export const PostCard = ({ post, onDelete, commentCount: commentCountProp, onCom
         <CommentsSection
           postId={post?.id}
           postAuthorId={post?.authorId}
+          includeDeleted={commentsIncludeDeleted}
           onCommentAdded={() => {
             if (commentCountProp === undefined) {
               setCommentCount((prev: number) => prev + 1);

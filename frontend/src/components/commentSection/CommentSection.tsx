@@ -43,10 +43,12 @@ interface CommentsSectionProps {
   postId: string;
   postAuthorId?: string;
   onCommentAdded?: () => void;
+  /** Admin only: include deleted/inactive comments */
+  includeDeleted?: boolean;
 }
 
 // Main Comments Section Component
-export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: CommentsSectionProps) => {
+export const CommentsSection = ({ postId, postAuthorId, onCommentAdded, includeDeleted = false }: CommentsSectionProps) => {
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
@@ -93,7 +95,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
         setLoading(true);
       }
       setError(null);
-      const response = await commentsApi.getByPost(postId, page, 20, search);
+      const response = await commentsApi.getByPost(postId, page, 20, search, includeDeleted);
 
       if (append) {
         setComments((prev) => [...prev, ...response.data]);
@@ -110,7 +112,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [postId, postAuthorId]);
+  }, [postId, postAuthorId, includeDeleted]);
 
   // Handle search with debounce
   useEffect(() => {

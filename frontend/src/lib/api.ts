@@ -809,13 +809,16 @@ export interface QueryCommentsParams {
 }
 
 export const commentsApi = {
-  getByPost: async (postId: string, page: number = 1, limit: number = 20, search?: string): Promise<CommentsResponse> => {
+  getByPost: async (postId: string, page: number = 1, limit: number = 20, search?: string, includeDeleted?: boolean): Promise<CommentsResponse> => {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
     });
     if (search) {
       params.append('search', search);
+    }
+    if (includeDeleted === true) {
+      params.append('includeDeleted', 'true');
     }
     const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/post/${postId}?${params.toString()}`);
     return (response as any)?.data ?? response;

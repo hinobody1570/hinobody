@@ -116,14 +116,14 @@ export class PostService {
     posts: any[],
     blockedUserIds: string[],
     reportedCommentIds: string[] = [],
+    includeDeletedComments: boolean = false,
   ): Promise<any[]> {
     const postIds = posts.map((p) => p.id);
     const counts = await this.prisma.comment.groupBy({
       by: ['postId'],
       where: {
         postId: { in: postIds },
-        isActive: true,
-        isDeleted: false,
+        ...(includeDeletedComments ? {} : { isActive: true, isDeleted: false }),
         ...(blockedUserIds.length > 0 && { authorId: { notIn: blockedUserIds } }),
         ...(reportedCommentIds.length > 0 && { id: { notIn: reportedCommentIds } }),
       },
@@ -350,7 +350,7 @@ export class PostService {
             commentCount: post._count.comments,
             _count: { ...post._count, comments: post._count.comments },
           }))
-        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds, reportedCommentIds);
+        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds, reportedCommentIds, isAdmin);
 
     // Filter posts by board visibility and membership (unless admin)
     const filteredPosts = isAdmin
@@ -534,7 +534,7 @@ export class PostService {
             commentCount: post._count.comments,
             _count: { ...post._count, comments: post._count.comments },
           }))
-        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds, reportedCommentIds);
+        : await this.enrichPostsWithFilteredCommentCounts(posts, blockedUserIds, reportedCommentIds, isAdmin);
 
     // Filter posts by board visibility and membership (unless admin)
     const filteredPosts = isAdmin
@@ -650,11 +650,11 @@ export class PostService {
       throw new NotFoundException(`Post with ID ${id} not found`);
     }
 
-    // Calculate comment count excluding blocked users and reported comments
+    // Calculate comment count.
+    // Admin should see full totals (including deleted/inactive) for accurate moderation stats.
     const commentCountWhere: Prisma.CommentWhereInput = {
       postId: post.id,
-      isActive: true,
-      isDeleted: false,
+      ...(isAdmin ? {} : { isActive: true, isDeleted: false }),
       ...(blockedUserIds.length > 0 && { authorId: { notIn: blockedUserIds } }),
       ...(reportedCommentIds.length > 0 && { id: { notIn: reportedCommentIds } }),
     };
@@ -804,18 +804,13 @@ export class PostService {
       }
     }
 
-    // Soft-delete associated comments (including nested replies)
-    // and soft-delete the post in the same transaction.
-    await this.prisma.$transaction([
-      this.prisma.comment.updateMany({
-        where: { postId: id },
-        data: { isDeleted: true, isActive: false },
-      }),
-      this.prisma.post.update({
-        where: { id },
-        data: { isDeleted: true, isActive: false },
-      }),
-    ]);
+    // Soft-delete the post.
+    // IMPORTANT: Do not soft-delete comments here, otherwise admin comment counts become 0
+    // and historical comment counts are lost in admin views.
+    await this.prisma.post.update({
+      where: { id },
+      data: { isDeleted: true, isActive: false },
+    });
   }
 
   // Get home feed (all boards combined)

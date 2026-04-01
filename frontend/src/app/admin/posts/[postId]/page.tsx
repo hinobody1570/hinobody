@@ -11,6 +11,7 @@ import Image from "next/image";
 import DP from "../../../../../public/assets/images/avatar_default_4.png";
 import { ROUTE_PATHS } from "@/routes/paths";
 import Loading from "@/components/reuseComponents/Loading";
+import { CommentsSection } from "@/components/commentSection/CommentSection";
 
 const transformPost = (post: Post, tTime: (key: string, values?: Record<string, number | string>) => string): any => {
   return {
@@ -184,7 +185,12 @@ export default function AdminPostDetailPage() {
         {/* Post Card Preview */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-xl font-bold text-gray-900 mb-4">{t("postPreview")}</h3>
-          <PostCard {...transformedPost} post={transformedPost} />
+          <PostCard {...transformedPost} post={transformedPost} commentsIncludeDeleted />
+        </div>
+
+        {/* Comments (Admin) */}
+        <div className="mt-6">
+          <CommentsSection postId={post.id} postAuthorId={post.authorId} includeDeleted />
         </div>
       </div>
     </div>
