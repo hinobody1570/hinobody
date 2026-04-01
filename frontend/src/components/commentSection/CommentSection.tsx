@@ -57,6 +57,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded, includeD
   const tRef = useRef(t);
   tRef.current = t;
   const tTime = useTranslations('timeAgo');
+  const newCommentInputRef = useRef<HTMLInputElement | null>(null);
   const [sortBy, setSortBy] = useState(t('best'));
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +71,17 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded, includeD
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  // When the comment section is opened (mounted), focus the input.
+  // Only do this for authenticated users to avoid auto-opening the login modal via onFocus.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    // Defer one tick so the element is definitely in the DOM.
+    const raf = window.requestAnimationFrame(() => {
+      newCommentInputRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [isAuthenticated]);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -205,6 +217,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded, includeD
       <form onSubmit={handleSubmitComment} className="mb-4 sm:mb-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
           <input
+            ref={newCommentInputRef}
             type="text"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
