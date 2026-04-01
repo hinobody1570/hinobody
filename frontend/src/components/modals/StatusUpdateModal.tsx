@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FiX } from "react-icons/fi";
 
@@ -25,6 +25,11 @@ export const StatusUpdateModal = ({
 }: StatusUpdateModalProps) => {
   const t = useTranslations("admin");
   const [selectedStatus, setSelectedStatus] = useState(currentStatus);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setSelectedStatus(currentStatus || statusOptions[0]?.value || "");
+  }, [isOpen, currentStatus, statusOptions]);
 
   if (!isOpen) return null;
 
