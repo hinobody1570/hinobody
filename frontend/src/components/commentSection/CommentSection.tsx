@@ -24,11 +24,13 @@ const transformComment = (
 ): any => {
   return {
     id: comment.id,
+    authorId: comment.authorId,
     username: comment.author?.nickname || (t ? t('anonymous') : 'Anonymous'),
     avatar: DP, // Default avatar
     badge: comment.authorId === postAuthorId ? 'OP' : undefined,
     timestamp: formatTimestamp(comment.createdAt, tTime),
     text: comment.body,
+    isDeleted: comment.isDeleted,
     upvotes: comment.upvoteCount || 0,
     downvotes: comment.downvoteCount || 0,
     edited: comment.updatedAt !== comment.createdAt,
@@ -41,10 +43,12 @@ interface CommentsSectionProps {
   postId: string;
   postAuthorId?: string;
   onCommentAdded?: () => void;
+  /** Admin only: include deleted/inactive comments */
+  includeDeleted?: boolean;
 }
 
 // Main Comments Section Component
-export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: CommentsSectionProps) => {
+export const CommentsSection = ({ postId, postAuthorId, onCommentAdded, includeDeleted = false }: CommentsSectionProps) => {
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const { locale } = useLanguage();
@@ -53,6 +57,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
   const tRef = useRef(t);
   tRef.current = t;
   const tTime = useTranslations('timeAgo');
+  const newCommentInputRef = useRef<HTMLInputElement | null>(null);
   const [sortBy, setSortBy] = useState(t('best'));
   const [comments, setComments] = useState<CommentType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +71,17 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  // When the comment section is opened (mounted), focus the input.
+  // Only do this for authenticated users to avoid auto-opening the login modal via onFocus.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    // Defer one tick so the element is definitely in the DOM.
+    const raf = window.requestAnimationFrame(() => {
+      newCommentInputRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [isAuthenticated]);
 
   // Map locale to Language enum
   const getLanguage = (): Language => {
@@ -91,7 +107,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
         setLoading(true);
       }
       setError(null);
-      const response = await commentsApi.getByPost(postId, page, 20, search);
+      const response = await commentsApi.getByPost(postId, page, 20, search, includeDeleted);
 
       if (append) {
         setComments((prev) => [...prev, ...response.data]);
@@ -108,7 +124,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [postId, postAuthorId]);
+  }, [postId, postAuthorId, includeDeleted]);
 
   // Handle search with debounce
   useEffect(() => {
@@ -201,6 +217,7 @@ export const CommentsSection = ({ postId, postAuthorId, onCommentAdded }: Commen
       <form onSubmit={handleSubmitComment} className="mb-4 sm:mb-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
           <input
+            ref={newCommentInputRef}
             type="text"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}

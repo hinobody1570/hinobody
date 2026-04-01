@@ -61,6 +61,26 @@ export const AuthorPopup = ({ authorId, authorName, children }: AuthorPopupProps
     };
   }, [isOpen]);
 
+  // Close on scroll / other page interactions so popup doesn't stay open while user moves around.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const close = () => setIsOpen(false);
+
+    // Use capture so it also catches scroll events from nested scroll containers (feeds, modals, etc).
+    window.addEventListener("scroll", close, { capture: true, passive: true });
+    window.addEventListener("wheel", close, { passive: true });
+    window.addEventListener("touchmove", close, { passive: true });
+    window.addEventListener("resize", close);
+
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("wheel", close);
+      window.removeEventListener("touchmove", close);
+      window.removeEventListener("resize", close);
+    };
+  }, [isOpen]);
+
   const handleNavigateWithAuth = (path: string) => {
     if (!isAuthenticated) {
       setIsOpen(false);

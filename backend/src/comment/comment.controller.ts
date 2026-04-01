@@ -75,12 +75,14 @@ export class CommentController {
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
   @ApiQuery({ name: 'search', required: false, description: 'Search term' })
   @ApiQuery({ name: 'authorId', required: false, description: 'Filter by author ID' })
+  @ApiQuery({ name: 'includeDeleted', required: false, description: 'Admin only: include deleted comments', type: Boolean })
   findByPost(
     @Param('postId') postId: string,
     @Query() query: QueryCommentsDto,
     @GetUser('id') userId?: string,
+    @GetUser('role') role?: string,
   ) {
-    return this.commentService.findByPost(postId, { ...query, postId }, userId);
+    return this.commentService.findByPost(postId, { ...query, postId }, userId, role === 'ADMIN');
   }
 
   @Get(':id')

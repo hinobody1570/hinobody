@@ -161,9 +161,10 @@ export class CommentService {
     };
   }
 
-  async findByPost(postId: string, query?: QueryCommentsDto, userId?: string) {
-    const { page = 1, limit = 20, search, authorId } = query || {};
+  async findByPost(postId: string, query?: QueryCommentsDto, userId?: string, isAdmin: boolean = false) {
+    const { page = 1, limit = 20, search, authorId, includeDeleted } = query || {};
     const skip = (page - 1) * limit;
+    const allowDeleted = isAdmin && includeDeleted === true;
 
     // Get blocked user IDs if userId is provided
     let blockedUserIds: string[] = [];
@@ -198,15 +199,19 @@ export class CommentService {
 
     // Use PostgreSQL FTS when search is provided, otherwise use Prisma query builder
     if (search) {
-      return this.findByPostWithFTS(postId, query, blockedUserIds, reportedCommentIds);
+      return this.findByPostWithFTS(postId, query, blockedUserIds, reportedCommentIds, allowDeleted);
     }
 
     const where: Prisma.CommentWhereInput = {
       postId,
-      isActive: true,
-      isDeleted: false,
       parentId: null, // Top-level comments only
       ...(authorId && { authorId }),
+      OR: [
+        // Normal visible comments
+        { isActive: true, isDeleted: false },
+        // Soft-deleted comments that still have visible replies (keep the thread, show placeholder in UI)
+        { isDeleted: true, replies: { some: { isActive: true, isDeleted: false } } },
+      ],
       // Exclude comments from blocked users (only if authorId is not specified)
       ...(!authorId && blockedUserIds.length > 0 && {
         authorId: {
@@ -215,6 +220,12 @@ export class CommentService {
       }),
       ...(reportedCommentIds.length > 0 && { id: { notIn: reportedCommentIds } }),
     };
+
+    if (allowDeleted) {
+      // Admin: include deleted/inactive comments too (still respecting blocked/report filters)
+      delete (where as any).OR;
+      (where as any).OR = [{}, ...((where as any).OR ?? [])];
+    }
 
     const [topLevelComments, total] = await Promise.all([
       this.prisma.comment.findMany({
@@ -255,7 +266,7 @@ export class CommentService {
     };
   }
 
-  private async findByPostWithFTS(postId: string, query: QueryCommentsDto, blockedUserIds: string[] = [], reportedCommentIds: string[] = []) {
+  private async findByPostWithFTS(postId: string, query: QueryCommentsDto, blockedUserIds: string[] = [], reportedCommentIds: string[] = [], includeDeleted: boolean = false) {
     const { page = 1, limit = 20, search, authorId } = query;
     const skip = (page - 1) * limit;
 
@@ -275,8 +286,7 @@ export class CommentService {
     // Search ALL comments (including replies) - not just top-level
     const matchWhere: Prisma.CommentWhereInput = {
       postId,
-      isActive: true,
-      isDeleted: false,
+      ...(includeDeleted ? {} : { isActive: true, isDeleted: false }),
       body: {
         contains: search,
         mode: 'insensitive',

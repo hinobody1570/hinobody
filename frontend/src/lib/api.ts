@@ -809,7 +809,7 @@ export interface QueryCommentsParams {
 }
 
 export const commentsApi = {
-  getByPost: async (postId: string, page: number = 1, limit: number = 20, search?: string): Promise<CommentsResponse> => {
+  getByPost: async (postId: string, page: number = 1, limit: number = 20, search?: string, includeDeleted?: boolean): Promise<CommentsResponse> => {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -817,11 +817,18 @@ export const commentsApi = {
     if (search) {
       params.append('search', search);
     }
+    if (includeDeleted === true) {
+      params.append('includeDeleted', 'true');
+    }
     const response = await api.get<ApiResponse<CommentsResponse>>(`${API_END_POINT.COMMENTS}/post/${postId}?${params.toString()}`);
     return (response as any)?.data ?? response;
   },
   create: async (createCommentDto: CreateCommentDto): Promise<Comment> => {
     const response = await api.post<ApiResponse<Comment>>(API_END_POINT.COMMENTS, createCommentDto);
+    return (response as any)?.data ?? response;
+  },
+  update: async (id: string, dto: { body?: string }): Promise<Comment> => {
+    const response = await api.patch<ApiResponse<Comment>>(`${API_END_POINT.COMMENTS}/${id}`, dto);
     return (response as any)?.data ?? response;
   },
   getAllAdmin: async (params: QueryCommentsParams = {}): Promise<CommentsResponse> => {
