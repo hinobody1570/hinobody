@@ -41,7 +41,7 @@ const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState<Board | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<PostCategory | null>("Free Board");
+  const [selectedCategory, setSelectedCategory] = useState<PostCategory | null>("Reviews");
   const [showCommunity, setShowCommunity] = useState(false);
   const [boards, setBoards] = useState<Board[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -390,7 +390,13 @@ const CreatePost = () => {
                       <span className="text-white text-xs font-bold">r</span>
                     </div>
                     <span className="text-sm font-semibold text-gray-700 truncate min-w-0">
-                      {selectedCommunity ? `r/${selectedCommunity.name}` : selectedCategory ? selectedCategory : t("selectMenu")}
+                     {selectedCommunity
+  ? `r/${selectedCommunity.name}`
+  : selectedCategory
+    ? selectedCategory === "Reviews"
+      ? "Face Check"
+      : selectedCategory
+    : t("selectMenu")}
                     </span>
                     <BiChevronDown size={16} className="text-gray-600 flex-shrink-0" />
                   </button>
@@ -426,7 +432,9 @@ const CreatePost = () => {
                             <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                               <span className="text-blue-600 text-xs font-bold">#</span>
                             </div>
-                            <p className="text-sm font-semibold text-gray-900">{t(labelKey)}</p>
+                           <p className="text-sm font-semibold text-gray-900">
+  {value === "Reviews" ? "Face Check" : t(labelKey)}
+</p>
                           </button>
                         ))}
                       </div>
