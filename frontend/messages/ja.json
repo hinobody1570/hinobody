@@ -834,6 +834,7 @@
       "poll": "投票"
     },
     "titlePlaceholder": "タイトル*",
+    "faceCheckTitlePlaceholder": "顔のどの部分を改善したいですか？",
     "addTags": "タグを追加",
     "addTagTitle": "タグを追加",
     "addTag": "タグを追加",
