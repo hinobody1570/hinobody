@@ -834,7 +834,8 @@
       "link": "Link",
       "poll": "Poll"
     },
-    "titlePlaceholder": "What would you like to improve about your face?",
+    "titlePlaceholder": "Title*",
+    "faceCheckTitlePlaceholder": "What would you like to improve about your face?",
     "addTags": "Add tags",
     "addTagTitle": "Add tag",
     "addTag": "Add Tag",
