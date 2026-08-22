@@ -832,7 +832,8 @@
       "link": "링크",
       "poll": "투표"
     },
-    "titlePlaceholder": "얼굴에서 어떤 부분을 개선하고 싶나요?",
+    "titlePlaceholder": "제목*",
+    "faceCheckTitlePlaceholder": "얼굴에서 어떤 부분을 개선하고 싶나요?",
     "addTags": "태그 추가",
     "addTagTitle": "태그 추가",
     "addTag": "태그 추가",
