@@ -834,6 +834,7 @@
       "poll": "投票"
     },
     "titlePlaceholder": "标题*",
+    "faceCheckTitlePlaceholder": "你想改善脸部的哪些方面？",
     "addTags": "添加标签",
     "addTagTitle": "添加标签",
     "addTag": "添加标签",
