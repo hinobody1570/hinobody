@@ -484,7 +484,11 @@ const CreatePost = () => {
               <div className="mb-3 sm:mb-4">
                 <input
                   type="text"
-                  placeholder={t("titlePlaceholder")}
+                 placeholder={
+  selectedCategory === "Reviews"
+    ? t("faceCheckTitlePlaceholder")
+    : t("titlePlaceholder")
+}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   maxLength={300}
