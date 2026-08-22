@@ -503,7 +503,7 @@
     "home": "Home",
     "chat": "Messages",
     "news": "News",
-    "reviews": "Reviews",
+    "reviews": "Face Check",
     "recommend": "Recommend",
     "freeBoard": "Free Board",
     "popular": "Popular",
@@ -862,7 +862,7 @@
     "communitiesLabel": "Communities",
     "categories": {
       "news": "News",
-      "reviews": "Reviews",
+      "reviews": "Face Check",
       "recommend": "Recommend",
       "freeBoard": "Free Board"
     },
