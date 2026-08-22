@@ -545,7 +545,13 @@ const CreatePost = () => {
 
         {/* Right sidebar - Image upload card */}
         <div className="lg:w-80 flex-shrink-0 mt-[55px]">
-          <div className="lg:sticky lg:top-4">
+         <div
+  className={`lg:sticky lg:top-4 ${
+    selectedCategory === "Reviews"
+      ? "rounded-2xl border-2 border-blue-500 bg-blue-50 p-2 shadow-md"
+      : ""
+  }`}
+>
             <PostImageUploadCard imageIds={postImageIds} onImagesReady={setPostImageIds} />
           </div>
         </div>
