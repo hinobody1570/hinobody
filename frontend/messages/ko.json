@@ -823,6 +823,8 @@
     "noBoardsFound": "보드를 찾을 수 없습니다",
     "addImages": "이미지 추가",
     "addImagesHint": "업로드 또는 카메라로 눈 마스킹",
+    "faceCheckPhotoTitle": "얼굴 사진을 올려주세요",
+"faceCheckPhotoHint": "개인정보 보호를 위해 게시 전 눈 부분을 가릴 수 있습니다.",
     "imagesAttached": "개 이미지 첨부됨",
     "maxImagesExceeded": "게시물당 최대 5장의 이미지만 업로드할 수 있습니다.",
     "addImageWithMasking": "이미지 추가 (눈 마스킹)",
