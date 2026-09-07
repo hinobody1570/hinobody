@@ -241,7 +241,9 @@ export const RedditFeed = () => {
             {/* Category filter label (when viewing a category) */}
             {categoryFromUrl && (
               <div className="text-sm text-gray-600 mb-2">
-                {t('showingCategory', { category: categoryFromUrl })}
+                {t('showingCategory', {
+  category: categoryFromUrl === "Reviews" ? "Face Check" : categoryFromUrl
+})}
               </div>
             )}
             {/* Sort Options */}
