@@ -18,7 +18,7 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
     id: post.id,
     boardId: post.boardId, // Add boardId for membership checks
     authorId: post.authorId, // Add authorId for comment OP badge
-    commcommunity: post.board?.name
+    community: post.board?.name
   ? `r/${post.board.name}`
   : post.postCategory === "Reviews"
     ? "Face Check"
