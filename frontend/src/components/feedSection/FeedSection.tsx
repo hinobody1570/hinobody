@@ -246,6 +246,29 @@ export const RedditFeed = () => {
 })}
               </div>
             )}
+            {/* Face Check Hero */}
+{categoryFromUrl === "Reviews" && (
+  <div className="mb-5 rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+          Get honest feedback on your face
+        </h2>
+
+        <p className="mt-1 text-sm sm:text-base text-gray-600">
+          Share anonymously, protect your identity, and hear what real people think.
+        </p>
+      </div>
+
+      <a
+        href="/main/create-post?category=Reviews"
+        className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-gray-900 px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
+      >
+        Start a Face Check
+      </a>
+    </div>
+  </div>
+)}
             {/* Sort Options */}
             <div className="flex items-center gap-2 mb-4">
               <div className="relative" ref={dropdownRef}>
