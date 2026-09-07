@@ -469,6 +469,17 @@ const CreatePost = () => {
                 </div>
               )}
             </div>
+            {/* Face Check - Main Image Upload */}
+            {selectedCategory === "Reviews" && (
+              <div className="px-3 sm:px-4 md:px-6 pb-4 sm:pb-5">
+                <div className="rounded-2xl border-2 border-blue-500 bg-blue-50 p-2 shadow-sm">
+                  <PostImageUploadCard
+                    imageIds={postImageIds}
+                    onImagesReady={setPostImageIds}
+                  />
+                </div>
+              </div>
+            )}
             {/* Tabs */}
             <div className="px-3 sm:px-4 md:px-6 border-b border-gray-200 overflow-x-auto">
               <div className="flex flex-nowrap gap-4 sm:gap-8 md:gap-12 min-w-min">
@@ -543,19 +554,17 @@ const CreatePost = () => {
           <PostingGuide />
         </div>
 
-        {/* Right sidebar - Image upload card */}
-        <div className="lg:w-80 flex-shrink-0 mt-[55px]">
-         <div
-  className={`lg:sticky lg:top-4 ${
-    selectedCategory === "Reviews"
-      ? "rounded-2xl border-2 border-blue-500 bg-blue-50 p-2 shadow-md"
-      : ""
-  }`}
->
-            <PostImageUploadCard imageIds={postImageIds} onImagesReady={setPostImageIds} />
+        {/* Right sidebar - Image upload card for non-Face Check posts */}
+        {selectedCategory !== "Reviews" && (
+          <div className="lg:w-80 flex-shrink-0 mt-[55px]">
+            <div className="lg:sticky lg:top-4">
+              <PostImageUploadCard
+                imageIds={postImageIds}
+                onImagesReady={setPostImageIds}
+              />
+            </div>
           </div>
-        </div>
-      </div>
+        )}
 
       {/* Join Board Popup */}
       <JoinBoardPopup
