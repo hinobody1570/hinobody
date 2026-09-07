@@ -565,7 +565,7 @@ const CreatePost = () => {
             </div>
           </div>
         )}
-
+        </div>
       {/* Join Board Popup */}
       <JoinBoardPopup
         board={boardToJoin}
