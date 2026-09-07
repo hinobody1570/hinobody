@@ -18,7 +18,11 @@ const transformPost = (post: Post, tTime: (key: string, values?: Record<string, 
     id: post.id,
     boardId: post.boardId, // Add boardId for membership checks
     authorId: post.authorId, // Add authorId for comment OP badge
-    community: post.board?.name ? `r/${post.board.name}` : post.postCategory ? post.postCategory : "r/community",
+    commcommunity: post.board?.name
+  ? `r/${post.board.name}`
+  : post.postCategory === "Reviews"
+    ? "Face Check"
+    : post.postCategory || "r/community",
     communityAvatar: DP, // Default avatar
     verified: false, // Can be enhanced later based on board settings
     timestamp: formatTimestamp(post.createdAt, tTime),
@@ -38,7 +42,11 @@ const transformRecentPost = (post: Post, tTime: (key: string, values?: Record<st
   const downvoteCount = post.downvoteCount ?? 0;
   return {
     id: post.id,
-    community: post.board?.name ? `r/${post.board.name}` : post.postCategory || "r/community",
+    community: post.board?.name
+  ? `r/${post.board.name}`
+  : post.postCategory === "Reviews"
+    ? "Face Check"
+    : post.postCategory || "r/community",
     avatar: DP, // Default avatar
     timestamp: formatTimestamp(post.createdAt, tTime),
     title: post.title,
