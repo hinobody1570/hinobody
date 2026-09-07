@@ -91,6 +91,8 @@ const CreatePost = () => {
   const [boardToJoin, setBoardToJoin] = useState<Board | null>(null);
   const [postImageIds, setPostImageIds] = useState<string[]>([]);
   const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [isOwnPhotoConfirmed, setIsOwnPhotoConfirmed] = useState(false);
+const [isAdultConfirmed, setIsAdultConfirmed] = useState(false);
 
   // Load post for edit mode
   useEffect(() => {
@@ -159,6 +161,17 @@ const CreatePost = () => {
       showError(t("titleRequired"));
       return;
     }
+    if (!editPostId && selectedCategory === "Reviews") {
+  if (!isOwnPhotoConfirmed) {
+    showError("Please confirm that the photo is of you.");
+    return;
+  }
+
+  if (!isAdultConfirmed) {
+    showError("You must be 18 or older to post a Face Check.");
+    return;
+  }
+}
 
     const hasSelection = selectedCommunity || selectedCategory;
     if (!editPostId && !hasSelection) {
@@ -235,6 +248,8 @@ const CreatePost = () => {
       setSelectedCategory(null);
       setTags([]);
       setPostImageIds([]);
+      setIsOwnPhotoConfirmed(false);
+setIsAdultConfirmed(false);
 
       router.push(ROUTE_PATHS.HOME);
     } catch (error: any) {
@@ -578,7 +593,40 @@ const CreatePost = () => {
               <div className="border border-gray-300 rounded-lg overflow-x-auto overflow-y-hidden">
                 <RichTextEditor value={body} onChange={(text: any) => setBody(text)} />
               </div>
+{/* Face Check Safety Confirmation */}
+{selectedCategory === "Reviews" && !editPostId && (
+  <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
+    <div className="space-y-3">
+      <label className="flex items-start gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={isOwnPhotoConfirmed}
+          onChange={(e) => setIsOwnPhotoConfirmed(e.target.checked)}
+          className="mt-1 h-4 w-4"
+        />
+        <span className="text-sm text-gray-800">
+          This is a photo of me.
+        </span>
+      </label>
 
+      <label className="flex items-start gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={isAdultConfirmed}
+          onChange={(e) => setIsAdultConfirmed(e.target.checked)}
+          className="mt-1 h-4 w-4"
+        />
+        <span className="text-sm text-gray-800">
+          I am 18 or older.
+        </span>
+      </label>
+    </div>
+
+    <p className="mt-4 text-xs text-gray-500">
+      Community opinions are for informational purposes only and are not medical advice.
+    </p>
+  </div>
+)}
               {/* Action Buttons */}
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
                 {/* <button
