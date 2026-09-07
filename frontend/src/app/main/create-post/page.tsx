@@ -162,6 +162,10 @@ const [isAdultConfirmed, setIsAdultConfirmed] = useState(false);
       return;
     }
     if (!editPostId && selectedCategory === "Reviews") {
+      if (postImageIds.length === 0) {
+  showError("Please upload a photo for your Face Check.");
+  return;
+}
   if (!isOwnPhotoConfirmed) {
     showError("Please confirm that the photo is of you.");
     return;
