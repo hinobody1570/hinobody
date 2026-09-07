@@ -26,6 +26,44 @@ const POST_CATEGORIES: { value: PostCategory; labelKey: string }[] = [
 
 // Main Create Post Component
 const VALID_CATEGORIES: PostCategory[] = ["News", "Reviews", "Recommend", "Free Board"];
+const FACE_CHECK_PROMPTS = [
+  {
+    label: "Overall",
+    title: "What should I improve first?",
+  },
+  {
+    label: "Skin",
+    title: "What could I improve about my skin?",
+  },
+  {
+    label: "Eyes / Under-eye",
+    title: "What could I improve around my eyes or under-eye area?",
+  },
+  {
+    label: "Nose",
+    title: "What could I improve about my nose?",
+  },
+  {
+    label: "Jawline",
+    title: "What could I improve about my jawline?",
+  },
+  {
+    label: "Volume",
+    title: "Would improving facial volume help me?",
+  },
+  {
+    label: "Wrinkles",
+    title: "What could I improve about my wrinkles?",
+  },
+  {
+    label: "Lifting",
+    title: "Would lifting treatment improve my face?",
+  },
+  {
+    label: "After Treatment",
+    title: "How does my face look after treatment?",
+  },
+];
 
 const CreatePost = () => {
   const t = useTranslations("createPost");
@@ -491,6 +529,27 @@ const CreatePost = () => {
 
             {/* Form Content */}
             <div className="p-3 sm:p-4 md:p-6">
+              {/* Face Check Quick Questions */}
+{selectedCategory === "Reviews" && (
+  <div className="mb-5">
+    <p className="text-sm font-semibold text-gray-800 mb-3">
+      What would you like feedback on?
+    </p>
+
+    <div className="flex flex-wrap gap-2">
+      {FACE_CHECK_PROMPTS.map((prompt) => (
+        <button
+          key={prompt.label}
+          type="button"
+          onClick={() => setTitle(prompt.title)}
+          className="px-4 py-2 text-sm font-medium border border-gray-300 rounded-full bg-white text-gray-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+        >
+          {prompt.label}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
               {/* Title Input */}
               <div className="mb-3 sm:mb-4">
                 <input
